@@ -31,9 +31,9 @@
                                 <td>{{ $technician->specialtyService ? $technician->specialtyService->name : 'Sin especialidad' }}</td>
                                 <td>
                                     @if($technician->active)
-                                        <span class="badge badge-success">Activo</span>
+                                        <span class="badge badge-success badge-lg">Activo</span>
                                     @else
-                                        <span class="badge badge-danger">Inactivo</span>
+                                        <span class="badge badge-danger badge-lg">Inactivo</span>
                                     @endif
                                 </td>
                                 <td>

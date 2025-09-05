@@ -23,14 +23,20 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="service_request_id" class="form-label">Solicitud de Servicio</label>
-                                    <select class="form-select @error('service_request_id') is-invalid @enderror" id="service_request_id" name="service_request_id" required>
+                                    <select class="form-select @error('service_request_id') is-invalid @enderror" id="service_request_id" name="service_request_id" required {{ $selectedRequest ? 'disabled' : '' }}>
                                         <option value="">Seleccione una solicitud...</option>
                                         @foreach($pendingRequests as $request)
-                                            <option value="{{ $request->id }}" {{ old('service_request_id') == $request->id ? 'selected' : '' }}>
+                                            <option value="{{ $request->id }}" {{ old('service_request_id', $selectedRequest?->id) == $request->id ? 'selected' : '' }}>
                                                 {{ $request->service->name }} - {{ $request->client_name }}
                                             </option>
                                         @endforeach
                                     </select>
+                                    @if($selectedRequest)
+                                        <input type="hidden" name="service_request_id" value="{{ $selectedRequest->id }}">
+                                        <div class="alert alert-info mt-2">
+                                            <strong>Solicitud seleccionada:</strong> {{ $selectedRequest->service->name }} - {{ $selectedRequest->client_name }}
+                                        </div>
+                                    @endif
                                     @error('service_request_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

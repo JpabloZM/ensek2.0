@@ -27,6 +27,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <!-- Estilos personalizados -->
+    <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
     <style>
         html, body {
             height: 100%;

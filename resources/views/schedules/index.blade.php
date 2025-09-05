@@ -31,7 +31,48 @@
     </div>
 
     <div class="row">
-        <div class="col-12 mb-3">
+        <!-- Solicitudes de servicio pendientes -->
+        <div class="col-lg-3 col-md-4 d-none d-md-block mb-3">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white py-2">
+                    <h6 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Solicitudes Pendientes
+                        <span class="badge bg-light text-primary ms-2">{{ count($pendingRequests) }}</span>
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush pending-requests-list" style="max-height: 650px; overflow-y: auto;">
+                        @forelse($pendingRequests as $request)
+                            <div class="list-group-item list-group-item-action py-3 lh-sm">
+                                <div class="d-flex w-100 justify-content-between mb-1">
+                                    <h6 class="mb-1 text-primary">{{ $request->service->name }}</h6>
+                                    <small class="text-muted">{{ $request->created_at->diffForHumans() }}</small>
+                                </div>
+                                <p class="mb-1">{{ $request->client_name }}</p>
+                                <small class="d-block mb-2">{{ Str::limit($request->description, 60) }}</small>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ route('admin.schedules.create', ['service_request_id' => $request->id]) }}" class="btn btn-outline-primary">
+                                        <i class="fas fa-calendar-plus"></i> Agendar
+                                    </a>
+                                    <a href="{{ route('admin.service-requests.show', $request->id) }}" class="btn btn-outline-info">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="list-group-item py-4 text-center text-muted">
+                                <i class="fas fa-check-circle fa-2x mb-2"></i>
+                                <p class="mb-0">No hay solicitudes pendientes</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calendario -->
+        <div class="col-lg-9 col-md-8 col-12 mb-3">
             <div class="card">
                 <div class="card-body p-0 p-sm-3">
                     <div class="calendar-container overflow-hidden">
@@ -41,6 +82,11 @@
             </div>
         </div>
     </div>
+    
+    <!-- Botón flotante para mostrar solicitudes en móviles -->
+    <button type="button" class="btn btn-primary rounded-circle position-fixed d-md-none" id="showPendingRequestsBtn" style="bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 1050;">
+        <i class="fas fa-clipboard-list fa-lg"></i>
+    </button>
 </div>
 
 <!-- Modal para crear nuevo agendamiento -->
@@ -194,6 +240,51 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para mostrar solicitudes pendientes en dispositivos móviles -->
+<div class="modal fade" id="pendingRequestsModal" tabindex="-1" aria-labelledby="pendingRequestsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="pendingRequestsModalLabel">
+                    <i class="fas fa-clipboard-list me-2"></i>Solicitudes Pendientes
+                    <span class="badge bg-light text-primary ms-2">{{ count($pendingRequests) }}</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="list-group list-group-flush">
+                    @forelse($pendingRequests as $request)
+                        <div class="list-group-item list-group-item-action py-3 lh-sm">
+                            <div class="d-flex w-100 justify-content-between mb-1">
+                                <h6 class="mb-1 text-primary">{{ $request->service->name }}</h6>
+                                <small class="text-muted">{{ $request->created_at->diffForHumans() }}</small>
+                            </div>
+                            <p class="mb-1">{{ $request->client_name }}</p>
+                            <small class="d-block mb-2">{{ Str::limit($request->description, 60) }}</small>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{{ route('admin.schedules.create', ['service_request_id' => $request->id]) }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-calendar-plus"></i> Agendar
+                                </a>
+                                <a href="{{ route('admin.service-requests.show', $request->id) }}" class="btn btn-outline-info">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="list-group-item py-4 text-center text-muted">
+                            <i class="fas fa-check-circle fa-2x mb-2"></i>
+                            <p class="mb-0">No hay solicitudes pendientes</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('styles')
@@ -205,7 +296,7 @@
     }
 
     .technician-calendar {
-        height: 700px;
+        height: 650px;
         max-width: 100%;
     }
     
@@ -278,6 +369,34 @@
         width: 100%;
     }
     
+    /* Estilos para la lista de solicitudes pendientes */
+    .pending-requests-list {
+        scrollbar-width: thin;
+    }
+    
+    .pending-requests-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .pending-requests-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .pending-requests-list::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    /* Estilos para el botón flotante */
+    #showPendingRequestsBtn {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+    }
+    
+    #showPendingRequestsBtn:hover {
+        transform: scale(1.05);
+    }
+    
     /* Estilos responsivos para el calendario */
     @media (max-width: 992px) {
         .technician-calendar {
@@ -290,6 +409,16 @@
         
         .fc-toolbar-chunk {
             margin-bottom: 0.5rem;
+        }
+        
+        /* Ajuste para evitar que los eventos se desborden en tablets */
+        .fc-event-title {
+            white-space: normal !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
     }
     
@@ -316,6 +445,36 @@
         .fc .fc-toolbar-title {
             font-size: 1.2em;
         }
+        
+        /* Optimizar visualización en móviles */
+        .fc-resource-timeline-divider {
+            display: none !important;
+        }
+        
+        .fc-event {
+            margin: 1px 0 !important;
+            padding: 2px !important;
+        }
+    }
+    
+    /* Optimizaciones adicionales para pantallas muy pequeñas */
+    @media (max-width: 480px) {
+        .fc-toolbar-chunk .fc-button-group {
+            display: flex;
+            width: 100%;
+        }
+        
+        .fc-toolbar-chunk .fc-button-group .fc-button {
+            flex: 1;
+        }
+        
+        .fc-resource-timeline-header {
+            font-size: 0.9em;
+        }
+        
+        .technician-calendar {
+            height: 450px;
+        }
     }
 </style>
 @endpush
@@ -333,18 +492,27 @@
         const isMobile = window.innerWidth < 768;
         const isTablet = window.innerWidth >= 768 && window.innerWidth < 992;
         
+        // Configuración para el botón de solicitudes pendientes en móviles
+        const showPendingRequestsBtn = document.getElementById('showPendingRequestsBtn');
+        if (showPendingRequestsBtn) {
+            showPendingRequestsBtn.addEventListener('click', function() {
+                const pendingRequestsModal = new bootstrap.Modal(document.getElementById('pendingRequestsModal'));
+                pendingRequestsModal.show();
+            });
+        }
+        
         // Inicializar el calendario con más funcionalidades
         const calendarEl = document.getElementById('technician-calendar');
         const calendar = new FullCalendar.Calendar(calendarEl, {
-            // Vista principal
-            initialView: 'resourceTimelineDay',
+            // Vista principal - ajustar según tamaño de pantalla
+            initialView: isMobile ? 'timeGridDay' : 'resourceTimelineDay',
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
             
             // Barra de herramientas personalizada
             headerToolbar: {
-                left: 'today dayGridMonth,timeGridWeek,resourceTimelineDay',
+                left: isMobile ? 'today' : 'today dayGridMonth,timeGridWeek,resourceTimelineDay',
                 center: 'title',
-                right: 'prevYear,prev,next,nextYear'
+                right: isMobile ? 'prev,next' : 'prevYear,prev,next,nextYear'
             },
             
             // Configuración de tiempo
@@ -355,7 +523,7 @@
             
             // Personalización de la vista
             resourceAreaWidth: isMobile ? '25%' : (isTablet ? '20%' : '15%'),
-            height: 'auto',
+            height: isMobile ? 'auto' : undefined,
             
             // Datos iniciales
             resources: resources,
@@ -365,7 +533,7 @@
             editable: true,
             eventResourceEditable: true,
             nowIndicator: true,
-            navLinks: true,
+            navLinks: !isMobile, // desactivar en móviles
             selectable: true,
             selectMirror: true,
             allDaySlot: false,
@@ -521,21 +689,39 @@
         }
         
         // Responder a cambios en el tamaño de la ventana
-        document.addEventListener('app:resize', function(e) {
-            const isMobile = e.detail.isMobile;
-            const isTablet = e.detail.isTablet;
+        window.addEventListener('resize', function() {
+            const width = window.innerWidth;
+            const isMobile = width < 768;
+            const isTablet = width >= 768 && width < 992;
             
             // Actualizar configuración del calendario según el tamaño de pantalla
             calendar.setOption('slotDuration', isMobile ? '01:00:00' : '00:30:00');
             calendar.setOption('resourceAreaWidth', isMobile ? '25%' : (isTablet ? '20%' : '15%'));
             
+            // Ajustar vista del calendario según el dispositivo
+            if (isMobile && calendar.view.type.includes('resource')) {
+                calendar.changeView('timeGridDay');
+                calendar.setOption('headerToolbar', {
+                    left: 'today',
+                    center: 'title',
+                    right: 'prev,next'
+                });
+            } else if (!isMobile && calendar.view.type === 'timeGridDay') {
+                calendar.changeView('resourceTimelineDay');
+                calendar.setOption('headerToolbar', {
+                    left: 'today dayGridMonth,timeGridWeek,resourceTimelineDay',
+                    center: 'title',
+                    right: 'prevYear,prev,next,nextYear'
+                });
+            }
+            
             // Forzar refrescado del calendario
             calendar.updateSize();
             
             // Refrescar eventos para asegurar que se muestran correctamente
-            if (window.innerWidth < 500) {
+            if (width < 500) {
                 calendar.setOption('eventMaxStack', 1);
-            } else if (window.innerWidth < 768) {
+            } else if (width < 768) {
                 calendar.setOption('eventMaxStack', 2);
             } else {
                 calendar.setOption('eventMaxStack', 3);

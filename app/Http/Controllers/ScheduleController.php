@@ -142,7 +142,7 @@ class ScheduleController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         // Obtener técnicos activos
         $technicians = Technician::where('active', true)
@@ -153,8 +153,14 @@ class ScheduleController extends Controller
         $pendingRequests = ServiceRequest::where('status', 'pendiente')
             ->with('service')
             ->get();
+        
+        // Si se especifica una solicitud específica
+        $selectedRequest = null;
+        if ($request->has('service_request_id')) {
+            $selectedRequest = ServiceRequest::with('service')->findOrFail($request->service_request_id);
+        }
             
-        return view('schedules.create', compact('technicians', 'pendingRequests'));
+        return view('schedules.create', compact('technicians', 'pendingRequests', 'selectedRequest'));
     }
 
     /**
@@ -184,7 +190,7 @@ class ScheduleController extends Controller
         $serviceRequest->status = 'agendado';
         $serviceRequest->save();
         
-        return redirect()->route('schedules.index')
+        return redirect()->route('admin.schedules.index')
             ->with('success', 'Agendamiento creado correctamente.');
     }
 

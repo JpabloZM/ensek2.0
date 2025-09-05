@@ -50,6 +50,27 @@ class ServiceSeeder extends Seeder
                 'duration' => 90, // en minutos
                 'active' => true
             ],
+            [
+                'name' => 'Reparación de Aire Acondicionado',
+                'description' => 'Servicio de reparación y mantenimiento para sistemas de aire acondicionado',
+                'price' => 280.00,
+                'duration' => 150, // en minutos
+                'active' => true
+            ],
+            [
+                'name' => 'Mantenimiento de Refrigeradores',
+                'description' => 'Servicio de mantenimiento preventivo y correctivo para refrigeradores',
+                'price' => 220.00,
+                'duration' => 120, // en minutos
+                'active' => true
+            ],
+            [
+                'name' => 'Instalación de Lavadoras',
+                'description' => 'Servicio de instalación y configuración de lavadoras',
+                'price' => 180.00,
+                'duration' => 90, // en minutos
+                'active' => true
+            ],
         ];
 
         foreach ($services as $service) {

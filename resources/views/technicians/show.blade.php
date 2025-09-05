@@ -86,9 +86,9 @@
                                             <th>Estado</th>
                                             <td>
                                                 @if($technician->active)
-                                                    <span class="badge badge-success">Activo</span>
+                                                    <span class="badge badge-success badge-lg">Activo</span>
                                                 @else
-                                                    <span class="badge badge-danger">Inactivo</span>
+                                                    <span class="badge badge-danger badge-lg">Inactivo</span>
                                                 @endif
                                             </td>
                                         </tr>
@@ -128,19 +128,19 @@
                                                             <td>
                                                                 @switch($schedule->status)
                                                                     @case('pending')
-                                                                        <span class="badge badge-warning">Pendiente</span>
+                                                                        <span class="badge badge-warning badge-lg">Pendiente</span>
                                                                         @break
                                                                     @case('in_progress')
-                                                                        <span class="badge badge-info">En Progreso</span>
+                                                                        <span class="badge badge-info badge-lg">En Progreso</span>
                                                                         @break
                                                                     @case('completed')
-                                                                        <span class="badge badge-success">Completado</span>
+                                                                        <span class="badge badge-success badge-lg">Completado</span>
                                                                         @break
                                                                     @case('cancelled')
-                                                                        <span class="badge badge-danger">Cancelado</span>
+                                                                        <span class="badge badge-danger badge-lg">Cancelado</span>
                                                                         @break
                                                                     @default
-                                                                        <span class="badge badge-secondary">{{ $schedule->status }}</span>
+                                                                        <span class="badge badge-secondary badge-lg">{{ $schedule->status }}</span>
                                                                 @endswitch
                                                             </td>
                                                         </tr>

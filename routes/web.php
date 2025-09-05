@@ -39,10 +39,11 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         
         // Solicitudes de servicio
         Route::resource('service-requests', ServiceRequestController::class)->names('admin.service-requests');
+        Route::get('/service-requests/filter', [ServiceRequestController::class, 'filter'])->name('admin.service-requests.filter');
         
         // Agendamientos
         Route::resource('schedules', ScheduleController::class)->names('admin.schedules');
-        Route::patch('/schedules/{schedule}/update-duration', [ScheduleController::class, 'updateDuration'])->name('schedules.updateDuration');
+        Route::patch('/schedules/{schedule}/update-duration', [ScheduleController::class, 'updateDuration'])->name('admin.schedules.updateDuration');
     });
 });
 
