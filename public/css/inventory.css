@@ -1,0 +1,97 @@
+/* Estilos específicos para el módulo de inventario */
+
+/* Badges de estado de inventario */
+.badge-success {
+    background-color: #1cc88a;
+    color: white !important;
+}
+
+.badge-danger {
+    background-color: #e74a3b;
+    color: white !important;
+}
+
+.badge-warning {
+    background-color: #f6c23e;
+    color: #333 !important; /* Texto oscuro para mejor contraste */
+}
+
+.badge-info {
+    background-color: #36b9cc;
+    color: white !important;
+}
+
+.badge-primary {
+    background-color: #4e73df;
+    color: white !important;
+}
+
+.badge-secondary {
+    background-color: #858796;
+    color: white !important;
+}
+
+/* Clases para estados de stock */
+.low-stock {
+    background-color: #ffe8e6;
+}
+
+.critical-stock {
+    background-color: #ffcccc;
+}
+
+/* Mejoras para tablas de inventario */
+.inventory-table th {
+    background-color: #f8f9fc;
+    color: #4e73df;
+    vertical-align: middle !important;
+}
+
+.inventory-table tbody tr:hover {
+    background-color: #f1f5fb;
+}
+
+.quantity-cell {
+    font-weight: bold;
+    text-align: center;
+}
+
+.stock-indicator {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.stock-low {
+    background-color: #e74a3b;
+}
+
+.stock-medium {
+    background-color: #f6c23e;
+}
+
+.stock-good {
+    background-color: #1cc88a;
+}
+
+/* Mejoras para el modal de movimientos */
+.modal-stock .modal-header {
+    padding: 0.75rem 1rem;
+}
+
+.modal-stock.add .modal-header {
+    background-color: #1cc88a;
+    color: white;
+}
+
+.modal-stock.remove .modal-header {
+    background-color: #e74a3b;
+    color: white;
+}
+
+.modal-stock .form-control:disabled,
+.modal-stock .form-control[readonly] {
+    background-color: #eaecf4;
+}

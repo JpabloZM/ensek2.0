@@ -36,6 +36,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         
         // Ítems de inventario
         Route::resource('inventory-items', InventoryItemController::class)->names('admin.inventory-items');
+        Route::get('inventory-items/export/{format?}', [InventoryItemController::class, 'export'])->name('admin.inventory-items.export');
+        Route::get('inventory-items/{id}/print-barcode', [InventoryItemController::class, 'printBarcode'])->name('admin.inventory-items.print-barcode');
+        Route::patch('inventory-items/{id}/add-stock', [InventoryItemController::class, 'addStock'])->name('admin.inventory-items.add-stock');
+        Route::patch('inventory-items/{id}/remove-stock', [InventoryItemController::class, 'removeStock'])->name('admin.inventory-items.remove-stock');
         
         // Solicitudes de servicio
         Route::resource('service-requests', ServiceRequestController::class)->names('admin.service-requests');
