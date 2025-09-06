@@ -164,19 +164,23 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
-<script>
+<script type="text/javascript">
+    // Pasamos los datos de PHP a JavaScript mediante una variable global
+    var chartDataPendientes = parseInt("{{ $pendientes }}");
+    var chartDataAgendadas = parseInt("{{ $agendadas }}");
+    var chartDataCompletadas = parseInt("{{ $completadas }}");
+    var chartDataCanceladas = parseInt("{{ $canceladas }}");
+    
     // Gráfico de solicitudes
     document.addEventListener('DOMContentLoaded', function() {
         var ctx = document.getElementById("servicePieChart");
         
-        // Verificar si hay datos para mostrar
-        var pendientes = {{ $pendientes }};
-        var agendadas = {{ $agendadas }};
-        var completadas = {{ $completadas }};
-        var canceladas = {{ $canceladas }};
-        
-        if (pendientes === 0 && agendadas === 0 && completadas === 0 && canceladas === 0) {
-            // Si no hay datos, mostrar un mensaje
+        // Verificar si hay datos disponibles
+        var hayDatos = (chartDataPendientes > 0 || chartDataAgendadas > 0 || 
+                    chartDataCompletadas > 0 || chartDataCanceladas > 0);
+                
+        if (!hayDatos) {
+            // Si no hay datos, mostrar mensaje
             var noDataText = document.createElement('div');
             noDataText.className = 'text-center text-muted p-4';
             noDataText.innerHTML = '<i class="fas fa-chart-pie fa-3x mb-3"></i><br>No hay datos disponibles';
@@ -188,13 +192,14 @@
                 data: {
                     labels: ["Pendientes", "Agendadas", "Completadas", "Canceladas"],
                     datasets: [{
-                        data: [pendientes, agendadas, completadas, canceladas],
+                        data: [chartDataPendientes, chartDataAgendadas, chartDataCompletadas, chartDataCanceladas],
                         backgroundColor: ['#f6c23e', '#36b9cc', '#1cc88a', '#e74a3b'],
                         hoverBackgroundColor: ['#daa520', '#2c9faf', '#17a673', '#c23321'],
-                        hoverBorderColor: "rgba(234, 236, 244, 1)",
-                    }],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)"
+                    }]
                 },
                 options: {
+                    responsive: true,
                     maintainAspectRatio: false,
                     tooltips: {
                         backgroundColor: "rgb(255,255,255)",
@@ -204,13 +209,13 @@
                         xPadding: 15,
                         yPadding: 15,
                         displayColors: false,
-                        caretPadding: 10,
+                        caretPadding: 10
                     },
                     legend: {
                         display: false
                     },
-                    cutoutPercentage: 70,
-                },
+                    cutoutPercentage: 70
+                }
             });
         }
     });
