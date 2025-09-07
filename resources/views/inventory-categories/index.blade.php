@@ -87,26 +87,24 @@
                                     <span class="badge badge-primary badge-pill">{{ $category->inventoryItems->count() }}</span>
                                 </td>
                                 <td>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('admin.inventory-items.index', ['category' => $category->id]) }}" class="btn btn-info" title="Ver productos">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-warning btn-edit" title="Editar" 
-                                            data-toggle="modal" 
-                                            data-target="#editCategoryModal" 
-                                            data-id="{{ $category->id }}" 
-                                            data-name="{{ $category->name }}" 
-                                            data-description="{{ $category->description }}">
-                                            <i class="fas fa-edit"></i>
+                                    <button type="button" class="btn btn-sm btn-warning btn-edit" title="Editar" 
+                                        data-toggle="modal" 
+                                        data-target="#editCategoryModal" 
+                                        data-id="{{ $category->id }}" 
+                                        data-name="{{ $category->name }}" 
+                                        data-description="{{ $category->description }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <a href="{{ route('admin.inventory-items.index', ['category' => $category->id]) }}" class="btn btn-sm btn-info" title="Ver productos">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <form action="{{ route('admin.inventory-categories.destroy', $category->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar" {{ $category->inventoryItems->count() > 0 ? 'disabled' : '' }}>
+                                            <i class="fas fa-trash"></i>
                                         </button>
-                                        <form action="{{ route('admin.inventory-categories.destroy', $category->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger" title="Eliminar" {{ $category->inventoryItems->count() > 0 ? 'disabled' : '' }}>
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
+                                    </form>
                                 </td>
                             </tr>
                         @empty

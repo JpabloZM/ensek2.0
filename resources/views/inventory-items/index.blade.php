@@ -171,29 +171,27 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('admin.inventory-items.show', $item->id) }}" class="btn btn-info" title="Ver detalles">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.inventory-items.edit', $item->id) }}" class="btn btn-warning" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-success btn-add-stock" title="Añadir Stock" 
-                                            data-toggle="modal" data-target="#addStockModal" 
-                                            data-id="{{ $item->id }}" 
-                                            data-name="{{ $item->name }}" 
-                                            data-code="{{ $item->code }}"
-                                            data-current="{{ $item->quantity }}">
-                                            <i class="fas fa-plus-circle"></i>
+                                    <a href="{{ route('admin.inventory-items.edit', $item->id) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ route('admin.inventory-items.show', $item->id) }}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-success btn-add-stock" title="Añadir Stock" 
+                                        data-toggle="modal" data-target="#addStockModal" 
+                                        data-id="{{ $item->id }}" 
+                                        data-name="{{ $item->name }}" 
+                                        data-code="{{ $item->code }}"
+                                        data-current="{{ $item->quantity }}">
+                                        <i class="fas fa-plus-circle"></i>
+                                    </button>
+                                    <form action="{{ route('admin.inventory-items.destroy', $item->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este producto?')">
+                                            <i class="fas fa-trash"></i>
                                         </button>
-                                        <form action="{{ route('admin.inventory-items.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar este producto?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger" title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
+                                    </form>
                                 </td>
                             </tr>
                         @empty

@@ -94,27 +94,25 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('admin.services.show', $service->id) }}" class="btn btn-info" title="Ver detalles">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.services.edit', $service->id) }}" class="btn btn-warning" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        @if($service->service_requests_count == 0)
-                                            <form action="{{ route('admin.services.destroy', $service->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar este servicio?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger" title="Eliminar">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        @else
-                                            <button type="button" class="btn btn-secondary" title="No se puede eliminar" disabled>
+                                    <a href="{{ route('admin.services.edit', $service->id) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ route('admin.services.show', $service->id) }}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    @if($service->service_requests_count == 0)
+                                        <form action="{{ route('admin.services.destroy', $service->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este servicio?')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
-                                        @endif
-                                    </div>
+                                        </form>
+                                    @else
+                                        <button type="button" class="btn btn-sm btn-secondary" title="No se puede eliminar" disabled>
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
