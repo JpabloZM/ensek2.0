@@ -14,17 +14,28 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <!-- jQuery primero que todo -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap JS (necesario para DataTables) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    
+    <!-- DataTables con Bootstrap 5 -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     
     <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/resource-timeline@5.11.3/main.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/locales-all@5.11.3/main.min.js"></script>
     
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Scripts de Vite -->
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     
     <!-- Estilos personalizados -->
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
@@ -273,5 +284,63 @@
     </script>
     
     @stack('scripts')
+    
+    <!-- Script para asegurar que DataTables esté disponible y funcione correctamente -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si DataTables está cargado
+            if (typeof $.fn.DataTable === 'undefined') {
+                console.error('DataTables no está disponible. Intentando cargar nuevamente...');
+                // Intentar cargar DataTables de nuevo si no está disponible
+                var script = document.createElement('script');
+                script.src = 'https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js';
+                document.head.appendChild(script);
+                
+                script.onload = function() {
+                    var bootstrapScript = document.createElement('script');
+                    bootstrapScript.src = 'https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js';
+                    document.head.appendChild(bootstrapScript);
+                    
+                    bootstrapScript.onload = function() {
+                        console.log('DataTables cargado correctamente');
+                        initializeDataTables();
+                    };
+                };
+            } else {
+                // Aplicar un parche general para cualquier tabla DataTable que pueda estar causando problemas
+                setTimeout(function() {
+                    // Verificar si hay tablas con el error de conteo de columnas
+                    if ($('#dataTable').length > 0 && !$('#dataTable').hasClass('dataTable')) {
+                        console.log('Aplicando inicialización segura a la tabla');
+                        try {
+                            $('#dataTable').DataTable({
+                                "paging": false,
+                                "ordering": false,
+                                "info": false,
+                                "searching": true
+                            });
+                        } catch (e) {
+                            console.error('Error al inicializar DataTable:', e);
+                        }
+                    }
+                }, 500);
+            }
+            
+            // Función auxiliar para inicializar DataTables de forma segura
+            function initializeDataTables() {
+                if ($('#dataTable').length > 0 && !$('#dataTable').hasClass('dataTable')) {
+                    try {
+                        $('#dataTable').DataTable({
+                            "paging": false,
+                            "ordering": false,
+                            "info": false
+                        });
+                    } catch(e) {
+                        console.error('Error al inicializar DataTable:', e);
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

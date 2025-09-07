@@ -140,6 +140,10 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
+        // Primero, contamos las columnas en el encabezado de la tabla
+        var columnCount = $('#dataTable thead th').length;
+        console.log('Número de columnas detectadas en el encabezado (servicios):', columnCount);
+        
         $('#dataTable').DataTable({
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
@@ -147,13 +151,12 @@
             "paging": false,
             "info": false,
             "searching": true,
+            "ordering": true,
             "order": [[0, 'asc']],
+            // Configuración simplificada
             "columnDefs": [
-                { "orderable": false, "targets": 6 },
-                { "className": "text-center", "targets": [3, 4, 5, 6] }
-            ],
-            "responsive": true,
-            "autoWidth": false
+                { "orderable": false, "targets": [columnCount - 1] } // Última columna no ordenable (Acciones)
+            ]
         });
         
         // Mejora la experiencia de usuario al confirmar eliminación

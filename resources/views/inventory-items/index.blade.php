@@ -319,7 +319,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Configuración de DataTables
+        // Primero, contamos las columnas en el encabezado de la tabla
+        var columnCount = $('#dataTable thead th').length;
+        console.log('Número de columnas detectadas en el encabezado:', columnCount);
+        
+        // Configuración de DataTables con inicialización simple
         $('#dataTable').DataTable({
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
@@ -327,13 +331,12 @@
             "paging": false,
             "info": false,
             "searching": true,
+            "ordering": true,
             "order": [[1, 'asc']],
+            // Configuración simplificada para evitar problemas de conteo de columnas
             "columnDefs": [
-                { "orderable": false, "targets": 8 },
-                { "className": "text-center", "targets": [4, 7, 8] }
-            ],
-            "responsive": true,
-            "autoWidth": false
+                { "orderable": false, "targets": [columnCount - 1] } // Última columna no ordenable (Acciones)
+            ]
         });
         
         // SweetAlert para confirmación de eliminación
