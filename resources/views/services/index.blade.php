@@ -34,9 +34,14 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Servicios</h1>
-        <a href="{{ route('admin.services.create') }}" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-plus fa-sm text-white-50"></i> Nuevo Servicio
-        </a>
+        <div>
+            <a href="{{ route('admin.services.trashed') }}" class="d-sm-inline-block btn btn-sm btn-secondary shadow-sm mr-2">
+                <i class="fas fa-trash fa-sm text-white-50"></i> Ver Eliminados
+            </a>
+            <a href="{{ route('admin.services.create') }}" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Nuevo Servicio
+            </a>
+        </div>
     </div>
 
     <!-- Card de servicios -->
@@ -81,7 +86,10 @@
                             <tr>
                                 <td>{{ $service->name }}</td>
                                 <td>{{ Str::limit($service->description, 50) }}</td>
-                                <td>${{ number_format($service->price, 2) }}</td>
+                                <td>
+                                    <div>{{ $service->formatted_price }}</div>
+                                    <small class="text-muted">+{{ $service->tax_rate }}% IVA</small>
+                                </td>
                                 <td>{{ $service->duration }}</td>
                                 <td>
                                     <span class="badge badge-pill badge-primary">{{ $service->service_requests_count }}</span>
@@ -91,6 +99,9 @@
                                         <span class="badge badge-success badge-lg">Activo</span>
                                     @else
                                         <span class="badge badge-danger badge-lg">Inactivo</span>
+                                    @endif
+                                    @if($service->requires_technician_approval)
+                                        <br><span class="badge badge-info badge-sm mt-1">Técnico especializado</span>
                                     @endif
                                 </td>
                                 <td>

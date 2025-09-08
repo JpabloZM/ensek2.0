@@ -34,11 +34,29 @@ class ServiceController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:services',
+            'name' => 'required|string|max:255|unique:services,name,NULL,id,deleted_at,NULL',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'duration' => 'required|integer|min:0',
+            'tax_rate' => 'required|numeric|min:0|max:100',
+            'duration' => 'required|integer|min:5',
+            'special_requirements' => 'nullable|string',
+            'materials_included' => 'nullable|string',
+            'requires_technician_approval' => 'boolean',
             'active' => 'boolean',
+        ], [
+            'name.required' => 'El nombre del servicio es obligatorio.',
+            'name.unique' => 'Este nombre de servicio ya está en uso.',
+            'description.required' => 'La descripción del servicio es obligatoria.',
+            'price.required' => 'El precio es obligatorio.',
+            'price.numeric' => 'El precio debe ser un valor numérico.',
+            'price.min' => 'El precio no puede ser negativo.',
+            'tax_rate.required' => 'La tasa de impuesto es obligatoria.',
+            'tax_rate.numeric' => 'La tasa de impuesto debe ser un valor numérico.',
+            'tax_rate.min' => 'La tasa de impuesto no puede ser negativa.',
+            'tax_rate.max' => 'La tasa de impuesto no puede superar el 100%.',
+            'duration.required' => 'La duración es obligatoria.',
+            'duration.integer' => 'La duración debe ser un número entero.',
+            'duration.min' => 'La duración mínima es de 5 minutos.'
         ]);
 
         if ($validator->fails()) {
@@ -51,7 +69,11 @@ class ServiceController extends Controller
         $service->name = $request->name;
         $service->description = $request->description;
         $service->price = $request->price;
+        $service->tax_rate = $request->tax_rate;
         $service->duration = $request->duration;
+        $service->special_requirements = $request->special_requirements;
+        $service->materials_included = $request->materials_included;
+        $service->requires_technician_approval = $request->has('requires_technician_approval');
         $service->active = $request->has('active');
         $service->save();
 
@@ -93,11 +115,29 @@ class ServiceController extends Controller
         $service = Service::findOrFail($id);
         
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:services,name,' . $id,
+            'name' => 'required|string|max:255|unique:services,name,' . $id . ',id,deleted_at,NULL',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'duration' => 'required|integer|min:0',
+            'tax_rate' => 'required|numeric|min:0|max:100',
+            'duration' => 'required|integer|min:5',
+            'special_requirements' => 'nullable|string',
+            'materials_included' => 'nullable|string',
+            'requires_technician_approval' => 'boolean',
             'active' => 'boolean',
+        ], [
+            'name.required' => 'El nombre del servicio es obligatorio.',
+            'name.unique' => 'Este nombre de servicio ya está en uso.',
+            'description.required' => 'La descripción del servicio es obligatoria.',
+            'price.required' => 'El precio es obligatorio.',
+            'price.numeric' => 'El precio debe ser un valor numérico.',
+            'price.min' => 'El precio no puede ser negativo.',
+            'tax_rate.required' => 'La tasa de impuesto es obligatoria.',
+            'tax_rate.numeric' => 'La tasa de impuesto debe ser un valor numérico.',
+            'tax_rate.min' => 'La tasa de impuesto no puede ser negativa.',
+            'tax_rate.max' => 'La tasa de impuesto no puede superar el 100%.',
+            'duration.required' => 'La duración es obligatoria.',
+            'duration.integer' => 'La duración debe ser un número entero.',
+            'duration.min' => 'La duración mínima es de 5 minutos.'
         ]);
 
         if ($validator->fails()) {
@@ -109,7 +149,11 @@ class ServiceController extends Controller
         $service->name = $request->name;
         $service->description = $request->description;
         $service->price = $request->price;
+        $service->tax_rate = $request->tax_rate;
         $service->duration = $request->duration;
+        $service->special_requirements = $request->special_requirements;
+        $service->materials_included = $request->materials_included;
+        $service->requires_technician_approval = $request->has('requires_technician_approval');
         $service->active = $request->has('active');
         $service->save();
 
@@ -124,17 +168,65 @@ class ServiceController extends Controller
     {
         $service = Service::findOrFail($id);
         
-        // Verificar si hay solicitudes asociadas
-        $requestsCount = $service->serviceRequests()->count();
+        // Verificar si hay solicitudes pendientes o agendadas asociadas
+        $activeRequestsCount = $service->serviceRequests()
+                              ->whereIn('status', ['pendiente', 'agendado'])
+                              ->count();
         
-        if ($requestsCount > 0) {
+        if ($activeRequestsCount > 0) {
             return redirect()->back()
-                ->with('error', 'No se puede eliminar este servicio porque tiene solicitudes asociadas.');
+                ->with('error', 'No se puede eliminar este servicio porque tiene solicitudes pendientes o agendadas.');
         }
         
+        // Usar soft delete
         $service->delete();
         
         return redirect()->route('admin.services.index')
             ->with('success', 'Servicio eliminado correctamente');
+    }
+    
+    /**
+     * Mostrar los servicios eliminados (soft-deleted).
+     */
+    public function trashed()
+    {
+        $trashedServices = Service::onlyTrashed()
+            ->orderBy('name')
+            ->paginate(10);
+            
+        return view('services.trashed', compact('trashedServices'));
+    }
+    
+    /**
+     * Restaurar un servicio eliminado.
+     */
+    public function restore(string $id)
+    {
+        $service = Service::onlyTrashed()->findOrFail($id);
+        $service->restore();
+        
+        return redirect()->route('admin.services.index')
+            ->with('success', 'Servicio restaurado correctamente');
+    }
+    
+    /**
+     * Eliminar permanentemente un servicio.
+     */
+    public function forceDelete(string $id)
+    {
+        $service = Service::onlyTrashed()->findOrFail($id);
+        
+        // Verificar si hay solicitudes asociadas en general
+        $requestsCount = $service->serviceRequests()->count();
+        
+        if ($requestsCount > 0) {
+            return redirect()->back()
+                ->with('error', 'No se puede eliminar permanentemente este servicio porque tiene solicitudes asociadas en el historial.');
+        }
+        
+        $service->forceDelete();
+        
+        return redirect()->route('admin.services.trashed')
+            ->with('success', 'Servicio eliminado permanentemente');
     }
 }

@@ -159,7 +159,7 @@
     
     @stack('styles')
 </head>
-<body>
+<body @yield('body_attributes')>
     <div id="wrapper">
         <!-- Sidebar -->
         <div class="bg-dark border-right" id="sidebar-wrapper">

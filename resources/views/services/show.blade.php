@@ -42,8 +42,16 @@
                                 <p>{{ $service->name }}</p>
                             </div>
                             <div class="mb-3">
-                                <h6 class="font-weight-bold">Precio:</h6>
-                                <p>${{ number_format($service->price, 2) }}</p>
+                                <h6 class="font-weight-bold">Precio (sin IVA):</h6>
+                                <p>{{ $service->formatted_price }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="font-weight-bold">Tasa de impuesto:</h6>
+                                <p>{{ number_format($service->tax_rate, 2) }}%</p>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="font-weight-bold">Precio (con IVA):</h6>
+                                <p>{{ $service->formatted_price_with_tax }}</p>
                             </div>
                             <div class="mb-3">
                                 <h6 class="font-weight-bold">Duración:</h6>
@@ -51,6 +59,18 @@
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="mb-3">
+                                <h6 class="font-weight-bold">Requiere técnico especializado:</h6>
+                                <p>{{ $service->requires_technician_approval ? 'Sí' : 'No' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="font-weight-bold">Estado:</h6>
+                                <p>
+                                    <span class="badge badge-{{ $service->active ? 'success' : 'danger' }} badge-lg">
+                                        {{ $service->active ? 'Activo' : 'Inactivo' }}
+                                    </span>
+                                </p>
+                            </div>
                             <div class="mb-3">
                                 <h6 class="font-weight-bold">Fecha de Creación:</h6>
                                 <p>{{ $service->created_at->format('d/m/Y H:i') }}</p>
@@ -65,6 +85,20 @@
                         <h6 class="font-weight-bold">Descripción:</h6>
                         <p>{{ $service->description }}</p>
                     </div>
+                    
+                    @if($service->special_requirements)
+                    <div class="mb-3">
+                        <h6 class="font-weight-bold">Requisitos especiales:</h6>
+                        <p>{{ $service->special_requirements }}</p>
+                    </div>
+                    @endif
+                    
+                    @if($service->materials_included)
+                    <div class="mb-3">
+                        <h6 class="font-weight-bold">Materiales incluidos:</h6>
+                        <p>{{ $service->materials_included }}</p>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>

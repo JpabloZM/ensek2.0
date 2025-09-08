@@ -52,15 +52,64 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="form-group row">
+                    <label for="tax_rate" class="col-sm-2 col-form-label">Tasa de impuesto <span class="text-danger">*</span></label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="number" class="form-control @error('tax_rate') is-invalid @enderror" id="tax_rate" name="tax_rate" value="{{ old('tax_rate', 16) }}" step="0.01" min="0" max="100" required>
+                            <div class="input-group-append">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            @error('tax_rate')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <small class="form-text text-muted">Porcentaje de impuesto aplicable a este servicio.</small>
+                    </div>
+                </div>
 
                 <div class="form-group row">
                     <label for="duration" class="col-sm-2 col-form-label">Duración (min) <span class="text-danger">*</span></label>
                     <div class="col-sm-10">
-                        <input type="number" class="form-control @error('duration') is-invalid @enderror" id="duration" name="duration" value="{{ old('duration') }}" min="0" required>
+                        <input type="number" class="form-control @error('duration') is-invalid @enderror" id="duration" name="duration" value="{{ old('duration', 30) }}" min="5" required>
                         @error('duration')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                         <small class="form-text text-muted">Duración estimada del servicio en minutos.</small>
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <label for="special_requirements" class="col-sm-2 col-form-label">Requisitos especiales</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control @error('special_requirements') is-invalid @enderror" id="special_requirements" name="special_requirements" rows="3">{{ old('special_requirements') }}</textarea>
+                        @error('special_requirements')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Requisitos especiales para realizar este servicio (opcional).</small>
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <label for="materials_included" class="col-sm-2 col-form-label">Materiales incluidos</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control @error('materials_included') is-invalid @enderror" id="materials_included" name="materials_included" rows="3">{{ old('materials_included') }}</textarea>
+                        @error('materials_included')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Materiales incluidos en el precio del servicio (opcional).</small>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-2">Requiere técnico especializado</div>
+                    <div class="col-sm-10">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="requires_technician_approval" name="requires_technician_approval" {{ old('requires_technician_approval') ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="requires_technician_approval">Sí</label>
+                        </div>
+                        <small class="form-text text-muted">Marque si este servicio requiere un técnico con aprobación especial.</small>
                     </div>
                 </div>
 

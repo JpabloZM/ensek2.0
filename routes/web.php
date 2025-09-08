@@ -25,6 +25,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         
         // Servicios
+        Route::get('/services/trashed', [ServiceController::class, 'trashed'])->name('admin.services.trashed');
+        Route::post('/services/{service}/restore', [ServiceController::class, 'restore'])->name('admin.services.restore');
+        Route::delete('/services/{service}/force-delete', [ServiceController::class, 'forceDelete'])->name('admin.services.force-delete');
         Route::resource('services', ServiceController::class)->names('admin.services');
         
         // Técnicos
@@ -32,6 +35,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::post('/technicians/quick-add', [TechnicianController::class, 'quickAdd'])->name('admin.technicians.quick-add');
         
         // Categorías de inventario
+        Route::get('/inventory-categories/trashed', [InventoryCategoryController::class, 'trashed'])->name('admin.inventory-categories.trashed');
+        Route::post('/inventory-categories/{category}/restore', [InventoryCategoryController::class, 'restore'])->name('admin.inventory-categories.restore');
+        Route::delete('/inventory-categories/{category}/force-delete', [InventoryCategoryController::class, 'forceDelete'])->name('admin.inventory-categories.force-delete');
         Route::resource('inventory-categories', InventoryCategoryController::class)->names('admin.inventory-categories');
         
         // Ítems de inventario
