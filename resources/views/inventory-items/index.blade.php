@@ -215,15 +215,15 @@
     </div>
     
     <!-- Stock Dashboard -->
-    <div class="row">
+    <div class="row" id="dashboardRow">
         <!-- Stock General -->
         <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
+            <div class="card shadow mb-4 h-100">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Resumen de Inventario</h6>
                 </div>
-                <div class="card-body">
-                    <div class="chart-area">
+                <div class="card-body d-flex flex-column">
+                    <div class="chart-area flex-grow-1">
                         <canvas id="inventorySummaryChart"></canvas>
                     </div>
                 </div>
@@ -232,13 +232,13 @@
 
         <!-- Items con Stock Bajo -->
         <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
+            <div class="card shadow mb-4 h-100">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Items con Stock Bajo</h6>
                 </div>
-                <div class="card-body">
+                <div class="card-body d-flex flex-column">
                     @if($lowStockItems->count() > 0)
-                        <div class="list-group">
+                        <div class="list-group flex-grow-1" style="overflow-y: auto;">
                             @foreach($lowStockItems as $item)
                                 <a href="{{ route('admin.inventory-items.show', $item->id) }}" class="list-group-item list-group-item-action flex-column align-items-start">
                                     <div class="d-flex w-100 justify-content-between">
@@ -257,7 +257,7 @@
                             </div>
                         @endif
                     @else
-                        <div class="text-center py-4">
+                        <div class="text-center py-5 flex-grow-1 d-flex flex-column justify-content-center">
                             <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
                             <p class="mb-0">Todos los productos tienen stock suficiente</p>
                         </div>
@@ -570,6 +570,49 @@
                 b: Math.round(b * 255)
             };
         }
+        
+        // Función para igualar la altura de las cards en el dashboard
+        function equalizeDashboardCardHeights() {
+            const summaryCard = document.querySelector('#dashboardRow .col-xl-8 .card');
+            const lowStockCard = document.querySelector('#dashboardRow .col-xl-4 .card');
+            
+            if (summaryCard && lowStockCard) {
+                // Asegurarse de que ambas tarjetas tengan la misma altura
+                const observer = new ResizeObserver(() => {
+                    // Permitir que el DOM se actualice completamente
+                    setTimeout(() => {
+                        // Resetear alturas a automático para medir correctamente
+                        summaryCard.style.minHeight = 'auto';
+                        lowStockCard.style.minHeight = 'auto';
+                        
+                        // Obtener la altura del más grande
+                        const maxHeight = Math.max(
+                            summaryCard.offsetHeight,
+                            lowStockCard.offsetHeight
+                        );
+                        
+                        // Aplicar la misma altura a ambos
+                        if (maxHeight > 0) {
+                            summaryCard.style.minHeight = maxHeight + 'px';
+                            lowStockCard.style.minHeight = maxHeight + 'px';
+                        }
+                    }, 50);
+                });
+                
+                // Observar cambios en las dimensiones
+                observer.observe(summaryCard);
+                observer.observe(lowStockCard);
+                
+                // También ajustar al cambiar el tamaño de la ventana
+                window.addEventListener('resize', () => {
+                    observer.disconnect();
+                    equalizeDashboardCardHeights();
+                });
+            }
+        }
+        
+        // Iniciar la igualdad de alturas cuando el documento esté listo
+        equalizeDashboardCardHeights();
     });
 </script>
 @endpush
