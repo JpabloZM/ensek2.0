@@ -14,13 +14,18 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         Role::create([
-            'name' => 'admin',
-            'description' => 'Administrador del sistema',
+            'name' => 'Administrador',
+            'description' => 'Acceso completo a todas las funciones del sistema',
         ]);
         
         Role::create([
-            'name' => 'technician',
-            'description' => 'Técnico de servicio',
+            'name' => 'Técnico',
+            'description' => 'Acceso para administrar servicios, solicitudes y horarios',
+        ]);
+        
+        Role::create([
+            'name' => 'Cliente',
+            'description' => 'Acceso limitado para crear y ver solicitudes de servicio',
         ]);
     }
 }

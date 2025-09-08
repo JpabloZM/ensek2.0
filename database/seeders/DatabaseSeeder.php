@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             InventoryCategorySeeder::class,
             TechnicianSeeder::class,
             ServiceRequestSeeder::class,
+            SkillSeeder::class,
         ]);
     }
 }

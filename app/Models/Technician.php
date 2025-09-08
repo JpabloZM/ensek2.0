@@ -16,10 +16,17 @@ class Technician extends Model
      */
     protected $fillable = [
         'user_id',
-        'specialty',
-        'skills',
-        'active',
-        'availability',
+        'specialization',
+        'experience_years',
+        'certification',
+        'title',
+        'bio',
+        'status',
+        'employment_type',
+        'hire_date',
+        'profile_image',
+        'hourly_rate',
+        'rating',
     ];
     
     /**
@@ -28,7 +35,10 @@ class Technician extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'active' => 'boolean',
+        'hire_date' => 'date',
+        'hourly_rate' => 'decimal:2',
+        'rating' => 'decimal:1',
+        'experience_years' => 'integer',
     ];
     
     /**
@@ -52,6 +62,32 @@ class Technician extends Model
      */
     public function specialtyService()
     {
-        return $this->belongsTo(Service::class, 'specialty', 'id');
+        return $this->belongsTo(Service::class, 'specialty_id', 'id');
+    }
+    
+    /**
+     * Get the availability entries for the technician.
+     */
+    public function availability()
+    {
+        return $this->hasMany(TechnicianAvailability::class);
+    }
+    
+    /**
+     * Get the time off requests for the technician.
+     */
+    public function timeOffRequests()
+    {
+        return $this->hasMany(TechnicianTimeOff::class);
+    }
+    
+    /**
+     * Get the skills of the technician.
+     */
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'technician_skill')
+                    ->withPivot('proficiency_level')
+                    ->withTimestamps();
     }
 }

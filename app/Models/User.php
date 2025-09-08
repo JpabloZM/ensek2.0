@@ -61,7 +61,23 @@ class User extends Authenticatable
      */
     public function isAdmin()
     {
-        return $this->role->name === 'admin';
+        return $this->role->name === 'Administrador';
+    }
+    
+    /**
+     * Check if user is technician.
+     */
+    public function isTechnician()
+    {
+        return $this->role->name === 'Técnico';
+    }
+    
+    /**
+     * Check if user is client.
+     */
+    public function isClient()
+    {
+        return $this->role->name === 'Cliente';
     }
     
     /**

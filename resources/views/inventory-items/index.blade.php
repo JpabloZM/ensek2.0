@@ -139,7 +139,7 @@
             @endif
 
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered datatable-table" id="dt-table" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>Código</th>
@@ -319,25 +319,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Primero, contamos las columnas en el encabezado de la tabla
-        var columnCount = $('#dataTable thead th').length;
-        console.log('Número de columnas detectadas en el encabezado:', columnCount);
-        
-        // Configuración de DataTables con inicialización simple
-        $('#dataTable').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
-            },
-            "paging": false,
-            "info": false,
-            "searching": true,
-            "ordering": true,
-            "order": [[1, 'asc']],
-            // Configuración simplificada para evitar problemas de conteo de columnas
-            "columnDefs": [
-                { "orderable": false, "targets": [columnCount - 1] } // Última columna no ordenable (Acciones)
-            ]
-        });
+        console.log('Inicializando scripts de inventory-items...');
         
         // SweetAlert para confirmación de eliminación
         $('.table').on('submit', 'form', function(e) {
@@ -375,244 +357,245 @@
             $('#addStockForm').attr('action', `/admin/inventory-items/${id}/add-stock`);
         });
 
-        // Gráfico de resumen de inventario
-        if ($('#inventorySummaryChart').length > 0) {
-            const ctx = document.getElementById('inventorySummaryChart');
-            // Convertimos los datos PHP a variables JavaScript de manera segura
-            const labels = JSON.parse('@json($categoryLabels)'.replace(/&quot;/g, '"'));
-            const quantities = JSON.parse('@json($categoryQuantities)'.replace(/&quot;/g, '"'));
-            const colors = generateColors(labels.length);
-            
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Cantidad en Inventario',
-                        data: quantities,
-                        backgroundColor: colors,
-                        borderColor: colors.map(color => darkenColor(color, -20)),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    layout: {
-                        padding: {
-                            left: 10,
-                            right: 25,
-                            top: 25,
-                            bottom: 0
-                        }
-                    },
-                    scales: {
-                        xAxes: [{
-                            time: {
-                                unit: 'category'
-                            },
-                            gridLines: {
-                                display: false,
-                                drawBorder: false
-                            },
-                            ticks: {
-                                maxTicksLimit: 10
-                            },
-                            maxBarThickness: 50,
-                        }],
-                        yAxes: [{
-                            ticks: {
-                                min: 0,
-                                maxTicksLimit: 5,
-                                padding: 10,
-                                callback: function(value) {
-                                    return value;
+        // Inicializar el gráfico con un retraso
+        setTimeout(initializeInventoryChart, 500);
+        
+        // Función para inicializar el gráfico
+        function initializeInventoryChart() {
+            // Comprobar si existe el elemento del gráfico
+            if ($('#inventorySummaryChart').length > 0) {
+                try {
+                    const ctx = document.getElementById('inventorySummaryChart');
+                    
+                    // Convertir los datos PHP a variables JavaScript de manera segura
+                    let labels = [];
+                    let quantities = [];
+                    
+                    try {
+                        labels = JSON.parse('@json($categoryLabels)'.replace(/&quot;/g, '"'));
+                        quantities = JSON.parse('@json($categoryQuantities)'.replace(/&quot;/g, '"'));
+                        console.log('Datos del gráfico cargados correctamente:', labels, quantities);
+                    } catch (parseError) {
+                        console.error('Error al parsear datos del gráfico:', parseError);
+                        // Usar datos de fallback
+                        labels = ['Sin datos'];
+                        quantities = [0];
+                    }
+                    
+                    // Generar colores para el gráfico
+                    const colors = generateColors(labels.length);
+                    
+                    // Crear el gráfico con Chart.js
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: quantities,
+                                backgroundColor: colors,
+                                hoverBackgroundColor: colors,
+                                hoverBorderColor: "rgba(234, 236, 244, 1)"
+                            }]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            layout: {
+                                padding: {
+                                    left: 10,
+                                    right: 25,
+                                    top: 25,
+                                    bottom: 0
                                 }
                             },
-                            gridLines: {
-                                color: "rgb(234, 236, 244)",
-                                zeroLineColor: "rgb(234, 236, 244)",
-                                drawBorder: false,
-                                borderDash: [2],
-                                zeroLineBorderDash: [2]
-                            }
-                        }],
-                    },
-                    legend: {
-                        display: false
-                    },
-                    tooltips: {
-                        titleMarginBottom: 10,
-                        titleFontColor: '#6e707e',
-                        titleFontSize: 14,
-                        backgroundColor: "rgb(255,255,255)",
-                        bodyFontColor: "#858796",
-                        borderColor: '#dddfeb',
-                        borderWidth: 1,
-                        xPadding: 15,
-                        yPadding: 15,
-                        displayColors: false,
-                        caretPadding: 10,
-                        callbacks: {
-                            label: function(tooltipItem, chart) {
-                                return 'Cantidad: ' + tooltipItem.yLabel;
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            cutoutPercentage: 80,
+                            tooltips: {
+                                backgroundColor: "rgb(255,255,255)",
+                                bodyFontColor: "#858796",
+                                borderColor: '#dddfeb',
+                                borderWidth: 1,
+                                xPadding: 15,
+                                yPadding: 15,
+                                displayColors: false,
+                                caretPadding: 10
                             }
                         }
-                    }
+                    });
+                    console.log('Gráfico de resumen creado correctamente');
+                } catch (chartError) {
+                    console.error('Error al crear el gráfico de resumen:', chartError);
                 }
-            });
+            }
+            
+            // Inicializar el gráfico de bajo stock
+            if ($('#lowStockChart').length > 0) {
+                try {
+                    const ctx = document.getElementById('lowStockChart');
+                    
+                    // Convertir los datos PHP a variables JavaScript de manera segura
+                    let labels = [];
+                    let quantities = [];
+                    let thresholds = [];
+                    
+                    try {
+                        labels = JSON.parse('@json($lowStockLabels)'.replace(/&quot;/g, '"'));
+                        quantities = JSON.parse('@json($lowStockQuantities)'.replace(/&quot;/g, '"'));
+                        thresholds = JSON.parse('@json($lowStockThresholds)'.replace(/&quot;/g, '"'));
+                        console.log('Datos del gráfico de bajo stock cargados correctamente:', labels, quantities, thresholds);
+                    } catch (parseError) {
+                        console.error('Error al parsear datos del gráfico de bajo stock:', parseError);
+                        // Usar datos de fallback
+                        labels = ['Sin datos'];
+                        quantities = [0];
+                        thresholds = [0];
+                    }
+                    
+                    // Crear el gráfico con Chart.js
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: "Cantidad actual",
+                                    backgroundColor: "#e74a3b",
+                                    hoverBackgroundColor: "#c13228",
+                                    data: quantities
+                                },
+                                {
+                                    label: "Nivel mínimo",
+                                    backgroundColor: "#4e73df",
+                                    hoverBackgroundColor: "#2653d4",
+                                    data: thresholds
+                                }
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            layout: {
+                                padding: {
+                                    left: 10,
+                                    right: 25,
+                                    top: 25,
+                                    bottom: 0
+                                }
+                            },
+                            scales: {
+                                xAxes: [{
+                                    gridLines: {
+                                        display: false,
+                                        drawBorder: false
+                                    },
+                                    ticks: {
+                                        maxTicksLimit: 10
+                                    },
+                                    maxBarThickness: 25
+                                }],
+                                yAxes: [{
+                                    ticks: {
+                                        min: 0,
+                                        maxTicksLimit: 5,
+                                        padding: 10
+                                    },
+                                    gridLines: {
+                                        color: "rgb(234, 236, 244)",
+                                        zeroLineColor: "rgb(234, 236, 244)",
+                                        drawBorder: false,
+                                        borderDash: [2],
+                                        zeroLineBorderDash: [2]
+                                    }
+                                }]
+                            },
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltips: {
+                                titleMarginBottom: 10,
+                                titleFontColor: '#6e707e',
+                                titleFontSize: 14,
+                                backgroundColor: "rgb(255,255,255)",
+                                bodyFontColor: "#858796",
+                                borderColor: '#dddfeb',
+                                borderWidth: 1,
+                                xPadding: 15,
+                                yPadding: 15,
+                                displayColors: false,
+                                caretPadding: 10
+                            }
+                        }
+                    });
+                    console.log('Gráfico de bajo stock creado correctamente');
+                } catch (chartError) {
+                    console.error('Error al crear el gráfico de bajo stock:', chartError);
+                }
+            }
+            
+            // Igualar alturas de las tarjetas con un enfoque seguro
+            equalizeCardHeights();
         }
         
-        // Función para generar colores
+        // Función para generar colores aleatorios
         function generateColors(count) {
-            const baseColors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796', '#5a5c69'];
             const colors = [];
+            const baseColors = [
+                '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', 
+                '#858796', '#5a5c69', '#2e59d9', '#17a673', '#2c9faf'
+            ];
             
             for (let i = 0; i < count; i++) {
-                const baseColor = baseColors[i % baseColors.length];
-                const shiftAmount = Math.floor(i / baseColors.length) * 20;
-                colors.push(shiftColor(baseColor, shiftAmount));
+                if (i < baseColors.length) {
+                    colors.push(baseColors[i]);
+                } else {
+                    // Generar colores aleatorios adicionales si son necesarios
+                    const r = Math.floor(Math.random() * 255);
+                    const g = Math.floor(Math.random() * 255);
+                    const b = Math.floor(Math.random() * 255);
+                    colors.push(`rgb(${r}, ${g}, ${b})`);
+                }
             }
             
             return colors;
         }
         
-        function shiftColor(hex, amount) {
-            const rgb = hexToRgb(hex);
-            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-            
-            hsl.h = (hsl.h + amount / 360) % 1;
-            
-            const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
-            return rgbToHex(newRgb.r, newRgb.g, newRgb.b);
-        }
-        
-        function darkenColor(hex, percent) {
-            const rgb = hexToRgb(hex);
-            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-            
-            hsl.l = Math.max(0, Math.min(1, hsl.l + percent / 100));
-            
-            const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
-            return rgbToHex(newRgb.r, newRgb.g, newRgb.b);
-        }
-        
-        function hexToRgb(hex) {
-            const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-            hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-                return r + r + g + g + b + b;
-            });
-            
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? {
-                r: parseInt(result[1], 16),
-                g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16)
-            } : null;
-        }
-        
-        function rgbToHex(r, g, b) {
-            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-        }
-        
-        function rgbToHsl(r, g, b) {
-            r /= 255;
-            g /= 255;
-            b /= 255;
-            
-            const max = Math.max(r, g, b);
-            const min = Math.min(r, g, b);
-            let h, s, l = (max + min) / 2;
-            
-            if (max === min) {
-                h = s = 0; // achromatic
-            } else {
-                const d = max - min;
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        // Función simple para igualar alturas de tarjetas
+        function equalizeCardHeights() {
+            console.log('Igualando alturas de tarjetas...');
+            try {
+                // Resetear alturas primero
+                $('.card.shadow').css('height', 'auto');
                 
-                switch (max) {
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break;
-                }
-                
-                h /= 6;
-            }
-            
-            return { h, s, l };
-        }
-        
-        function hslToRgb(h, s, l) {
-            let r, g, b;
-            
-            if (s === 0) {
-                r = g = b = l; // achromatic
-            } else {
-                const hue2rgb = (p, q, t) => {
-                    if (t < 0) t += 1;
-                    if (t > 1) t -= 1;
-                    if (t < 1/6) return p + (q - p) * 6 * t;
-                    if (t < 1/2) return q;
-                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-                    return p;
-                };
-                
-                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-                const p = 2 * l - q;
-                
-                r = hue2rgb(p, q, h + 1/3);
-                g = hue2rgb(p, q, h);
-                b = hue2rgb(p, q, h - 1/3);
-            }
-            
-            return {
-                r: Math.round(r * 255),
-                g: Math.round(g * 255),
-                b: Math.round(b * 255)
-            };
-        }
-        
-        // Función para igualar la altura de las cards en el dashboard
-        function equalizeDashboardCardHeights() {
-            const summaryCard = document.querySelector('#dashboardRow .col-xl-8 .card');
-            const lowStockCard = document.querySelector('#dashboardRow .col-xl-4 .card');
-            
-            if (summaryCard && lowStockCard) {
-                // Asegurarse de que ambas tarjetas tengan la misma altura
-                const observer = new ResizeObserver(() => {
-                    // Permitir que el DOM se actualice completamente
-                    setTimeout(() => {
-                        // Resetear alturas a automático para medir correctamente
-                        summaryCard.style.minHeight = 'auto';
-                        lowStockCard.style.minHeight = 'auto';
-                        
-                        // Obtener la altura del más grande
-                        const maxHeight = Math.max(
-                            summaryCard.offsetHeight,
-                            lowStockCard.offsetHeight
-                        );
-                        
-                        // Aplicar la misma altura a ambos
-                        if (maxHeight > 0) {
-                            summaryCard.style.minHeight = maxHeight + 'px';
-                            lowStockCard.style.minHeight = maxHeight + 'px';
-                        }
-                    }, 50);
-                });
-                
-                // Observar cambios en las dimensiones
-                observer.observe(summaryCard);
-                observer.observe(lowStockCard);
-                
-                // También ajustar al cambiar el tamaño de la ventana
-                window.addEventListener('resize', () => {
-                    observer.disconnect();
-                    equalizeDashboardCardHeights();
-                });
+                // Esperar un momento para asegurar que las cartas se hayan renderizado
+                setTimeout(function() {
+                    // Encontrar la altura máxima
+                    let maxHeight = 0;
+                    $('.card.shadow').each(function() {
+                        const height = $(this).outerHeight();
+                        maxHeight = Math.max(maxHeight, height);
+                    });
+                    
+                    // Aplicar la altura máxima a todas las tarjetas
+                    if (maxHeight > 0) {
+                        $('.card.shadow').css('height', maxHeight + 'px');
+                        console.log('Alturas igualadas a ' + maxHeight + 'px');
+                    }
+                }, 300);
+            } catch (error) {
+                console.error('Error al igualar alturas:', error);
             }
         }
         
-        // Iniciar la igualdad de alturas cuando el documento esté listo
-        equalizeDashboardCardHeights();
+        // Manejar el evento de cambio de tamaño de ventana (con limitación de llamadas)
+        let resizeTimer;
+        $(window).resize(function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                equalizeCardHeights();
+            }, 250);
+        });
     });
 </script>
 @endpush

@@ -69,7 +69,7 @@
             @endif
 
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered datatable-table" id="dt-table" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>Nombre</th>
@@ -155,20 +155,7 @@
         var columnCount = $('#dataTable thead th').length;
         console.log('Número de columnas detectadas en el encabezado (servicios):', columnCount);
         
-        $('#dataTable').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
-            },
-            "paging": false,
-            "info": false,
-            "searching": true,
-            "ordering": true,
-            "order": [[0, 'asc']],
-            // Configuración simplificada
-            "columnDefs": [
-                { "orderable": false, "targets": [columnCount - 1] } // Última columna no ordenable (Acciones)
-            ]
-        });
+        console.log('Sistema de búsqueda personalizado aplicado a la tabla de servicios');
         
         // Mejora la experiencia de usuario al confirmar eliminación
         $('.table').on('submit', 'form', function(e) {
@@ -190,6 +177,8 @@
                 }
             });
         });
+    });
+</script>
     });
 </script>
 @endpush

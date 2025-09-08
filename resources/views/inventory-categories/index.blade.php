@@ -157,7 +157,7 @@
             @endif
 
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered datatable-table" id="dt-table" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th width="35%">Nombre</th>
@@ -342,20 +342,7 @@
         console.log('Número de columnas detectadas en el encabezado (categorías):', columnCount);
         
         // DataTables con configuración simple
-        $('#dataTable').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
-            },
-            "paging": false,
-            "info": false,
-            "searching": true,
-            "ordering": true,
-            "order": [[0, 'asc']],
-            // Configuración simplificada
-            "columnDefs": [
-                { "orderable": false, "targets": [columnCount - 1] } // Última columna no ordenable (Acciones)
-            ]
-        });
+        console.log('Sistema de búsqueda personalizado aplicado a la tabla de categorías');
         
         // Manejar botón de añadir subcategoría
         $('.add-subcategory-btn').click(function() {
@@ -410,9 +397,6 @@
         
         // Función para cargar subcategorías mediante AJAX
         function loadSubcategories(parentId) {
-            // Simular la carga de subcategorías
-            // En una implementación real, esto sería una llamada AJAX a un endpoint que devuelva las subcategorías
-            
             // Verificar si ya se cargaron las subcategorías para evitar duplicados
             if ($('.subcategory-row[data-parent="' + parentId + '"]').length > 0) {
                 return;
@@ -423,48 +407,14 @@
             const loadingRow = $('<tr class="subcategory-row" data-parent="' + parentId + '"><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando subcategorías...</td></tr>');
             parentRow.after(loadingRow);
             
-            // Aquí iría el código AJAX para cargar las subcategorías
-            // Por ahora, simularemos una carga con timeout
+            // Simular carga con timeout
             setTimeout(function() {
                 loadingRow.remove();
-                
-                // En una implementación real, esta información vendría del servidor
-                // Por ahora, dejamos este código comentado como referencia para la implementación futura
-                /*
-                $.ajax({
-                    url: '/admin/api/inventory-categories/' + parentId + '/children',
-                    method: 'GET',
-                    success: function(response) {
-                        // Eliminar indicador de carga
-                        loadingRow.remove();
-                        
-                        // Agregar filas de subcategorías
-                        if (response.data.length > 0) {
-                            response.data.forEach(function(subcategory) {
-                                appendSubcategoryRow(parentId, subcategory, parentRow);
-                            });
-                        } else {
-                            const emptyRow = $('<tr class="subcategory-row" data-parent="' + parentId + '"><td colspan="5" class="text-center"><i>No hay subcategorías</i></td></tr>');
-                            parentRow.after(emptyRow);
-                        }
-                    },
-                    error: function() {
-                        loadingRow.remove();
-                        const errorRow = $('<tr class="subcategory-row" data-parent="' + parentId + '"><td colspan="5" class="text-center text-danger">Error al cargar subcategorías</td></tr>');
-                        parentRow.after(errorRow);
-                    }
-                });
-                */
                 
                 // Por ahora, mostraremos un mensaje para implementación futura
                 const messageRow = $('<tr class="subcategory-row" data-parent="' + parentId + '"><td colspan="5" class="text-center font-italic">La carga de subcategorías se implementará en la próxima actualización. Por favor utilice la vista de detalles para ver las subcategorías.</td></tr>');
                 parentRow.after(messageRow);
             }, 500);
-        }
-        
-        function appendSubcategoryRow(parentId, subcategory, parentRow) {
-            // Esta función agregaría las filas de subcategorías al DOM
-            // Será implementada cuando se tenga la funcionalidad AJAX
         }
         
         // SweetAlert para confirmar eliminación

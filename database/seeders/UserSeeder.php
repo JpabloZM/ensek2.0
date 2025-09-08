@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             'name' => 'Administrador',
             'email' => 'admin@empresa.com',
             'password' => Hash::make('password'),
-            'role_id' => Role::where('name', 'admin')->first()->id,
+            'role_id' => Role::where('name', 'Administrador')->first()->id,
         ]);
         
         // Crear usuario técnico
@@ -28,8 +28,39 @@ class UserSeeder extends Seeder
             'name' => 'Técnico Demo',
             'email' => 'tecnico@empresa.com',
             'password' => Hash::make('password'),
-            'role_id' => Role::where('name', 'technician')->first()->id,
+            'role_id' => Role::where('name', 'Técnico')->first()->id,
             'phone' => '123456789',
         ]);
+        
+        // Crear usuarios clientes de ejemplo
+        User::create([
+            'name' => 'Cliente Demo',
+            'email' => 'cliente@empresa.com',
+            'password' => Hash::make('password'),
+            'role_id' => Role::where('name', 'Cliente')->first()->id,
+            'phone' => '987654321',
+        ]);
+        
+        // Crear técnicos adicionales
+        $technicians = [
+            [
+                'name' => 'Carlos Técnico',
+                'email' => 'carlos@empresa.com',
+                'password' => Hash::make('password'),
+                'phone' => '555666777',
+            ],
+            [
+                'name' => 'María Técnico',
+                'email' => 'maria@empresa.com',
+                'password' => Hash::make('password'),
+                'phone' => '777888999',
+            ],
+        ];
+        
+        foreach ($technicians as $technicianData) {
+            User::create(array_merge($technicianData, [
+                'role_id' => Role::where('name', 'Técnico')->first()->id,
+            ]));
+        }
     }
 }

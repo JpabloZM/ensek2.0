@@ -6,6 +6,7 @@ use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceRequestController;
+use App\Http\Controllers\SkillController;
 use App\Http\Controllers\TechnicianController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -20,7 +21,7 @@ Auth::routes();
 
 // Rutas para administradores
 Route::middleware(['auth'])->prefix('admin')->group(function () {
-    Route::middleware([\App\Http\Middleware\CheckRole::class . ':admin'])->group(function () {
+    Route::middleware([\App\Http\Middleware\CheckRole::class . ':Administrador'])->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         
@@ -33,6 +34,26 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         // Técnicos
         Route::resource('technicians', TechnicianController::class)->names('admin.technicians');
         Route::post('/technicians/quick-add', [TechnicianController::class, 'quickAdd'])->name('admin.technicians.quick-add');
+        
+        // Gestión de disponibilidad
+        Route::get('/technicians/{id}/availability', [TechnicianController::class, 'manageAvailability'])->name('admin.technicians.availability');
+        Route::post('/technicians/{id}/availability', [TechnicianController::class, 'storeAvailability'])->name('admin.technicians.store-availability');
+        
+        // Gestión de tiempo libre
+        Route::get('/technicians/{id}/time-off', [TechnicianController::class, 'manageTimeOff'])->name('admin.technicians.time-off');
+        Route::post('/technicians/{id}/time-off', [TechnicianController::class, 'storeTimeOff'])->name('admin.technicians.store-time-off');
+        Route::patch('/technicians/{id}/time-off/{timeOffId}', [TechnicianController::class, 'updateTimeOffStatus'])->name('admin.technicians.update-time-off');
+        
+        // Gestión de habilidades
+        Route::get('/technicians/{id}/skills', [TechnicianController::class, 'manageSkills'])->name('admin.technicians.skills');
+        Route::post('/technicians/{id}/skills', [TechnicianController::class, 'storeSkills'])->name('admin.technicians.store-skills');
+        
+        // Actualización de imagen de perfil
+        Route::post('/technicians/{id}/profile-image', [TechnicianController::class, 'updateProfileImage'])->name('admin.technicians.update-profile-image');
+        
+        // Habilidades
+        Route::resource('skills', SkillController::class)->names('admin.skills');
+        Route::get('/api/skills', [SkillController::class, 'apiList'])->name('api.skills');
         
         // Categorías de inventario
         Route::get('/inventory-categories/trashed', [InventoryCategoryController::class, 'trashed'])->name('admin.inventory-categories.trashed');
@@ -59,7 +80,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 // Rutas para técnicos
 Route::middleware(['auth'])->prefix('technician')->group(function () {
-    Route::middleware([\App\Http\Middleware\CheckRole::class . ':technician'])->group(function () {
+    Route::middleware([\App\Http\Middleware\CheckRole::class . ':Técnico'])->group(function () {
         // Dashboard para técnicos
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('technician.dashboard');
         
@@ -68,14 +89,34 @@ Route::middleware(['auth'])->prefix('technician')->group(function () {
         
         // Actualizar estado de agendamiento
         Route::patch('/schedules/{schedule}/update-status', [ScheduleController::class, 'updateStatus'])->name('technician.schedules.update-status');
+        
+        // Gestión de disponibilidad del técnico
+        Route::get('/availability', [TechnicianController::class, 'myAvailability'])->name('technician.availability');
+        Route::post('/availability', [TechnicianController::class, 'updateMyAvailability'])->name('technician.update-availability');
+        
+        // Gestión de tiempo libre del técnico
+        Route::get('/time-off', [TechnicianController::class, 'myTimeOff'])->name('technician.time-off');
+        Route::post('/time-off', [TechnicianController::class, 'requestTimeOff'])->name('technician.request-time-off');
+        
+        // Gestión de habilidades del técnico
+        Route::get('/skills', [TechnicianController::class, 'mySkills'])->name('technician.skills');
+        Route::post('/skills', [TechnicianController::class, 'updateMySkills'])->name('technician.update-skills');
+        
+        // Perfil del técnico
+        Route::get('/profile', [TechnicianController::class, 'myProfile'])->name('technician.profile');
+        Route::post('/profile', [TechnicianController::class, 'updateMyProfile'])->name('technician.update-profile');
+        Route::post('/profile/image', [TechnicianController::class, 'updateMyProfileImage'])->name('technician.update-profile-image');
     });
 });
 
 // Ruta después de login
 Route::get('/home', function () {
-    if (Auth::user()->role->name === 'admin') {
+    if (Auth::user()->role->name === 'Administrador') {
         return redirect()->route('admin.dashboard');
-    } else {
+    } elseif (Auth::user()->role->name === 'Técnico') {
         return redirect()->route('technician.dashboard');
+    } else {
+        // Por defecto para clientes
+        return redirect()->route('client.dashboard');
     }
 })->name('home');
