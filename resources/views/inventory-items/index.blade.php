@@ -29,7 +29,27 @@
     
     .stock-badge {
         font-size: 0.8rem;
-        padding: 0.35em 0.65em;
+    }
+    
+    .action-btn {
+        width: 38px !important;
+        height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 2px !important;
+        padding: 0 !important;
+        border-radius: 4px !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+    
+    .d-flex.justify-content-center {
+        gap: 5px;
     }
     
     .low-stock {
@@ -135,32 +155,25 @@
             </div>
         </div>
         <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle mr-2"></i> {{ session('success') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
+            <!-- Notifications are now handled by toast system -->
             
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle mr-2"></i> {{ session('error') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+            <div class="alert alert-info alert-dismissible fade show" role="alert" id="stockOperationsAlert">
+                <div>
+                    <i class="fas fa-info-circle mr-2"></i> Las operaciones de gestión de stock (añadir/retirar) ahora están disponibles exclusivamente desde la página de detalle de cada producto.
                 </div>
-            @endif
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
             
-            @if(session('info'))
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    <i class="fas fa-info-circle mr-2"></i> {{ session('info') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
+            <script>
+                // Auto-dismiss this specific alert after 10 seconds
+                setTimeout(function() {
+                    $('#stockOperationsAlert').fadeOut('slow', function() {
+                        $(this).remove();
+                    });
+                }, 10000);
+            </script>
 
             <div class="table-responsive">
                 <table class="table table-bordered datatable-table" id="dt-table" width="100%" cellspacing="0">
@@ -195,33 +208,17 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group">
-                                        <a href="{{ route('admin.inventory-items.edit', $item->id) }}" class="btn btn-sm btn-warning" title="Editar">
+                                    <div class="d-flex justify-content-center">
+                                        <a href="{{ route('admin.inventory-items.edit', $item->id) }}" class="btn btn-sm btn-warning action-btn" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{{ route('admin.inventory-items.show', $item->id) }}" class="btn btn-sm btn-info" title="Ver detalles">
+                                        <a href="{{ route('admin.inventory-items.show', $item->id) }}" class="btn btn-sm btn-info action-btn" title="Ver detalles">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-success btn-add-stock" title="Añadir Stock" 
-                                            data-toggle="modal" data-target="#addStockModal" 
-                                            data-id="{{ $item->id }}" 
-                                            data-name="{{ $item->name }}" 
-                                            data-code="{{ $item->code }}"
-                                            data-current="{{ $item->quantity }}">
-                                            <i class="fas fa-plus-circle"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-warning btn-remove-stock" title="Retirar Stock" 
-                                            data-toggle="modal" data-target="#removeStockModal" 
-                                            data-id="{{ $item->id }}" 
-                                            data-name="{{ $item->name }}" 
-                                            data-code="{{ $item->code }}"
-                                            data-current="{{ $item->quantity }}">
-                                            <i class="fas fa-minus-circle"></i>
-                                        </button>
-                                        <form action="{{ route('admin.inventory-items.destroy', $item->id) }}" method="POST" class="d-inline">
+                                        <form action="{{ route('admin.inventory-items.destroy', $item->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Eliminar" onclick="return confirm('¿Está seguro de eliminar este producto?')">
+                                            <button type="submit" class="btn btn-sm btn-danger action-btn" title="Eliminar" onclick="return confirm('¿Está seguro de eliminar este producto?')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -692,18 +689,7 @@
                 );
             }, 150);
             
-            // Animación para las alertas
-            $('.alert').each(function() {
-                $(this).slideDown('slow');
-                
-                // Auto-ocultar después de 5 segundos
-                const alert = $(this);
-                setTimeout(function() {
-                    alert.slideUp('slow', function() {
-                        alert.remove();
-                    });
-                }, 5000);
-            });
+            // Alertas ahora son manejadas por el sistema de toast
         });
         
         // Manejar eventos de redimensionamiento

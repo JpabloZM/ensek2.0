@@ -13,13 +13,27 @@
                 </div>
                 <div class="card-body">
                     @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                        <div class="alert alert-danger alert-dismissible fade show" id="formErrorsAlert">
+                            <div>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
+                        
+                        <script>
+                            // Auto-dismiss form errors alert after 15 seconds
+                            setTimeout(function() {
+                                $('#formErrorsAlert').fadeOut('slow', function() {
+                                    $(this).remove();
+                                });
+                            }, 15000);
+                        </script>
                     @endif
                     
                     <form action="{{ route('admin.service-requests.store') }}" method="POST">

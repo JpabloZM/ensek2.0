@@ -39,6 +39,84 @@
     <!-- Estilos personalizados -->
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
     <style>
+        /* Alert styles */
+        .alert {
+            border-radius: 0.25rem;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+        
+        .alert .close {
+            padding: 0;
+            background-color: transparent;
+            border: 0;
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: inherit;
+            opacity: .5;
+            margin-left: 15px;
+        }
+        
+        /* Toast notification styles */
+        .toast-container {
+            position: fixed;
+            z-index: 1500;
+            right: 20px;
+            top: 80px;
+        }
+        
+        .toast {
+            opacity: 0;
+            transition: all 0.5s ease-in-out;
+            margin-bottom: 10px;
+            max-width: 350px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+        }
+        
+        .toast.showing {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .toast-body {
+            padding: 12px 15px;
+            font-weight: 500;
+        }
+        
+        .btn-close-white {
+            filter: brightness(0) invert(1);
+        }
+        
+        .bg-success {
+            background-color: #1cc88a !important;
+        }
+        
+        .bg-danger {
+            background-color: #e74a3b !important;
+        }
+        
+        .bg-info {
+            background-color: #36b9cc !important;
+        }
+        
         html, body {
             height: 100%;
             margin: 0;
@@ -159,6 +237,42 @@
     @stack('styles')
 </head>
 <body @yield('body_attributes')>
+    <!-- Toast Container for Notifications -->
+    <div class="toast-container position-fixed p-3" style="z-index: 1500; right: 20px; top: 80px;">
+        @if(session('success'))
+            <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        @endif
+        
+        @if(session('error'))
+            <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        @endif
+        
+        @if(session('info'))
+            <div id="infoToast" class="toast align-items-center text-white bg-info border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-info-circle me-2"></i> {{ session('info') }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        @endif
+    </div>
+
     <div id="wrapper">
         <!-- Sidebar -->
         <div class="bg-dark border-right" id="sidebar-wrapper">
@@ -228,18 +342,6 @@
             </nav>
             
             <div class="container-fluid py-3 py-md-4 px-3 px-md-4 overflow-hidden">
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                
-                @if (session('error'))
-                    <div class="alert alert-danger">
-                        {{ session('error') }}
-                    </div>
-                @endif
-                
                 @yield('content')
             </div>
         </div>
@@ -279,6 +381,100 @@
             // Ajustar al cargar y al cambiar el tamaño de la ventana
             adjustHeight();
             window.addEventListener('resize', adjustHeight);
+            
+            // Toast Notifications System
+            function initializeToasts() {
+                // Initialize all toast elements
+                const toasts = document.querySelectorAll('.toast');
+                
+                if (toasts.length > 0) {
+                    toasts.forEach(toast => {
+                        // Show the toast with animation
+                        setTimeout(() => {
+                            toast.classList.add('showing');
+                            setTimeout(() => {
+                                toast.classList.add('show');
+                            }, 100);
+                            
+                            // Auto-hide after 5 seconds
+                            setTimeout(() => {
+                                toast.classList.remove('show');
+                                setTimeout(() => {
+                                    toast.remove();
+                                }, 500);
+                            }, 5000);
+                        }, 200);
+                    });
+                    
+                    // Add event listeners to close buttons
+                    document.querySelectorAll('.btn-close').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const toast = this.closest('.toast');
+                            toast.classList.remove('show');
+                            setTimeout(() => {
+                                toast.remove();
+                            }, 500);
+                        });
+                    });
+                }
+            }
+            
+            // Initialize toasts on page load
+            initializeToasts();
+            
+            // Apply standardized styling to all alerts in the application
+            function standardizeAlerts() {
+                // Find all alerts that don't already have proper structure
+                $('.alert').each(function() {
+                    const $alert = $(this);
+                    
+                    // Skip alerts that have already been processed
+                    if ($alert.data('processed')) return;
+                    
+                    // Make sure alert is dismissible
+                    if (!$alert.hasClass('alert-dismissible')) {
+                        $alert.addClass('alert-dismissible fade show');
+                    }
+                    
+                    // Add close button if not present
+                    if ($alert.find('.close').length === 0) {
+                        $alert.append(
+                            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                            '<span aria-hidden="true">&times;</span>' +
+                            '</button>'
+                        );
+                    }
+                    
+                    // Wrap content in div if not already wrapped
+                    const $children = $alert.contents().filter(function() {
+                        // Exclude the close button
+                        return !$(this).hasClass('close') && 
+                               !$(this).parent().hasClass('close');
+                    });
+                    
+                    if (!$children.parent().is('div') || $children.parent().is($alert)) {
+                        $children.wrapAll('<div></div>');
+                    }
+                    
+                    // Mark as processed
+                    $alert.data('processed', true);
+                    
+                    // Auto-dismiss non-error alerts after 10 seconds
+                    if (!$alert.hasClass('alert-danger') && !$alert.attr('id')) {
+                        setTimeout(function() {
+                            $alert.fadeOut('slow', function() {
+                                $(this).remove();
+                            });
+                        }, 10000);
+                    }
+                });
+            }
+            
+            // Run when DOM is ready and after AJAX calls
+            standardizeAlerts();
+            $(document).ajaxComplete(function() {
+                standardizeAlerts();
+            });
         });
     </script>
     
