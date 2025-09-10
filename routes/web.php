@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryCategoryController;
 use App\Http\Controllers\InventoryItemController;
+use App\Http\Controllers\InventoryMovementController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceRequestController;
@@ -67,6 +68,12 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::get('inventory-items/{id}/print-barcode', [InventoryItemController::class, 'printBarcode'])->name('admin.inventory-items.print-barcode');
         Route::patch('inventory-items/{id}/add-stock', [InventoryItemController::class, 'addStock'])->name('admin.inventory-items.add-stock');
         Route::patch('inventory-items/{id}/remove-stock', [InventoryItemController::class, 'removeStock'])->name('admin.inventory-items.remove-stock');
+        
+        // Movimientos de inventario
+        Route::resource('inventory-movements', InventoryMovementController::class)->names('admin.inventory-movements');
+        Route::get('inventory-movements-report/form', [InventoryMovementController::class, 'reportForm'])->name('admin.inventory-movements.report.form');
+        Route::get('inventory-movements-report', [InventoryMovementController::class, 'report'])->name('admin.inventory-movements.report');
+        Route::get('inventory-movements-valuation', [InventoryMovementController::class, 'valuation'])->name('admin.inventory-movements.valuation');
         
         // Solicitudes de servicio
         Route::resource('service-requests', ServiceRequestController::class)->names('admin.service-requests');

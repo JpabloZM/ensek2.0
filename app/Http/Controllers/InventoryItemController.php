@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\InventoryItem;
 use App\Models\InventoryCategory;
+use App\Models\InventoryMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -65,7 +66,33 @@ class InventoryItemController extends Controller
             
         $lowStockTotal = InventoryItem::whereRaw('quantity <= minimum_stock')->count();
         
-        return view('inventory-items.index', compact('items', 'categories', 'categoryLabels', 'categoryQuantities', 'lowStockItems', 'lowStockTotal'));
+        // Datos para el gráfico de ítems con bajo stock
+        $lowStockData = InventoryItem::whereRaw('quantity <= minimum_stock')
+            ->orderBy('quantity')
+            ->take(10)
+            ->get();
+            
+        $lowStockLabels = [];
+        $lowStockQuantities = [];
+        $lowStockThresholds = [];
+        
+        foreach ($lowStockData as $item) {
+            $lowStockLabels[] = $item->name;
+            $lowStockQuantities[] = $item->quantity;
+            $lowStockThresholds[] = $item->minimum_stock;
+        }
+        
+        return view('inventory-items.index', compact(
+            'items', 
+            'categories', 
+            'categoryLabels', 
+            'categoryQuantities', 
+            'lowStockItems', 
+            'lowStockTotal',
+            'lowStockLabels',
+            'lowStockQuantities',
+            'lowStockThresholds'
+        ));
     }
 
     /**
@@ -117,14 +144,12 @@ class InventoryItemController extends Controller
     {
         $item = InventoryItem::with('category')->findOrFail($id);
         
-        // Obtener el historial de movimientos
-        $movements = DB::table('inventory_movements')
-            ->where('inventory_item_id', $id)
+        // Obtener el historial de movimientos usando el modelo Eloquent
+        $movements = InventoryMovement::where('inventory_item_id', $id)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
             
-        $lastMovement = DB::table('inventory_movements')
-            ->where('inventory_item_id', $id)
+        $lastMovement = InventoryMovement::where('inventory_item_id', $id)
             ->orderBy('created_at', 'desc')
             ->first();
             
@@ -223,14 +248,23 @@ class InventoryItemController extends Controller
             $item->quantity += $quantity;
             $item->save();
             
-            // Registrar movimiento
-            $this->registerStockMovement($item->id, 'add', $quantity, $request->notes);
+            // Crear directamente el movimiento usando el campo 'type' correcto
+            InventoryMovement::create([
+                'inventory_item_id' => $item->id,
+                'type' => 'add',
+                'quantity' => $quantity,
+                'notes' => $request->notes ?: 'Adición de stock',
+                'user_id' => Auth::id(),
+            ]);
             
             DB::commit();
-            return redirect()->back()->with('success', "Se añadieron {$quantity} unidades al inventario.");
+            
+            // Redirigir a la misma página con un mensaje de éxito
+            $redirectUrl = request()->headers->get('referer') ?: route('admin.inventory-items.index');
+            return redirect($redirectUrl)->with('success', "Se añadieron {$quantity} unidades de {$item->name} al inventario.");
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Ocurrió un error al actualizar el inventario.');
+            return redirect()->back()->with('error', 'Ocurrió un error al actualizar el inventario: ' . $e->getMessage());
         }
     }
     
@@ -260,32 +294,27 @@ class InventoryItemController extends Controller
             $item->quantity -= $quantity;
             $item->save();
             
-            // Registrar movimiento
-            $this->registerStockMovement($item->id, 'remove', $quantity, $request->notes);
+            // Crear directamente el movimiento usando el campo 'type' correcto
+            InventoryMovement::create([
+                'inventory_item_id' => $item->id,
+                'type' => 'remove',
+                'quantity' => $quantity,
+                'notes' => $request->notes ?: 'Retiro de stock',
+                'user_id' => Auth::id(),
+            ]);
             
             DB::commit();
-            return redirect()->back()->with('success', "Se retiraron {$quantity} unidades del inventario.");
+            
+            // Redirigir a la misma página con un mensaje de éxito
+            $redirectUrl = request()->headers->get('referer') ?: route('admin.inventory-items.index');
+            return redirect($redirectUrl)->with('success', "Se retiraron {$quantity} unidades de {$item->name} del inventario.");
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Ocurrió un error al actualizar el inventario.');
+            return redirect()->back()->with('error', 'Ocurrió un error al actualizar el inventario: ' . $e->getMessage());
         }
     }
     
-    /**
-     * Register a stock movement in the database.
-     */
-    private function registerStockMovement($itemId, $type, $quantity, $notes = null)
-    {
-        DB::table('inventory_movements')->insert([
-            'inventory_item_id' => $itemId,
-            'type' => $type,
-            'quantity' => $quantity,
-            'notes' => $notes,
-            'user_id' => Auth::id(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-    }
+    // El método registerStockMovement ha sido eliminado ya que ahora creamos los movimientos directamente
     
     /**
      * Export inventory items.

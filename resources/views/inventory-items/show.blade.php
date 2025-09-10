@@ -118,7 +118,7 @@
                                         </td>
                                         <td class="text-center">{{ $movement->quantity }}</td>
                                         <td>{{ $movement->notes ?? '-' }}</td>
-                                        <td>{{ $movement->user->name ?? 'Sistema' }}</td>
+                                        <td>{{ $movement->user ? $movement->user->name : 'Sistema' }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -152,10 +152,18 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <button class="btn btn-success btn-block mb-2" data-toggle="modal" data-target="#addStockModal">
+                        <button id="btnAddStock" class="btn btn-success btn-block mb-2" 
+                            data-id="{{ $item->id }}" 
+                            data-name="{{ $item->name }}" 
+                            data-code="{{ $item->code }}" 
+                            data-current="{{ $item->quantity }}">
                             <i class="fas fa-plus-circle"></i> Añadir Stock
                         </button>
-                        <button class="btn btn-danger btn-block mb-2" data-toggle="modal" data-target="#removeStockModal">
+                        <button id="btnRemoveStock" class="btn btn-danger btn-block mb-2" 
+                            data-id="{{ $item->id }}" 
+                            data-name="{{ $item->name }}" 
+                            data-code="{{ $item->code }}" 
+                            data-current="{{ $item->quantity }}">
                             <i class="fas fa-minus-circle"></i> Retirar Stock
                         </button>
                         <a href="{{ route('admin.inventory-items.edit', $item->id) }}" class="btn btn-warning btn-block mb-2">
@@ -204,7 +212,7 @@
                     </div>
                     <div class="mb-3">
                         <h6 class="font-weight-bold">Último Movimiento:</h6>
-                        <p>{{ $lastMovement ? $lastMovement->created_at->format('d/m/Y H:i') : 'No hay registros' }}</p>
+                        <p>{{ $lastMovement ? ($lastMovement->created_at instanceof \Carbon\Carbon ? $lastMovement->created_at->format('d/m/Y H:i') : \Carbon\Carbon::parse($lastMovement->created_at)->format('d/m/Y H:i')) : 'No hay registros' }}</p>
                     </div>
                 </div>
             </div>
@@ -216,7 +224,7 @@
 <div class="modal fade" id="addStockModal" tabindex="-1" role="dialog" aria-labelledby="addStockModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="{{ route('admin.inventory-items.add-stock', $item->id) }}" method="POST">
+            <form id="addStockForm" action="{{ route('admin.inventory-items.add-stock', $item->id) }}" method="POST" class="needs-validation" novalidate>
                 @csrf
                 @method('PATCH')
                 <div class="modal-header">
@@ -226,6 +234,16 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    
                     <div class="form-group">
                         <label for="current_stock">Stock Actual:</label>
                         <input type="text" class="form-control" id="current_stock" value="{{ $item->quantity }}" readonly>
@@ -233,6 +251,9 @@
                     <div class="form-group">
                         <label for="add_quantity">Cantidad a añadir:</label>
                         <input type="number" class="form-control" name="add_quantity" id="add_quantity" min="1" required>
+                        <div class="invalid-feedback">
+                            Por favor ingrese una cantidad válida (mínimo 1).
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="notes">Notas (opcional):</label>
@@ -241,7 +262,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                    <button type="submit" class="btn btn-success btn-stock-submit">Guardar Cambios</button>
                 </div>
             </form>
         </div>
@@ -252,7 +273,7 @@
 <div class="modal fade" id="removeStockModal" tabindex="-1" role="dialog" aria-labelledby="removeStockModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="{{ route('admin.inventory-items.remove-stock', $item->id) }}" method="POST">
+            <form id="removeStockForm" action="{{ route('admin.inventory-items.remove-stock', $item->id) }}" method="POST" class="needs-validation" novalidate>
                 @csrf
                 @method('PATCH')
                 <div class="modal-header">
@@ -262,6 +283,16 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    
                     <div class="form-group">
                         <label for="current_remove_stock">Stock Actual:</label>
                         <input type="text" class="form-control" id="current_remove_stock" value="{{ $item->quantity }}" readonly>
@@ -269,6 +300,9 @@
                     <div class="form-group">
                         <label for="remove_quantity">Cantidad a retirar:</label>
                         <input type="number" class="form-control" name="remove_quantity" id="remove_quantity" min="1" max="{{ $item->quantity }}" required>
+                        <div class="invalid-feedback">
+                            Por favor ingrese una cantidad válida (mínimo 1 y no mayor al stock actual).
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="remove_notes">Notas (opcional):</label>
@@ -277,7 +311,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Guardar Cambios</button>
+                    <button type="submit" class="btn btn-danger btn-stock-submit">Confirmar Retiro</button>
                 </div>
             </form>
         </div>
@@ -332,12 +366,88 @@
         
         // Validación para el stock a retirar
         $('#remove_quantity').on('input', function() {
-            var value = parseInt($(this).val());
+            var value = parseInt($(this).val()) || 0;
             var max = parseInt($(this).attr('max'));
             
             if (value > max) {
                 $(this).val(max);
+                $(this).addClass('is-invalid');
+                $(this).next('.invalid-feedback').text('La cantidad a retirar no puede ser mayor que ' + max);
+            } else if (value <= 0) {
+                $(this).addClass('is-invalid');
+                $(this).next('.invalid-feedback').text('La cantidad debe ser mayor que 0');
+            } else {
+                $(this).removeClass('is-invalid').addClass('is-valid');
             }
+        });
+        
+        // Validación para añadir stock
+        $('#add_quantity').on('input', function() {
+            var value = parseInt($(this).val()) || 0;
+            
+            if (value <= 0) {
+                $(this).addClass('is-invalid');
+                $(this).next('.invalid-feedback').text('La cantidad debe ser mayor que 0');
+            } else {
+                $(this).removeClass('is-invalid').addClass('is-valid');
+            }
+        });
+        
+        // Manejar eventos de botones de acción rápida
+        $('#btnAddStock').click(function(e) {
+            e.preventDefault();
+            console.log('Botón Añadir Stock clickeado');
+            // Limpiar validaciones previas
+            $('#addStockForm').removeClass('was-validated');
+            $('#add_quantity').val('').removeClass('is-valid is-invalid');
+            $('#notes').val('');
+            $('#addStockModal').modal('show');
+        });
+        
+        $('#btnRemoveStock').click(function(e) {
+            e.preventDefault();
+            console.log('Botón Retirar Stock clickeado');
+            // Limpiar validaciones previas
+            $('#removeStockForm').removeClass('was-validated');
+            $('#remove_quantity').val('').removeClass('is-valid is-invalid');
+            $('#remove_notes').val('');
+            $('#removeStockModal').modal('show');
+        });
+        
+        // Mostrar indicador de carga al enviar formularios
+        $('#addStockForm').on('submit', function(e) {
+            console.log('Formulario de añadir stock enviado');
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).addClass('was-validated');
+                return false;
+            }
+            
+            $('.btn-stock-submit', this).html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
+            return true;
+        });
+        
+        $('#removeStockForm').on('submit', function(e) {
+            console.log('Formulario de retirar stock enviado');
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).addClass('was-validated');
+                return false;
+            }
+            
+            const quantity = parseInt($('#remove_quantity').val()) || 0;
+            const current = parseInt($('#current_remove_stock').val());
+            
+            if (quantity > current) {
+                e.preventDefault();
+                $('#remove_quantity').addClass('is-invalid');
+                return false;
+            }
+            
+            $('.btn-stock-submit', this).html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
+            return true;
         });
     });
 </script>

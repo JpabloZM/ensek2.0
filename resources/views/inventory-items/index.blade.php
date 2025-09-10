@@ -41,6 +41,21 @@
         background-color: #1cc88a;
         color: white;
     }
+    
+    /* Estilos mejorados para tarjetas de dashboard */
+    .dashboard-card {
+        transition: height 0.3s ease;
+    }
+    
+    .chart-container {
+        width: 100%;
+        height: 350px;
+    }
+    
+    .stock-list {
+        max-height: 350px;
+        overflow-y: auto;
+    }
 </style>
 @endpush
 
@@ -122,7 +137,7 @@
         <div class="card-body">
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
+                    <i class="fas fa-check-circle mr-2"></i> {{ session('success') }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -131,7 +146,16 @@
             
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
+                    <i class="fas fa-exclamation-circle mr-2"></i> {{ session('error') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+            
+            @if(session('info'))
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle mr-2"></i> {{ session('info') }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -170,28 +194,38 @@
                                         <span class="badge badge-success">Stock Normal</span>
                                     @endif
                                 </td>
-                                <td>
-                                    <a href="{{ route('admin.inventory-items.edit', $item->id) }}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{{ route('admin.inventory-items.show', $item->id) }}" class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-success btn-add-stock" title="Añadir Stock" 
-                                        data-toggle="modal" data-target="#addStockModal" 
-                                        data-id="{{ $item->id }}" 
-                                        data-name="{{ $item->name }}" 
-                                        data-code="{{ $item->code }}"
-                                        data-current="{{ $item->quantity }}">
-                                        <i class="fas fa-plus-circle"></i>
-                                    </button>
-                                    <form action="{{ route('admin.inventory-items.destroy', $item->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este producto?')">
-                                            <i class="fas fa-trash"></i>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <a href="{{ route('admin.inventory-items.edit', $item->id) }}" class="btn btn-sm btn-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ route('admin.inventory-items.show', $item->id) }}" class="btn btn-sm btn-info" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-success btn-add-stock" title="Añadir Stock" 
+                                            data-toggle="modal" data-target="#addStockModal" 
+                                            data-id="{{ $item->id }}" 
+                                            data-name="{{ $item->name }}" 
+                                            data-code="{{ $item->code }}"
+                                            data-current="{{ $item->quantity }}">
+                                            <i class="fas fa-plus-circle"></i>
                                         </button>
-                                    </form>
+                                        <button type="button" class="btn btn-sm btn-warning btn-remove-stock" title="Retirar Stock" 
+                                            data-toggle="modal" data-target="#removeStockModal" 
+                                            data-id="{{ $item->id }}" 
+                                            data-name="{{ $item->name }}" 
+                                            data-code="{{ $item->code }}"
+                                            data-current="{{ $item->quantity }}">
+                                            <i class="fas fa-minus-circle"></i>
+                                        </button>
+                                        <form action="{{ route('admin.inventory-items.destroy', $item->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Eliminar" onclick="return confirm('¿Está seguro de eliminar este producto?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -218,12 +252,12 @@
     <div class="row" id="dashboardRow">
         <!-- Stock General -->
         <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4 h-100">
+            <div class="card shadow mb-4 dashboard-card">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Resumen de Inventario</h6>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <div class="chart-area flex-grow-1">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height: 350px;">
                         <canvas id="inventorySummaryChart"></canvas>
                     </div>
                 </div>
@@ -232,13 +266,13 @@
 
         <!-- Items con Stock Bajo -->
         <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4 h-100">
+            <div class="card shadow mb-4 dashboard-card">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Items con Stock Bajo</h6>
                 </div>
-                <div class="card-body d-flex flex-column">
+                <div class="card-body">
                     @if($lowStockItems->count() > 0)
-                        <div class="list-group flex-grow-1" style="overflow-y: auto;">
+                        <div class="list-group stock-list" style="max-height: 350px; overflow-y: auto;">
                             @foreach($lowStockItems as $item)
                                 <a href="{{ route('admin.inventory-items.show', $item->id) }}" class="list-group-item list-group-item-action flex-column align-items-start">
                                     <div class="d-flex w-100 justify-content-between">
@@ -257,7 +291,7 @@
                             </div>
                         @endif
                     @else
-                        <div class="text-center py-5 flex-grow-1 d-flex flex-column justify-content-center">
+                        <div class="text-center py-5 d-flex flex-column justify-content-center" style="height: 350px;">
                             <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
                             <p class="mb-0">Todos los productos tienen stock suficiente</p>
                         </div>
@@ -272,7 +306,7 @@
 <div class="modal fade" id="addStockModal" tabindex="-1" role="dialog" aria-labelledby="addStockModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form id="addStockForm" action="" method="POST">
+            <form id="addStockForm" action="" method="POST" class="needs-validation" novalidate>
                 @csrf
                 @method('PATCH')
                 <div class="modal-header">
@@ -282,6 +316,15 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <div class="form-group">
                         <label for="itemName">Producto:</label>
                         <input type="text" class="form-control" id="itemName" readonly>
@@ -297,6 +340,9 @@
                             <div class="form-group">
                                 <label for="addQuantity">Cantidad a añadir:</label>
                                 <input type="number" class="form-control" name="add_quantity" id="addQuantity" min="1" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese una cantidad válida (mínimo 1).
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -307,7 +353,65 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                    <button type="submit" class="btn btn-success btn-stock-submit">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para retirar stock -->
+<div class="modal fade" id="removeStockModal" tabindex="-1" role="dialog" aria-labelledby="removeStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="removeStockForm" action="" method="POST" class="needs-validation" novalidate>
+                @csrf
+                @method('PATCH')
+                <div class="modal-header">
+                    <h5 class="modal-title" id="removeStockModalLabel">Retirar Stock</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    <div class="form-group">
+                        <label for="removeItemName">Producto:</label>
+                        <input type="text" class="form-control" id="removeItemName" readonly>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="removeCurrentStock">Stock Actual:</label>
+                                <input type="text" class="form-control" id="removeCurrentStock" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="removeQuantity">Cantidad a retirar:</label>
+                                <input type="number" class="form-control" name="remove_quantity" id="removeQuantity" min="1" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese una cantidad válida (mínimo 1 y no mayor al stock actual).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="removeNotes">Motivo / Notas (opcional):</label>
+                        <textarea class="form-control" name="notes" id="removeNotes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning btn-stock-submit">Confirmar Retiro</button>
                 </div>
             </form>
         </div>
@@ -317,12 +421,62 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<script src="{{ asset('js/inventory-charts.js') }}"></script>
+
+<!-- Script de inicialización (separamos el paso de datos de PHP a JS) -->
 <script>
+    // Datos PHP ocultos para ser utilizados en JavaScript
+</script>
+
+<!-- 
+    Datos del inventario (Este método elimina los errores de sintaxis en VS Code)
+    VSCode no analiza el contenido de comentarios HTML, por lo que no generará errores
+-->
+<script id="inventory-data" type="application/json">
+@php
+    // Preparamos los datos en PHP primero
+    $inventoryData = [
+        'categoryLabels' => $categoryLabels ?? [],
+        'categoryQuantities' => $categoryQuantities ?? [],
+        'lowStockLabels' => $lowStockLabels ?? [],
+        'lowStockQuantities' => $lowStockQuantities ?? [],
+        'lowStockThresholds' => $lowStockThresholds ?? []
+    ];
+    
+    // Luego los codificamos a JSON una sola vez
+    echo json_encode($inventoryData, JSON_PRETTY_PRINT);
+@endphp
+</script>
+
+<script>
+    // Inicialización principal cuando el documento está listo
     $(document).ready(function() {
         console.log('Inicializando scripts de inventory-items...');
         
+        // Cargar datos de inventario desde el JSON embebido
+        let inventoryData;
+        try {
+            // Obtener los datos del elemento oculto
+            const dataElement = document.getElementById('inventory-data');
+            inventoryData = JSON.parse(dataElement.textContent);
+            console.log('Datos de inventario cargados correctamente');
+        } catch (e) {
+            console.error('Error al cargar datos de inventario:', e);
+            inventoryData = {
+                categoryLabels: [],
+                categoryQuantities: [],
+                lowStockLabels: [],
+                lowStockQuantities: [],
+                lowStockThresholds: []
+            };
+        }
+        
         // SweetAlert para confirmación de eliminación
         $('.table').on('submit', 'form', function(e) {
+            if ($(this).hasClass('stock-form')) {
+                return; // No aplicar esta confirmación a los formularios de stock
+            }
+            
             e.preventDefault();
             const form = this;
             
@@ -342,258 +496,223 @@
             });
         });
         
-        // Modal para añadir stock
-        $('.btn-add-stock').click(function() {
-            const id = $(this).data('id');
-            const name = $(this).data('name');
-            const code = $(this).data('code');
-            const current = $(this).data('current');
+        // Validación de formularios
+        (function() {
+            'use strict';
             
+            // Fetch all forms we want to apply custom validation styles to
+            var forms = document.querySelectorAll('.needs-validation');
+            
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+        
+        // Funciones para manejar los modales y eventos de stock
+        function setupAddStockModal(id, name, code, current) {
+            console.log('Setup Add Stock Modal:', id, name, code, current);
             $('#itemName').val(name + ' (' + code + ')');
             $('#currentStock').val(current);
             $('#addQuantity').val('');
             $('#notes').val('');
             
-            $('#addStockForm').attr('action', `/admin/inventory-items/${id}/add-stock`);
-        });
-
-        // Inicializar el gráfico con un retraso
-        setTimeout(initializeInventoryChart, 500);
-        
-        // Función para inicializar el gráfico
-        function initializeInventoryChart() {
-            // Comprobar si existe el elemento del gráfico
-            if ($('#inventorySummaryChart').length > 0) {
-                try {
-                    const ctx = document.getElementById('inventorySummaryChart');
-                    
-                    // Convertir los datos PHP a variables JavaScript de manera segura
-                    let labels = [];
-                    let quantities = [];
-                    
-                    try {
-                        labels = JSON.parse('@json($categoryLabels)'.replace(/&quot;/g, '"'));
-                        quantities = JSON.parse('@json($categoryQuantities)'.replace(/&quot;/g, '"'));
-                        console.log('Datos del gráfico cargados correctamente:', labels, quantities);
-                    } catch (parseError) {
-                        console.error('Error al parsear datos del gráfico:', parseError);
-                        // Usar datos de fallback
-                        labels = ['Sin datos'];
-                        quantities = [0];
-                    }
-                    
-                    // Generar colores para el gráfico
-                    const colors = generateColors(labels.length);
-                    
-                    // Crear el gráfico con Chart.js
-                    new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                data: quantities,
-                                backgroundColor: colors,
-                                hoverBackgroundColor: colors,
-                                hoverBorderColor: "rgba(234, 236, 244, 1)"
-                            }]
-                        },
-                        options: {
-                            maintainAspectRatio: false,
-                            layout: {
-                                padding: {
-                                    left: 10,
-                                    right: 25,
-                                    top: 25,
-                                    bottom: 0
-                                }
-                            },
-                            legend: {
-                                display: true,
-                                position: 'bottom'
-                            },
-                            cutoutPercentage: 80,
-                            tooltips: {
-                                backgroundColor: "rgb(255,255,255)",
-                                bodyFontColor: "#858796",
-                                borderColor: '#dddfeb',
-                                borderWidth: 1,
-                                xPadding: 15,
-                                yPadding: 15,
-                                displayColors: false,
-                                caretPadding: 10
-                            }
-                        }
-                    });
-                    console.log('Gráfico de resumen creado correctamente');
-                } catch (chartError) {
-                    console.error('Error al crear el gráfico de resumen:', chartError);
+            // Limpiar validaciones previas
+            $('#addStockForm').removeClass('was-validated');
+            
+            // Usar la ruta correcta de Laravel
+            const addStockUrl = "{{ route('admin.inventory-items.add-stock', ['id' => ':id']) }}".replace(':id', id);
+            console.log('URL para añadir stock:', addStockUrl);
+            $('#addStockForm').attr('action', addStockUrl);
+            
+            // Mostrar Toast al enviar el formulario correctamente
+            $('#addStockForm').off('submit').on('submit', function(e) {
+                console.log('Formulario de añadir stock enviado');
+                if (!this.checkValidity()) {
+                    e.preventDefault();
+                    return false;
                 }
-            }
-            
-            // Inicializar el gráfico de bajo stock
-            if ($('#lowStockChart').length > 0) {
-                try {
-                    const ctx = document.getElementById('lowStockChart');
-                    
-                    // Convertir los datos PHP a variables JavaScript de manera segura
-                    let labels = [];
-                    let quantities = [];
-                    let thresholds = [];
-                    
-                    try {
-                        labels = JSON.parse('@json($lowStockLabels)'.replace(/&quot;/g, '"'));
-                        quantities = JSON.parse('@json($lowStockQuantities)'.replace(/&quot;/g, '"'));
-                        thresholds = JSON.parse('@json($lowStockThresholds)'.replace(/&quot;/g, '"'));
-                        console.log('Datos del gráfico de bajo stock cargados correctamente:', labels, quantities, thresholds);
-                    } catch (parseError) {
-                        console.error('Error al parsear datos del gráfico de bajo stock:', parseError);
-                        // Usar datos de fallback
-                        labels = ['Sin datos'];
-                        quantities = [0];
-                        thresholds = [0];
-                    }
-                    
-                    // Crear el gráfico con Chart.js
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [
-                                {
-                                    label: "Cantidad actual",
-                                    backgroundColor: "#e74a3b",
-                                    hoverBackgroundColor: "#c13228",
-                                    data: quantities
-                                },
-                                {
-                                    label: "Nivel mínimo",
-                                    backgroundColor: "#4e73df",
-                                    hoverBackgroundColor: "#2653d4",
-                                    data: thresholds
-                                }
-                            ]
-                        },
-                        options: {
-                            maintainAspectRatio: false,
-                            layout: {
-                                padding: {
-                                    left: 10,
-                                    right: 25,
-                                    top: 25,
-                                    bottom: 0
-                                }
-                            },
-                            scales: {
-                                xAxes: [{
-                                    gridLines: {
-                                        display: false,
-                                        drawBorder: false
-                                    },
-                                    ticks: {
-                                        maxTicksLimit: 10
-                                    },
-                                    maxBarThickness: 25
-                                }],
-                                yAxes: [{
-                                    ticks: {
-                                        min: 0,
-                                        maxTicksLimit: 5,
-                                        padding: 10
-                                    },
-                                    gridLines: {
-                                        color: "rgb(234, 236, 244)",
-                                        zeroLineColor: "rgb(234, 236, 244)",
-                                        drawBorder: false,
-                                        borderDash: [2],
-                                        zeroLineBorderDash: [2]
-                                    }
-                                }]
-                            },
-                            legend: {
-                                display: true,
-                                position: 'bottom'
-                            },
-                            tooltips: {
-                                titleMarginBottom: 10,
-                                titleFontColor: '#6e707e',
-                                titleFontSize: 14,
-                                backgroundColor: "rgb(255,255,255)",
-                                bodyFontColor: "#858796",
-                                borderColor: '#dddfeb',
-                                borderWidth: 1,
-                                xPadding: 15,
-                                yPadding: 15,
-                                displayColors: false,
-                                caretPadding: 10
-                            }
-                        }
-                    });
-                    console.log('Gráfico de bajo stock creado correctamente');
-                } catch (chartError) {
-                    console.error('Error al crear el gráfico de bajo stock:', chartError);
-                }
-            }
-            
-            // Igualar alturas de las tarjetas con un enfoque seguro
-            equalizeCardHeights();
-        }
-        
-        // Función para generar colores aleatorios
-        function generateColors(count) {
-            const colors = [];
-            const baseColors = [
-                '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', 
-                '#858796', '#5a5c69', '#2e59d9', '#17a673', '#2c9faf'
-            ];
-            
-            for (let i = 0; i < count; i++) {
-                if (i < baseColors.length) {
-                    colors.push(baseColors[i]);
-                } else {
-                    // Generar colores aleatorios adicionales si son necesarios
-                    const r = Math.floor(Math.random() * 255);
-                    const g = Math.floor(Math.random() * 255);
-                    const b = Math.floor(Math.random() * 255);
-                    colors.push(`rgb(${r}, ${g}, ${b})`);
-                }
-            }
-            
-            return colors;
-        }
-        
-        // Función simple para igualar alturas de tarjetas
-        function equalizeCardHeights() {
-            console.log('Igualando alturas de tarjetas...');
-            try {
-                // Resetear alturas primero
-                $('.card.shadow').css('height', 'auto');
                 
-                // Esperar un momento para asegurar que las cartas se hayan renderizado
-                setTimeout(function() {
-                    // Encontrar la altura máxima
-                    let maxHeight = 0;
-                    $('.card.shadow').each(function() {
-                        const height = $(this).outerHeight();
-                        maxHeight = Math.max(maxHeight, height);
-                    });
-                    
-                    // Aplicar la altura máxima a todas las tarjetas
-                    if (maxHeight > 0) {
-                        $('.card.shadow').css('height', maxHeight + 'px');
-                        console.log('Alturas igualadas a ' + maxHeight + 'px');
+                // Mostrar indicador de carga
+                $('.btn-stock-submit', this).html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
+                return true;
+            });
+            
+            // Mostrar el modal
+            $('#addStockModal').modal('show');
+        }
+        
+        function setupRemoveStockModal(id, name, code, current) {
+            console.log('Setup Remove Stock Modal:', id, name, code, current);
+            $('#removeItemName').val(name + ' (' + code + ')');
+            $('#removeCurrentStock').val(current);
+            $('#removeQuantity').val('');
+            $('#removeNotes').val('');
+            
+            // Establecer la cantidad máxima que se puede retirar y validación
+            $('#removeQuantity').attr('max', current);
+            
+            // Validación en tiempo real para la cantidad
+            $('#removeQuantity').off('input').on('input', function() {
+                const val = parseInt($(this).val()) || 0;
+                if (val > parseInt(current)) {
+                    $(this).addClass('is-invalid');
+                    $(this).next('.invalid-feedback').text('La cantidad a retirar no puede ser mayor que ' + current);
+                } else if (val <= 0) {
+                    $(this).addClass('is-invalid');
+                    $(this).next('.invalid-feedback').text('La cantidad debe ser mayor que 0');
+                } else {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                }
+            });
+            
+            // Limpiar validaciones previas
+            $('#removeStockForm').removeClass('was-validated');
+            
+            // Usar la ruta correcta de Laravel
+            const removeStockUrl = "{{ route('admin.inventory-items.remove-stock', ['id' => ':id']) }}".replace(':id', id);
+            console.log('URL para retirar stock:', removeStockUrl);
+            $('#removeStockForm').attr('action', removeStockUrl);
+            
+            // Mostrar Toast al enviar el formulario correctamente
+            $('#removeStockForm').off('submit').on('submit', function(e) {
+                console.log('Formulario de retirar stock enviado');
+                if (!this.checkValidity()) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                const quantity = parseInt($('#removeQuantity').val()) || 0;
+                if (quantity > parseInt(current)) {
+                    e.preventDefault();
+                    $('#removeQuantity').addClass('is-invalid');
+                    return false;
+                }
+                
+                // Mostrar indicador de carga
+                $('.btn-stock-submit', this).html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
+                return true;
+            });
+            
+            // Mostrar el modal
+            $('#removeStockModal').modal('show');
+        }
+        
+        // Modal para añadir stock - Botones en tabla
+        $(document).on('click', '.btn-add-stock', function(e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+            const code = $(this).data('code');
+            const current = $(this).data('current');
+            console.log('Botón de añadir stock clickeado:', id, name, code, current);
+            setupAddStockModal(id, name, code, current);
+        });
+        
+        // Modal para retirar stock - Botones en tabla
+        $(document).on('click', '.btn-remove-stock', function(e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+            const code = $(this).data('code');
+            const current = $(this).data('current');
+            console.log('Botón de retirar stock clickeado:', id, name, code, current);
+            setupRemoveStockModal(id, name, code, current);
+        });
+        
+        // Botones de acciones rápidas (segunda imagen)
+        $(document).on('click', '#btnAddStock', function(e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+            const code = $(this).data('code');
+            const current = $(this).data('current');
+            console.log('Botón rápido de añadir stock clickeado:', id, name, code, current);
+            setupAddStockModal(id, name, code, current);
+        });
+        
+        $(document).on('click', '#btnRemoveStock', function(e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+            const code = $(this).data('code');
+            const current = $(this).data('current');
+            console.log('Botón rápido de retirar stock clickeado:', id, name, code, current);
+            setupRemoveStockModal(id, name, code, current);
+        });
+        
+        // Función para ajustar alturas de tarjetas
+        function fixCardHeights() {
+            console.log('Ajustando alturas de las tarjetas...');
+            // Resetear alturas para un nuevo cálculo
+            $('.dashboard-card').css('height', 'auto');
+            
+            // Aplicar la misma altura a las tarjetas en la misma fila
+            if (window.innerWidth >= 992) {
+                const rowCards = $('#dashboardRow .dashboard-card');
+                let maxHeight = 0;
+                
+                // Encontrar la altura máxima
+                rowCards.each(function() {
+                    const height = $(this).outerHeight();
+                    if (height > maxHeight) {
+                        maxHeight = height;
                     }
-                }, 300);
-            } catch (error) {
-                console.error('Error al igualar alturas:', error);
+                });
+                
+                // Aplicar la altura máxima a todas las tarjetas
+                if (maxHeight > 0) {
+                    rowCards.css('height', maxHeight + 'px');
+                }
             }
         }
         
-        // Manejar el evento de cambio de tamaño de ventana (con limitación de llamadas)
-        let resizeTimer;
-        $(window).resize(function() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                equalizeCardHeights();
+        // Inicialización cuando la página está completamente cargada
+        $(window).on('load', function() {
+            console.log('Página cargada completamente, inicializando componentes...');
+            
+            // Primero ajustar alturas
+            fixCardHeights();
+            
+            // Luego inicializar gráficos con un pequeño retraso
+            setTimeout(function() {
+                // Llamar a la función del archivo inventory-charts.js
+                initializeCharts(
+                    inventoryData.categoryLabels,
+                    inventoryData.categoryQuantities,
+                    inventoryData.lowStockLabels,
+                    inventoryData.lowStockQuantities,
+                    inventoryData.lowStockThresholds
+                );
+            }, 150);
+            
+            // Animación para las alertas
+            $('.alert').each(function() {
+                $(this).slideDown('slow');
+                
+                // Auto-ocultar después de 5 segundos
+                const alert = $(this);
+                setTimeout(function() {
+                    alert.slideUp('slow', function() {
+                        alert.remove();
+                    });
+                }, 5000);
+            });
+        });
+        
+        // Manejar eventos de redimensionamiento
+        let resizeTimeout;
+        $(window).on('resize', function() {
+            // Debounce para evitar múltiples ejecuciones
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                fixCardHeights();
             }, 250);
         });
     });
