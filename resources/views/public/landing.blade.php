@@ -540,7 +540,7 @@
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
                             <h4>Dirección</h4>
-                            <p class="mb-0">Calle Principal #123<br>Ciudad, CP 12345</p>
+                            <p class="mb-0">Carrera 55b #15-58<br>Rionegro, Antioquia</p>
                         </div>
                     </div>
                 </div>
@@ -571,7 +571,15 @@
             <div class="row mt-5">
                 <div class="col-12">
                     <div class="ratio ratio-21x9" style="height: 400px;">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d387193.3059445135!2d-74.25986613799748!3d40.69714941774136!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2sco!4v1631452424174!5m2!1sen!2sco" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        <!-- 
+                        Para cambiar la ubicación:
+                        1. Ve a Google Maps (https://maps.google.com)
+                        2. Busca la ubicación deseada
+                        3. Haz clic en "Compartir"
+                        4. Selecciona la pestaña "Insertar un mapa"
+                        5. Copia la URL dentro del atributo "src" y reemplaza la URL actual
+                        -->
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7275.562669698257!2d-75.38585170979741!3d6.126832498411359!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e469f2923df3565%3A0x6f73835ec96c331!2sCra.%2055b%20%23%2015-58%2C%20Rionegro%2C%20Antioquia!5e0!3m2!1ses!2sco!4v1757624022154!5m2!1ses!2sco" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                 </div>
             </div>
