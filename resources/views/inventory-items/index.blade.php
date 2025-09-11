@@ -156,24 +156,6 @@
         </div>
         <div class="card-body">
             <!-- Notifications are now handled by toast system -->
-            
-            <div class="alert alert-info alert-dismissible fade show" role="alert" id="stockOperationsAlert">
-                <div>
-                    <i class="fas fa-info-circle mr-2"></i> Las operaciones de gestión de stock (añadir/retirar) ahora están disponibles exclusivamente desde la página de detalle de cada producto.
-                </div>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            
-            <script>
-                // Auto-dismiss this specific alert after 10 seconds
-                setTimeout(function() {
-                    $('#stockOperationsAlert').fadeOut('slow', function() {
-                        $(this).remove();
-                    });
-                }, 10000);
-            </script>
 
             <div class="table-responsive">
                 <table class="table table-bordered datatable-table" id="dt-table" width="100%" cellspacing="0">
@@ -417,16 +399,61 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<!-- Debugging de Chart.js -->
+<script>
+    // Verificar si Chart.js está disponible
+    if (typeof Chart !== 'undefined') {
+        console.log("✓ Chart.js detectado, versión:", Chart.version);
+    } else {
+        console.error("❌ Chart.js NO detectado");
+    }
+</script>
+
 <script src="{{ asset('js/inventory-charts.js') }}"></script>
 
-<!-- Script de inicialización (separamos el paso de datos de PHP a JS) -->
+<!-- Datos de inventario como variables JavaScript -->
 <script>
-    // Datos PHP ocultos para ser utilizados en JavaScript
+    // Mejor forma de manejar los datos PHP en JS
+    (function() {
+        console.log("%c[DATA LOADER] Iniciando carga de datos", "background:blue; color:white");
+        
+        // Datos crudos (para inspección de consola)
+        console.log("Datos de categorías disponibles para JS");
+        
+        // Usar variables PHP renderizadas como strings y luego parseadas
+        window.inventoryData = {
+            categoryLabels: JSON.parse('{!! json_encode($categoryLabels ?? []) !!}'),
+            categoryQuantities: JSON.parse('{!! json_encode($categoryQuantities ?? []) !!}'),
+            lowStockLabels: JSON.parse('{!! json_encode($lowStockLabels ?? []) !!}'),
+            lowStockQuantities: JSON.parse('{!! json_encode($lowStockQuantities ?? []) !!}'),
+            lowStockThresholds: JSON.parse('{!! json_encode($lowStockThresholds ?? []) !!}')
+        };
+        
+        // Verificar los datos
+        if (!Array.isArray(window.inventoryData.categoryLabels)) {
+            console.error("categoryLabels no es un array:", window.inventoryData.categoryLabels);
+            window.inventoryData.categoryLabels = [];
+        }
+        
+        if (!Array.isArray(window.inventoryData.categoryQuantities)) {
+            console.error("categoryQuantities no es un array:", window.inventoryData.categoryQuantities);
+            window.inventoryData.categoryQuantities = [];
+        }
+        
+        console.log("%c✓ Datos cargados correctamente", "color:green; font-weight:bold");
+        console.log("Resumen de datos:", {
+            categorías: window.inventoryData.categoryLabels.length,
+            stockBajo: window.inventoryData.lowStockLabels.length
+        });
+        
+        // El gráfico ahora se inicializa directamente en document.ready, 
+        // así que no necesitamos esta lógica adicional de inicialización
+        console.log("%c✓ Los gráficos se inicializarán cuando el documento esté listo", "color:blue; font-weight:bold");
+    })();
 </script>
 
 <!-- 
-    Datos del inventario (Este método elimina los errores de sintaxis en VS Code)
+    Datos del inventario (Este método mantiene una copia en formato JSON)
     VSCode no analiza el contenido de comentarios HTML, por lo que no generará errores
 -->
 <script id="inventory-data" type="application/json">
@@ -448,25 +475,98 @@
 <script>
     // Inicialización principal cuando el documento está listo
     $(document).ready(function() {
-        console.log('Inicializando scripts de inventory-items...');
+        console.log('%c DOCUMENT READY', 'background:purple; color:white; font-size: 14px');
         
-        // Cargar datos de inventario desde el JSON embebido
-        let inventoryData;
-        try {
-            // Obtener los datos del elemento oculto
-            const dataElement = document.getElementById('inventory-data');
-            inventoryData = JSON.parse(dataElement.textContent);
-            console.log('Datos de inventario cargados correctamente');
-        } catch (e) {
-            console.error('Error al cargar datos de inventario:', e);
-            inventoryData = {
-                categoryLabels: [],
-                categoryQuantities: [],
-                lowStockLabels: [],
-                lowStockQuantities: [],
-                lowStockThresholds: []
-            };
+        // Verificar elementos críticos
+        const chartElement = document.getElementById('inventorySummaryChart');
+        if (chartElement) {
+            console.log("✓ Canvas encontrado correctamente", chartElement);
+        } else {
+            console.error("❌ Canvas NO encontrado en el DOM");
         }
+        
+        // Implementación directa del gráfico de resumen
+        setTimeout(function() {
+            try {
+                if (typeof Chart === 'undefined') {
+                    throw new Error("Chart.js no disponible");
+                }
+                
+                const canvas = document.getElementById('inventorySummaryChart');
+                if (!canvas) {
+                    throw new Error("Canvas no encontrado");
+                }
+                
+                // Destruir cualquier instancia previa del gráfico
+                const chartInstance = Chart.getChart(canvas);
+                if (chartInstance) {
+                    console.log("Destruyendo instancia previa del gráfico");
+                    chartInstance.destroy();
+                }
+                
+                // Datos para el gráfico desde el objeto global window.inventoryData
+                const categoryLabels = window.inventoryData.categoryLabels;
+                const categoryQuantities = window.inventoryData.categoryQuantities;
+                
+                console.log("Datos para el gráfico:", {
+                    labels: categoryLabels,
+                    data: categoryQuantities
+                });
+                
+                if (!categoryLabels.length) {
+                    throw new Error("No hay datos de categorías disponibles");
+                }
+                
+                // Colores predefinidos para el gráfico
+                const colors = [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', 
+                    '#858796', '#5a5c69', '#2e59d9', '#17a673', '#2c9faf'
+                ];
+                
+                // Crear gráfico directamente
+                const ctx = canvas.getContext('2d');
+                const summaryChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: categoryLabels,
+                        datasets: [{
+                            data: categoryQuantities,
+                            backgroundColor: colors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+                
+                console.log("%c ¡Gráfico creado exitosamente! 🎉", "color:green; font-weight:bold; font-size: 14px");
+                console.log("ID de gráfico asignado:", summaryChart.id);
+                
+            } catch (error) {
+                console.error("ERROR CRÍTICO:", error);
+                
+                // Mostrar error en la interfaz
+                const container = document.querySelector('.chart-container');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="alert alert-danger text-center p-3">
+                            <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
+                            <h5>Error al cargar el gráfico</h5>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+        }, 500);
         
         // SweetAlert para confirmación de eliminación
         $('.table').on('submit', 'form', function(e) {
@@ -677,17 +777,10 @@
             // Primero ajustar alturas
             fixCardHeights();
             
-            // Luego inicializar gráficos con un pequeño retraso
-            setTimeout(function() {
-                // Llamar a la función del archivo inventory-charts.js
-                initializeCharts(
-                    inventoryData.categoryLabels,
-                    inventoryData.categoryQuantities,
-                    inventoryData.lowStockLabels,
-                    inventoryData.lowStockQuantities,
-                    inventoryData.lowStockThresholds
-                );
-            }, 150);
+            // Los gráficos ahora se inicializan directamente en el document.ready principal
+            
+            // Ajustar alturas de tarjetas para mantener el diseño uniforme
+            fixCardHeights();
             
             // Alertas ahora son manejadas por el sistema de toast
         });
