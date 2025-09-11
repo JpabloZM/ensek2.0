@@ -105,26 +105,14 @@
                 <hr class="my-4">
 
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group row mb-0">
-                            <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save fa-sm mr-1"></i> Guardar Cambios
-                                </button>
-                                <a href="{{ route('admin.inventory-items.index') }}" class="btn btn-secondary ml-2">
-                                    <i class="fas fa-times fa-sm mr-1"></i> Cancelar
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 text-right">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addStockModal">
-                                <i class="fas fa-plus-circle fa-sm mr-1"></i> Añadir Stock
+                    <div class="col-md-12">
+                        <div class="form-group mb-0">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save fa-sm mr-1"></i> Guardar Cambios
                             </button>
-                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#removeStockModal">
-                                <i class="fas fa-minus-circle fa-sm mr-1"></i> Retirar Stock
-                            </button>
+                            <a href="{{ route('admin.inventory-items.index') }}" class="btn btn-secondary ml-2">
+                                <i class="fas fa-times fa-sm mr-1"></i> Cancelar
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -133,77 +121,6 @@
     </div>
 </div>
 
-<!-- Modal para añadir stock -->
-<div class="modal fade" id="addStockModal" tabindex="-1" role="dialog" aria-labelledby="addStockModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form action="{{ route('admin.inventory-items.add-stock', $item->id) }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addStockModalLabel">Añadir Stock</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="current_stock">Stock Actual:</label>
-                        <input type="text" class="form-control" id="current_stock" value="{{ $item->quantity }}" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="add_quantity">Cantidad a añadir:</label>
-                        <input type="number" class="form-control" name="add_quantity" id="add_quantity" min="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="notes">Notas (opcional):</label>
-                        <textarea class="form-control" name="notes" id="notes" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para retirar stock -->
-<div class="modal fade" id="removeStockModal" tabindex="-1" role="dialog" aria-labelledby="removeStockModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form action="{{ route('admin.inventory-items.remove-stock', $item->id) }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <div class="modal-header">
-                    <h5 class="modal-title" id="removeStockModalLabel">Retirar Stock</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="current_remove_stock">Stock Actual:</label>
-                        <input type="text" class="form-control" id="current_remove_stock" value="{{ $item->quantity }}" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="remove_quantity">Cantidad a retirar:</label>
-                        <input type="number" class="form-control" name="remove_quantity" id="remove_quantity" min="1" max="{{ $item->quantity }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="remove_notes">Notas (opcional):</label>
-                        <textarea class="form-control" name="notes" id="remove_notes" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
