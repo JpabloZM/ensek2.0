@@ -34,6 +34,16 @@
                             @enderror
                         </div>
                         
+                        <div class="form-floating mb-3">
+                            <input id="phone" type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" autocomplete="tel" placeholder="{{ __('Teléfono (opcional)') }}">
+                            <label for="phone">{{ __('Teléfono (opcional)') }}</label>
+                            @error('phone')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                        
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3 mb-md-0">

@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use App\Models\ServiceRequest;
+use App\Models\User;
+use App\Mail\NewServiceRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class ServiceRequestController extends Controller
 {
@@ -50,8 +54,33 @@ class ServiceRequestController extends Controller
         $serviceRequest->status = 'pendiente';
         $serviceRequest->save();
         
+        // Notificar a los administradores si la solicitud es creada desde el panel admin
+        $this->notifyAdminsOfNewRequest($serviceRequest);
+        
         return redirect()->route('admin.service-requests.index')
             ->with('success', 'Solicitud de servicio creada correctamente.');
+    }
+    
+    /**
+     * Notify administrators of new service request
+     */
+    private function notifyAdminsOfNewRequest($serviceRequest)
+    {
+        // Si estamos en modo de desarrollo, no enviar correos
+        if (app()->environment('local')) {
+            Log::info('Nueva solicitud de servicio creada: ' . $serviceRequest->id);
+            return;
+        }
+        
+        // Obtener todos los usuarios administradores
+        $admins = User::whereHas('role', function ($query) {
+            $query->where('name', 'Administrador');
+        })->get();
+        
+        // Enviar correo a cada administrador
+        foreach ($admins as $admin) {
+            Mail::to($admin->email)->send(new NewServiceRequest($serviceRequest));
+        }
     }
 
     /**

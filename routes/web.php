@@ -12,9 +12,13 @@ use App\Http\Controllers\TechnicianController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Ruta principal redirige a login
-Route::get('/', function () {
-    return redirect()->route('login');
+// Rutas públicas
+Route::get('/', [App\Http\Controllers\PublicController::class, 'index'])->name('public.landing');
+Route::get('/thank-you', [App\Http\Controllers\PublicController::class, 'thankYou'])->name('public.thank-you');
+
+// Ruta protegida para solicitar servicios (solo usuarios autenticados)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/service-request', [App\Http\Controllers\PublicController::class, 'storeServiceRequest'])->name('public.service-request');
 });
 
 // Rutas de autenticación
@@ -123,7 +127,7 @@ Route::get('/home', function () {
     } elseif (Auth::user()->role->name === 'Técnico') {
         return redirect()->route('technician.dashboard');
     } else {
-        // Por defecto para clientes
-        return redirect()->route('client.dashboard');
+        // Por defecto para clientes (redireccionar a la landing page)
+        return redirect()->route('public.landing');
     }
 })->name('home');

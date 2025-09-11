@@ -436,6 +436,9 @@
 @endsection
 
 @push('scripts')
+<!-- Script de depuración primero para monitorear todo -->
+<script src="{{ asset('js/inventory-debug.js') }}"></script>
+
 <!-- Debugging de Chart.js -->
 <script>
     // Verificar si Chart.js está disponible
@@ -446,71 +449,139 @@
     }
 </script>
 
-<script src="{{ asset('js/inventory-charts.js') }}"></script>
+<!-- Cargar el archivo JS corregido -->
+<script src="{{ asset('js/inventory-charts-fixed.js') }}"></script>
 
-<!-- Datos de inventario como variables JavaScript -->
+<!-- Pasando datos de PHP a JavaScript de manera segura -->
+<div id="php-data-container" style="display:none;" 
+     data-category-labels="{{ json_encode($categoryLabels ?? []) }}"
+     data-category-quantities="{{ json_encode($categoryQuantities ?? []) }}"
+     data-low-stock-labels="{{ json_encode($lowStockLabels ?? []) }}"
+     data-low-stock-quantities="{{ json_encode($lowStockQuantities ?? []) }}"
+     data-low-stock-thresholds="{{ json_encode($lowStockThresholds ?? []) }}">
+</div>
+
 <script>
-    // Mejor forma de manejar los datos PHP en JS
+    // Definimos los datos PHP como variables JavaScript globales
+    var PHP_DATA = {};
+    
+    // Función para parsear datos del contenedor oculto
+    function parseDataFromContainer() {
+        var container = document.getElementById('php-data-container');
+        if (container) {
+            try {
+                PHP_DATA.categoryLabels = JSON.parse(container.getAttribute('data-category-labels') || '[]');
+                PHP_DATA.categoryQuantities = JSON.parse(container.getAttribute('data-category-quantities') || '[]');
+                PHP_DATA.lowStockLabels = JSON.parse(container.getAttribute('data-low-stock-labels') || '[]');
+                PHP_DATA.lowStockQuantities = JSON.parse(container.getAttribute('data-low-stock-quantities') || '[]');
+                PHP_DATA.lowStockThresholds = JSON.parse(container.getAttribute('data-low-stock-thresholds') || '[]');
+                console.log("✓ Datos PHP cargados correctamente desde atributos data");
+            } catch (error) {
+                console.error("Error al parsear datos PHP:", error);
+                // Inicializar con arrays vacíos por seguridad
+                PHP_DATA = {
+                    categoryLabels: [],
+                    categoryQuantities: [],
+                    lowStockLabels: [],
+                    lowStockQuantities: [],
+                    lowStockThresholds: []
+                };
+            }
+        }
+    }
+    
+    // Parsear datos inmediatamente
+    parseDataFromContainer();
+</script>
+
+<script>
+    // Cargamos los datos en nuestra estructura
     (function() {
         console.log("%c[DATA LOADER] Iniciando carga de datos", "background:blue; color:white");
         
-        // Datos crudos (para inspección de consola)
-        console.log("Datos de categorías disponibles para JS");
-        
-        // Usar variables PHP renderizadas como strings y luego parseadas
-        window.inventoryData = {
-            categoryLabels: JSON.parse('{!! json_encode($categoryLabels ?? []) !!}'),
-            categoryQuantities: JSON.parse('{!! json_encode($categoryQuantities ?? []) !!}'),
-            lowStockLabels: JSON.parse('{!! json_encode($lowStockLabels ?? []) !!}'),
-            lowStockQuantities: JSON.parse('{!! json_encode($lowStockQuantities ?? []) !!}'),
-            lowStockThresholds: JSON.parse('{!! json_encode($lowStockThresholds ?? []) !!}')
-        };
-        
-        // Verificar los datos
-        if (!Array.isArray(window.inventoryData.categoryLabels)) {
-            console.error("categoryLabels no es un array:", window.inventoryData.categoryLabels);
-            window.inventoryData.categoryLabels = [];
+        try {
+            // Datos crudos (para inspección de consola)
+            console.log("Datos de categorías disponibles para JS");
+            
+            // Asignar datos a la estructura global desde PHP_DATA (con valores predeterminados seguros)
+            window.inventoryData = {
+                categoryLabels: Array.isArray(PHP_DATA.categoryLabels) ? PHP_DATA.categoryLabels : [],
+                categoryQuantities: Array.isArray(PHP_DATA.categoryQuantities) ? PHP_DATA.categoryQuantities : [],
+                lowStockLabels: Array.isArray(PHP_DATA.lowStockLabels) ? PHP_DATA.lowStockLabels : [],
+                lowStockQuantities: Array.isArray(PHP_DATA.lowStockQuantities) ? PHP_DATA.lowStockQuantities : [],
+                lowStockThresholds: Array.isArray(PHP_DATA.lowStockThresholds) ? PHP_DATA.lowStockThresholds : []
+            };
+            
+            // Log de resumen de datos cargados
+            console.log("Resumen de datos cargados:", {
+                categorías: window.inventoryData.categoryLabels.length,
+                cantidades: window.inventoryData.categoryQuantities.length,
+                etiquetasStockBajo: window.inventoryData.lowStockLabels.length
+            });
+            
+            // Validar los datos (asegurar que son arrays)
+            Object.keys(window.inventoryData).forEach(key => {
+                if (!Array.isArray(window.inventoryData[key])) {
+                    console.warn(`${key} no es un array, inicializando como array vacío`);
+                    window.inventoryData[key] = [];
+                }
+            });
+            
+            console.log("%c✓ Datos cargados correctamente", "color:green; font-weight:bold");
+            console.log("Resumen de datos:", {
+                categorías: window.inventoryData.categoryLabels.length,
+                stockBajo: window.inventoryData.lowStockLabels.length
+            });
+        } catch (error) {
+            console.error("Error al cargar datos:", error);
+            // Inicializar con valores vacíos en caso de error
+            window.inventoryData = {
+                categoryLabels: [],
+                categoryQuantities: [],
+                lowStockLabels: [],
+                lowStockQuantities: [],
+                lowStockThresholds: []
+            };
         }
-        
-        if (!Array.isArray(window.inventoryData.categoryQuantities)) {
-            console.error("categoryQuantities no es un array:", window.inventoryData.categoryQuantities);
-            window.inventoryData.categoryQuantities = [];
-        }
-        
-        console.log("%c✓ Datos cargados correctamente", "color:green; font-weight:bold");
-        console.log("Resumen de datos:", {
-            categorías: window.inventoryData.categoryLabels.length,
-            stockBajo: window.inventoryData.lowStockLabels.length
-        });
-        
-        // El gráfico ahora se inicializa directamente en document.ready, 
-        // así que no necesitamos esta lógica adicional de inicialización
-        console.log("%c✓ Los gráficos se inicializarán cuando el documento esté listo", "color:blue; font-weight:bold");
     })();
 </script>
 
 <!-- 
-    Datos del inventario (Este método mantiene una copia en formato JSON)
-    VSCode no analiza el contenido de comentarios HTML, por lo que no generará errores
+    Datos del inventario (Este método mantiene una copia en formato JSON para acceso alternativo)
+    Es una forma redundante pero segura de pasar datos
 -->
-<script id="inventory-data" type="application/json">
-@php
-    // Preparamos los datos en PHP primero
-    $inventoryData = [
-        'categoryLabels' => $categoryLabels ?? [],
-        'categoryQuantities' => $categoryQuantities ?? [],
-        'lowStockLabels' => $lowStockLabels ?? [],
-        'lowStockQuantities' => $lowStockQuantities ?? [],
-        'lowStockThresholds' => $lowStockThresholds ?? []
-    ];
-    
-    // Luego los codificamos a JSON una sola vez
-    echo json_encode($inventoryData, JSON_PRETTY_PRINT);
-@endphp
+<!-- Los datos JSON ahora se generan dinámicamente desde PHP_DATA -->
+<script>
+    // Creamos un elemento oculto con los datos JSON
+    (function() {
+        try {
+            // Crear el elemento de script con tipo application/json
+            var scriptElement = document.createElement('script');
+            scriptElement.id = 'inventory-data';
+            scriptElement.type = 'application/json';
+            
+            // Generar JSON desde los datos de PHP
+            var jsonData = JSON.stringify({
+                categoryLabels: PHP_DATA.categoryLabels,
+                categoryQuantities: PHP_DATA.categoryQuantities,
+                lowStockLabels: PHP_DATA.lowStockLabels,
+                lowStockQuantities: PHP_DATA.lowStockQuantities,
+                lowStockThresholds: PHP_DATA.lowStockThresholds
+            }, null, 2);
+            
+            // Asignar el contenido y añadir al DOM
+            scriptElement.textContent = jsonData;
+            document.head.appendChild(scriptElement);
+            
+            console.log("✓ Elemento JSON generado dinámicamente");
+        } catch(e) {
+            console.error("Error al crear el elemento JSON:", e);
+        }
+    })();
 </script>
 
 <script>
-    // Inicialización principal cuando el documento está listo
+    // Inicialización principal cuando el documento está listo - VERSIÓN MEJORADA
     $(document).ready(function() {
         console.log('%c DOCUMENT READY', 'background:purple; color:white; font-size: 14px');
         
@@ -522,88 +593,9 @@
             console.error("❌ Canvas NO encontrado en el DOM");
         }
         
-        // Implementación directa del gráfico de resumen
-        setTimeout(function() {
-            try {
-                if (typeof Chart === 'undefined') {
-                    throw new Error("Chart.js no disponible");
-                }
-                
-                const canvas = document.getElementById('inventorySummaryChart');
-                if (!canvas) {
-                    throw new Error("Canvas no encontrado");
-                }
-                
-                // Destruir cualquier instancia previa del gráfico
-                const chartInstance = Chart.getChart(canvas);
-                if (chartInstance) {
-                    console.log("Destruyendo instancia previa del gráfico");
-                    chartInstance.destroy();
-                }
-                
-                // Datos para el gráfico desde el objeto global window.inventoryData
-                const categoryLabels = window.inventoryData.categoryLabels;
-                const categoryQuantities = window.inventoryData.categoryQuantities;
-                
-                console.log("Datos para el gráfico:", {
-                    labels: categoryLabels,
-                    data: categoryQuantities
-                });
-                
-                if (!categoryLabels.length) {
-                    throw new Error("No hay datos de categorías disponibles");
-                }
-                
-                // Colores predefinidos para el gráfico
-                const colors = [
-                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', 
-                    '#858796', '#5a5c69', '#2e59d9', '#17a673', '#2c9faf'
-                ];
-                
-                // Crear gráfico directamente
-                const ctx = canvas.getContext('2d');
-                const summaryChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: categoryLabels,
-                        datasets: [{
-                            data: categoryQuantities,
-                            backgroundColor: colors,
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'bottom'
-                            }
-                        },
-                        cutout: '60%'
-                    }
-                });
-                
-                console.log("%c ¡Gráfico creado exitosamente! 🎉", "color:green; font-weight:bold; font-size: 14px");
-                console.log("ID de gráfico asignado:", summaryChart.id);
-                
-            } catch (error) {
-                console.error("ERROR CRÍTICO:", error);
-                
-                // Mostrar error en la interfaz
-                const container = document.querySelector('.chart-container');
-                if (container) {
-                    container.innerHTML = `
-                        <div class="alert alert-danger text-center p-3">
-                            <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
-                            <h5>Error al cargar el gráfico</h5>
-                            <p>${error.message}</p>
-                        </div>
-                    `;
-                }
-            }
-        }, 500);
+        // Ya no inicializamos directamente el gráfico aquí
+        // La inicialización se hace desde inventory-charts-fixed.js
+        // para evitar duplicación y problemas de inicialización
         
         // SweetAlert para confirmación de eliminación
         $('.table').on('submit', 'form', function(e) {
@@ -781,73 +773,17 @@
             setupRemoveStockModal(id, name, code, current);
         });
         
-        // Función para ajustar alturas de tarjetas
-        function fixCardHeights() {
-            console.log('Ajustando alturas de las tarjetas...');
-            
-            // Aplicar la misma altura a las tarjetas en la misma fila
-            if (window.innerWidth >= 992) {
-                // Aseguramos que ambas tarjetas tengan exactamente la misma altura
-                const leftCard = $('#dashboardRow .col-xl-8 .card');
-                const rightCard = $('#dashboardRow .col-xl-4 .card');
-                
-                // Reset inicial
-                leftCard.css('height', '');
-                rightCard.css('height', '');
-                
-                // Medimos las alturas actuales
-                const leftHeight = leftCard.outerHeight();
-                const rightHeight = rightCard.outerHeight();
-                
-                // Encontramos la altura máxima
-                const maxHeight = Math.max(leftHeight, rightHeight);
-                
-                console.log('Alturas de tarjetas:', {
-                    izquierda: leftHeight,
-                    derecha: rightHeight,
-                    máxima: maxHeight
-                });
-                
-                // Aplicamos la misma altura a ambas tarjetas
-                leftCard.css('height', maxHeight + 'px');
-                rightCard.css('height', maxHeight + 'px');
-                
-                // También aseguramos que los contenedores internos tengan la misma altura
-                const chartContainer = $('.chart-container');
-                const stockList = $('.stock-list');
-                
-                if (chartContainer.length && stockList.length) {
-                    // Altura de contenido = altura de tarjeta - altura de cabecera
-                    const contentHeight = maxHeight - 48; // 48px para el card-header
-                    chartContainer.css('height', contentHeight + 'px');
-                    stockList.css('height', contentHeight + 'px');
-                    
-                    console.log('Contenedores internos ajustados a:', contentHeight + 'px');
-                }
-            }
-        }
+        // La función fixCardHeights() ahora está en inventory-charts-fixed.js
+        // para mantener el código más organizado y evitar duplicación
         
         // Inicialización cuando la página está completamente cargada
         $(window).on('load', function() {
             console.log('Página cargada completamente, inicializando componentes...');
             
-            // Esperar a que todos los elementos estén renderizados
-            setTimeout(function() {
-                // Ajustar alturas de tarjetas para mantener el diseño uniforme
-                fixCardHeights();
-            }, 300);
+            // Ya no llamamos a fixCardHeights() aquí porque ahora está en inventory-charts-fixed.js
+            // y se llama automáticamente
             
             // Alertas ahora son manejadas por el sistema de toast
-        });
-        
-        // Manejar eventos de redimensionamiento
-        let resizeTimeout;
-        $(window).on('resize', function() {
-            // Debounce para evitar múltiples ejecuciones
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(function() {
-                fixCardHeights();
-            }, 250);
         });
         
         // Búsqueda dinámica para productos del inventario
