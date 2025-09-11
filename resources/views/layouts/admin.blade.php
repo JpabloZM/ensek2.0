@@ -17,9 +17,8 @@
     <!-- jQuery primero que todo -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
-    <!-- Bootstrap JS (necesario para DataTables) -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    <!-- Bootstrap JS completo (incluye Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Sistema de búsqueda personalizado (reemplaza completamente DataTables) -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css"/>
@@ -328,17 +327,15 @@
                             <a class="nav-link dropdown-toggle fw-bold text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user me-2"></i>{{ Auth::user()->name }}
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle me-2"></i>Perfil</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item text-danger" href="{{ route('logout') }}" 
-                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                       <i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión
-                                    </a>
-                                </li>
-                            </ul>
+                            <div class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#"><i class="fas fa-user-circle me-2"></i>Perfil</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="{{ route('logout') }}" 
+                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                   <i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión
+                                </a>
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -357,6 +354,22 @@
                 e.preventDefault();
                 document.getElementById("wrapper").classList.toggle("toggled");
             });
+            
+            // Inicializar los dropdowns de Bootstrap manualmente
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+            
+            // Asegurar que el dropdown de perfil funcione correctamente
+            const profileDropdown = document.getElementById('navbarDropdown');
+            if (profileDropdown) {
+                profileDropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const dropdown = bootstrap.Dropdown.getInstance(profileDropdown) || new bootstrap.Dropdown(profileDropdown);
+                    dropdown.toggle();
+                });
+            }
             
             // Ajustar altura en dispositivos móviles
             function adjustHeight() {
@@ -482,6 +495,33 @@
     </script>
     
     @stack('scripts')
+    
+    <!-- Inicialización de los componentes Bootstrap -->
+    <script>
+        // Función para verificar la inicialización de dropdown
+        function initBootstrapComponents() {
+            // Verificar si el dropdown de perfil funciona
+            const profileDropdown = document.getElementById('navbarDropdown');
+            if (profileDropdown && typeof bootstrap !== 'undefined') {
+                console.log('Inicializando dropdown de perfil...');
+                const dropdown = new bootstrap.Dropdown(profileDropdown);
+                
+                // Solución alternativa: usar un manipulador de eventos click
+                profileDropdown.addEventListener('click', function(e) {
+                    console.log('Click en dropdown de perfil');
+                });
+            } else {
+                console.warn('No se pudo inicializar el dropdown de perfil');
+            }
+        }
+        
+        // Ejecutar cuando el DOM esté completamente cargado
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initBootstrapComponents);
+        } else {
+            initBootstrapComponents();
+        }
+    </script>
     
     <!-- Utilizamos nuestro script personalizado datatables-custom.js para inicializar las tablas -->
 </body>

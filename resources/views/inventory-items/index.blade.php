@@ -90,6 +90,22 @@
     .search-highlight {
         background-color: #fff3cd;
     }
+    
+    /* Ajustes para el widget de stock bajo */
+    .stock-list {
+        height: 385px !important;
+        min-height: 385px;
+        overflow-y: auto;
+    }
+    
+    /* Asegurar que las cards del dashboard tengan la misma altura */
+    #dashboardRow .card {
+        height: 100%;
+    }
+    
+    #dashboardRow .card-body {
+        height: calc(100% - 48px); /* 48px es aproximadamente la altura del card-header */
+    }
 </style>
 @endpush
 
@@ -252,12 +268,12 @@
     <div class="row" id="dashboardRow">
         <!-- Stock General -->
         <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4 dashboard-card">
+            <div class="card shadow mb-4 dashboard-card h-100">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Resumen de Inventario</h6>
                 </div>
                 <div class="card-body">
-                    <div class="chart-container" style="position: relative; height: 350px;">
+                    <div class="chart-container" style="position: relative; height: 385px;">
                         <canvas id="inventorySummaryChart"></canvas>
                     </div>
                 </div>
@@ -266,13 +282,13 @@
 
         <!-- Items con Stock Bajo -->
         <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4 dashboard-card">
+            <div class="card shadow mb-4 dashboard-card h-100">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Items con Stock Bajo</h6>
                 </div>
                 <div class="card-body">
                     @if($lowStockItems->count() > 0)
-                        <div class="list-group stock-list" style="max-height: 350px; overflow-y: auto;">
+                        <div class="list-group stock-list" style="height: 385px; overflow-y: auto;">
                             @foreach($lowStockItems as $item)
                                 <a href="{{ route('admin.inventory-items.show', $item->id) }}" class="list-group-item list-group-item-action flex-column align-items-start">
                                     <div class="d-flex w-100 justify-content-between">
@@ -291,7 +307,7 @@
                             </div>
                         @endif
                     @else
-                        <div class="text-center py-5 d-flex flex-column justify-content-center" style="height: 350px;">
+                        <div class="text-center py-5 d-flex flex-column justify-content-center" style="height: 385px;">
                             <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
                             <p class="mb-0">Todos los productos tienen stock suficiente</p>
                         </div>
@@ -768,25 +784,45 @@
         // Función para ajustar alturas de tarjetas
         function fixCardHeights() {
             console.log('Ajustando alturas de las tarjetas...');
-            // Resetear alturas para un nuevo cálculo
-            $('.dashboard-card').css('height', 'auto');
             
             // Aplicar la misma altura a las tarjetas en la misma fila
             if (window.innerWidth >= 992) {
-                const rowCards = $('#dashboardRow .dashboard-card');
-                let maxHeight = 0;
+                // Aseguramos que ambas tarjetas tengan exactamente la misma altura
+                const leftCard = $('#dashboardRow .col-xl-8 .card');
+                const rightCard = $('#dashboardRow .col-xl-4 .card');
                 
-                // Encontrar la altura máxima
-                rowCards.each(function() {
-                    const height = $(this).outerHeight();
-                    if (height > maxHeight) {
-                        maxHeight = height;
-                    }
+                // Reset inicial
+                leftCard.css('height', '');
+                rightCard.css('height', '');
+                
+                // Medimos las alturas actuales
+                const leftHeight = leftCard.outerHeight();
+                const rightHeight = rightCard.outerHeight();
+                
+                // Encontramos la altura máxima
+                const maxHeight = Math.max(leftHeight, rightHeight);
+                
+                console.log('Alturas de tarjetas:', {
+                    izquierda: leftHeight,
+                    derecha: rightHeight,
+                    máxima: maxHeight
                 });
                 
-                // Aplicar la altura máxima a todas las tarjetas
-                if (maxHeight > 0) {
-                    rowCards.css('height', maxHeight + 'px');
+                // Aplicamos la misma altura a ambas tarjetas
+                leftCard.css('height', maxHeight + 'px');
+                rightCard.css('height', maxHeight + 'px');
+                
+                // También aseguramos que los contenedores internos tengan la misma altura
+                const chartContainer = $('.chart-container');
+                const stockList = $('.stock-list');
+                
+                if (chartContainer.length && stockList.length) {
+                    // Altura de contenido = altura de tarjeta - altura de cabecera
+                    const contentHeight = maxHeight - 48; // 48px para el card-header
+                    chartContainer.css('height', contentHeight + 'px');
+                    stockList.css('height', contentHeight + 'px');
+                    
+                    console.log('Contenedores internos ajustados a:', contentHeight + 'px');
                 }
             }
         }
@@ -795,13 +831,11 @@
         $(window).on('load', function() {
             console.log('Página cargada completamente, inicializando componentes...');
             
-            // Primero ajustar alturas
-            fixCardHeights();
-            
-            // Los gráficos ahora se inicializan directamente en el document.ready principal
-            
-            // Ajustar alturas de tarjetas para mantener el diseño uniforme
-            fixCardHeights();
+            // Esperar a que todos los elementos estén renderizados
+            setTimeout(function() {
+                // Ajustar alturas de tarjetas para mantener el diseño uniforme
+                fixCardHeights();
+            }, 300);
             
             // Alertas ahora son manejadas por el sistema de toast
         });
