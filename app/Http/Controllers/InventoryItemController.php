@@ -82,6 +82,24 @@ class InventoryItemController extends Controller
             $lowStockThresholds[] = $item->minimum_stock;
         }
         
+        // Si es una solicitud AJAX, devolvemos la vista parcial
+        if ($request->ajax()) {
+            // Aplicamos el mismo formato de URL para mantener la paginación funcionando
+            $items->appends($request->except('_token'));
+            
+            return view('inventory-items.index', compact(
+                'items', 
+                'categories', 
+                'categoryLabels', 
+                'categoryQuantities', 
+                'lowStockItems', 
+                'lowStockTotal',
+                'lowStockLabels',
+                'lowStockQuantities',
+                'lowStockThresholds'
+            ));
+        }
+        
         return view('inventory-items.index', compact(
             'items', 
             'categories', 
@@ -130,7 +148,14 @@ class InventoryItemController extends Controller
         
         // Registrar movimiento inicial si hay stock
         if ($request->quantity > 0) {
-            $this->registerStockMovement($item->id, 'add', $request->quantity, 'Stock inicial');
+            // Crear directamente el movimiento inicial de stock
+            InventoryMovement::create([
+                'inventory_item_id' => $item->id,
+                'type' => 'add',
+                'quantity' => $request->quantity,
+                'notes' => 'Stock inicial',
+                'user_id' => Auth::id(),
+            ]);
         }
         
         return redirect()->route('admin.inventory-items.index')

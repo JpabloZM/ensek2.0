@@ -77,13 +77,14 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="unit_price">Precio Unitario <span class="text-danger">*</span></label>
+                            <label for="unit_price">Precio Unitario (COP) <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">$</span>
                                 </div>
-                                <input type="number" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $item->unit_price) }}" min="0" step="0.01" required>
+                                <input type="number" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $item->unit_price) }}" min="0" step="1" required>
                             </div>
+                            <small class="form-text text-muted">Precio en pesos colombianos (sin decimales)</small>
                         </div>
                     </div>
                     <div class="col-md-4">

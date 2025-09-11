@@ -31,7 +31,7 @@ class InventoryMovement extends Model
         'quantity' => 'integer',
         'previous_quantity' => 'integer',
         'new_quantity' => 'integer',
-        'unit_price' => 'decimal:2',
+        'unit_price' => 'decimal:0',
     ];
     
     /**

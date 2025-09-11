@@ -55,7 +55,7 @@
                                         <strong>Servicio:</strong> {{ $serviceRequest->service->name }}
                                     </div>
                                     <div class="mb-3">
-                                        <strong>Precio:</strong> ${{ number_format($serviceRequest->service->price, 2) }}
+                                        <strong>Precio:</strong> $ {{ number_format($serviceRequest->service->price, 0, ',', '.') }}
                                     </div>
                                     <div class="mb-3">
                                         <strong>Duración Estimada:</strong> {{ $serviceRequest->service->duration ?? 'No especificada' }}

@@ -76,6 +76,20 @@
         max-height: 350px;
         overflow-y: auto;
     }
+    
+    /* Estilos para la búsqueda dinámica */
+    .opacity-50 {
+        opacity: 0.5;
+        transition: opacity 0.3s ease;
+    }
+    
+    .table-responsive {
+        transition: opacity 0.3s ease;
+    }
+    
+    .search-highlight {
+        background-color: #fff3cd;
+    }
 </style>
 @endpush
 
@@ -122,10 +136,17 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="search">Buscar por nombre o código:</label>
-                    <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder="Nombre o código...">
+                    <div class="input-group">
+                        <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder="Nombre o código..." autocomplete="off">
+                        <div class="input-group-append">
+                            <button id="clearSearch" type="button" class="btn btn-outline-secondary" @if(!request('search')) style="display: none;" @endif>
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <button type="submit" class="btn btn-primary mr-2">
+                    <button type="submit" id="filterBtn" class="btn btn-primary mr-2">
                         <i class="fas fa-search fa-sm"></i> Filtrar
                     </button>
                     <a href="{{ route('admin.inventory-items.index') }}" class="btn btn-secondary">
@@ -180,8 +201,8 @@
                                 <td>{{ $item->category->name }}</td>
                                 <td>{{ $item->location ?? 'No especificada' }}</td>
                                 <td class="text-center">{{ $item->quantity }}</td>
-                                <td class="text-right">${{ number_format($item->unit_price, 2) }}</td>
-                                <td class="text-right">${{ number_format($item->quantity * $item->unit_price, 2) }}</td>
+                                <td class="text-right">$ {{ number_format($item->unit_price, 0, ',', '.') }}</td>
+                                <td class="text-right">$ {{ number_format($item->quantity * $item->unit_price, 0, ',', '.') }}</td>
                                 <td class="text-center">
                                     @if($item->isLowStock())
                                         <span class="badge badge-danger">Stock Bajo</span>
@@ -794,6 +815,104 @@
                 fixCardHeights();
             }, 250);
         });
+        
+        // Búsqueda dinámica para productos del inventario
+        let searchTimer;
+        
+        // Función para realizar la búsqueda en tiempo real
+        function performLiveSearch() {
+            const searchValue = $('#search').val().trim();
+            const category = $('#category').val();
+            const stockStatus = $('#stock_status').val();
+            
+            // Si hay al menos 2 caracteres o el campo está vacío y hay otros filtros
+            if (searchValue.length >= 2 || searchValue.length === 0) {
+                // Mostrar indicador de carga
+                const btn = $('#filterBtn');
+                const originalBtnHtml = btn.html();
+                btn.html('<i class="fas fa-spinner fa-spin"></i> Buscando...').prop('disabled', true);
+                
+                // Mostrar indicador de carga en la tabla
+                $('.table-responsive').addClass('opacity-50');
+                
+                // Enviar formulario automáticamente
+                $.ajax({
+                    url: "{{ route('admin.inventory-items.index') }}",
+                    data: {
+                        search: searchValue,
+                        category: category,
+                        stock_status: stockStatus
+                    },
+                    success: function(response) {
+                        // Extraer solo el contenido de la tabla del HTML de respuesta
+                        const newContent = $(response).find('.table-responsive').html();
+                        const paginationContent = $(response).find('.pagination-container').html();
+                        const resultsInfo = $(response).find('.text-muted').html();
+                        
+                        // Actualizar solo la tabla sin recargar toda la página
+                        $('.table-responsive').html(newContent).removeClass('opacity-50');
+                        $('.pagination-container').html(paginationContent);
+                        $('.text-muted').html(resultsInfo);
+                        
+                        // Restaurar el botón
+                        btn.html(originalBtnHtml).prop('disabled', false);
+                        
+                        // Actualizar URL sin recargar página (para mantener el historial)
+                        const params = new URLSearchParams();
+                        if (searchValue) params.append('search', searchValue);
+                        if (category) params.append('category', category);
+                        if (stockStatus) params.append('stock_status', stockStatus);
+                        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                        window.history.replaceState({}, '', newUrl);
+                    },
+                    error: function() {
+                        // Restaurar el botón y la tabla en caso de error
+                        btn.html(originalBtnHtml).prop('disabled', false);
+                        $('.table-responsive').removeClass('opacity-50');
+                        showToast('Error', 'No se pudo realizar la búsqueda', 'error');
+                    }
+                });
+            }
+        }
+        
+        // Manejar eventos para búsqueda en vivo
+        $('#search').on('input', function() {
+            const searchValue = $(this).val().trim();
+            
+            // Mostrar/ocultar botón de limpiar
+            if (searchValue.length > 0) {
+                $('#clearSearch').show();
+            } else {
+                $('#clearSearch').hide();
+            }
+            
+            // Debounce para evitar demasiadas peticiones
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(performLiveSearch, 500); // Esperar 500ms después de que el usuario deje de escribir
+        });
+        
+        // También hacer búsqueda en vivo al cambiar los filtros
+        $('#category, #stock_status').on('change', function() {
+            performLiveSearch();
+        });
+        
+        // Limpiar búsqueda con botón
+        $('#clearSearch').on('click', function() {
+            $('#search').val('').focus();
+            $(this).hide();
+            performLiveSearch(); // Ejecutar búsqueda inmediatamente para mostrar todos los resultados
+        });
+        
+        // Función para mostrar notificaciones toast
+        function showToast(title, message, type = 'success') {
+            // Si existe la función showToast en el contexto global, úsala
+            if (typeof window.showToast === 'function') {
+                window.showToast(title, message, type);
+            } else {
+                // Implementación básica de notificación
+                console.log(`${type}: ${title} - ${message}`);
+            }
+        }
     });
 </script>
 @endpush

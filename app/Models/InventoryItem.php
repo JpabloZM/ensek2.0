@@ -38,13 +38,13 @@ class InventoryItem extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'unit_price' => 'decimal:2',
+        'unit_price' => 'decimal:0',
         'quantity' => 'integer',
         'minimum_stock' => 'integer',
         'reorder_point' => 'integer',
         'is_active' => 'boolean',
         'last_purchase_date' => 'date',
-        'last_purchase_price' => 'decimal:2',
+        'last_purchase_price' => 'decimal:0',
     ];
     
     /**
@@ -102,7 +102,7 @@ class InventoryItem extends Model
      */
     public function getFormattedUnitPriceAttribute()
     {
-        return '$' . number_format($this->unit_price, 2);
+        return '$ ' . number_format($this->unit_price, 0, ',', '.');
     }
     
     /**
@@ -110,6 +110,6 @@ class InventoryItem extends Model
      */
     public function getFormattedTotalValueAttribute()
     {
-        return '$' . number_format($this->total_value, 2);
+        return '$ ' . number_format($this->total_value, 0, ',', '.');
     }
 }

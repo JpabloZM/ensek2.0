@@ -33,8 +33,8 @@ class PurchaseItem extends Model
     protected $casts = [
         'quantity' => 'integer',
         'received_quantity' => 'integer',
-        'unit_price' => 'decimal:2',
-        'total_price' => 'decimal:2',
+        'unit_price' => 'decimal:0',
+        'total_price' => 'decimal:0',
     ];
     
     /**
@@ -66,7 +66,7 @@ class PurchaseItem extends Model
      */
     public function getFormattedUnitPriceAttribute()
     {
-        return '$' . number_format($this->unit_price, 2);
+        return '$ ' . number_format($this->unit_price, 0, ',', '.');
     }
     
     /**
@@ -74,7 +74,7 @@ class PurchaseItem extends Model
      */
     public function getFormattedTotalPriceAttribute()
     {
-        return '$' . number_format($this->total_price, 2);
+        return '$ ' . number_format($this->total_price, 0, ',', '.');
     }
     
     /**

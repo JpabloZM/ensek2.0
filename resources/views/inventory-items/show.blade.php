@@ -66,13 +66,13 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <h6 class="font-weight-bold">Precio Unitario:</h6>
-                                <p>${{ number_format($item->unit_price, 2) }}</p>
+                                <p>$ {{ number_format($item->unit_price, 0, ',', '.') }}</p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <h6 class="font-weight-bold">Valor Total:</h6>
-                                <p>${{ number_format($item->quantity * $item->unit_price, 2) }}</p>
+                                <p>$ {{ number_format($item->quantity * $item->unit_price, 0, ',', '.') }}</p>
                             </div>
                         </div>
                     </div>

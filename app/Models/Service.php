@@ -33,7 +33,7 @@ class Service extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'price' => 'decimal:2',
+        'price' => 'decimal:0',
         'tax_rate' => 'decimal:2',
         'active' => 'boolean',
         'requires_technician_approval' => 'boolean',
@@ -65,7 +65,7 @@ class Service extends Model
      */
     public function getFormattedPriceAttribute()
     {
-        return '$' . number_format($this->price, 2);
+        return '$ ' . number_format($this->price, 0, ',', '.');
     }
     
     /**
@@ -75,6 +75,6 @@ class Service extends Model
      */
     public function getFormattedPriceWithTaxAttribute()
     {
-        return '$' . number_format($this->price_with_tax, 2);
+        return '$ ' . number_format($this->price_with_tax, 0, ',', '.');
     }
 }

@@ -48,17 +48,18 @@
                 </div>
 
                 <div class="form-group row">
-                    <label for="price" class="col-sm-2 col-form-label">Precio <span class="text-danger">*</span></label>
+                    <label for="price" class="col-sm-2 col-form-label">Precio (COP) <span class="text-danger">*</span></label>
                     <div class="col-sm-10">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">$</span>
                             </div>
-                            <input type="number" class="form-control @error('price') is-invalid @enderror" id="price" name="price" value="{{ old('price', $service->price) }}" step="0.01" min="0" required>
+                            <input type="number" class="form-control @error('price') is-invalid @enderror" id="price" name="price" value="{{ old('price', $service->price) }}" step="1" min="0" required>
                             @error('price')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        <small class="form-text text-muted">Precio en pesos colombianos (sin decimales)</small>
                     </div>
                 </div>
                 

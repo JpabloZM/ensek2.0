@@ -35,9 +35,9 @@ class Purchase extends Model
     protected $casts = [
         'purchase_date' => 'date',
         'receipt_date' => 'date:Y-m-d',
-        'total_amount' => 'decimal:2',
-        'tax_amount' => 'decimal:2',
-        'shipping_cost' => 'decimal:2',
+        'total_amount' => 'decimal:0',
+        'tax_amount' => 'decimal:0',
+        'shipping_cost' => 'decimal:0',
     ];
     
     /**
@@ -85,7 +85,7 @@ class Purchase extends Model
      */
     public function getFormattedTotalAttribute()
     {
-        return '$' . number_format($this->total_amount, 2);
+        return '$ ' . number_format($this->total_amount, 0, ',', '.');
     }
     
     /**
