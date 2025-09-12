@@ -18,22 +18,138 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
+        :root {
+            --ensek-green-light: #87c947;
+            --ensek-green-dark: #004122;
+            --ensek-gray: #2c2e35;
+            --ensek-white: #ffffff;
+        }
+        
         body {
             font-family: 'Nunito', sans-serif;
-            color: #333;
+            color: var(--ensek-gray);
             overflow-x: hidden;
             position: relative;
         }
         
+        .text-ensek-logo {
+            color: var(--ensek-gray);
+        }
+        
+        .text-ensek-logo-green {
+            color: var(--ensek-green-light);
+        }
+        
+        .bg-dark .text-ensek-logo,
+        .navbar-dark .navbar-logo,
+        .hero-logo {
+            color: var(--ensek-white);
+        }
+        
+        .navbar.scrolled .navbar-logo {
+            color: var(--ensek-gray);
+        }
+        
+        footer .text-ensek-logo {
+            color: var(--ensek-white);
+        }
+        
+        .btn-ensek-green {
+            background-color: var(--ensek-green-light);
+            border-color: var(--ensek-green-light);
+            color: var(--ensek-white);
+        }
+        
+        .btn-ensek-green:hover, .btn-ensek-green:focus, .btn-ensek-green:active {
+            background-color: var(--ensek-green-dark);
+            border-color: var(--ensek-green-dark);
+            color: var(--ensek-white);
+        }
+        
+        .btn-outline-ensek-green {
+            color: var(--ensek-green-light);
+            border-color: var(--ensek-green-light);
+        }
+        
+        .btn-outline-ensek-green:hover, .btn-outline-ensek-green:focus, .btn-outline-ensek-green:active {
+            background-color: var(--ensek-green-light);
+            color: var(--ensek-white);
+        }
+        
+        .btn-login-action {
+            background-color: #0d6efd; /* Color azul de Bootstrap */
+            border-color: #0d6efd;
+            color: var(--ensek-white);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-width: 2px;
+        }
+        
+        .btn-login-action:hover, .btn-login-action:focus {
+            background-color: #0b5ed7; /* Un poco más oscuro */
+            border-color: #0b5ed7;
+            color: var(--ensek-white);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .btn-register-action {
+            color: var(--ensek-white);
+            border-color: var(--ensek-white);
+            background-color: transparent;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border-width: 2px;
+        }
+        
+        .btn-register-action:hover, .btn-register-action:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--ensek-white);
+            border-color: var(--ensek-white);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        .btn-hero-action {
+            background-color: var(--ensek-green-light);
+            border-color: var(--ensek-green-light);
+            color: var(--ensek-white);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-width: 2px;
+        }
+        
+        .btn-hero-action:hover, .btn-hero-action:focus {
+            background-color: #002b17; /* Un poco más oscuro que --ensek-green-dark para mejor contraste */
+            border-color: var(--ensek-green-light);
+            color: var(--ensek-white);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .btn-hero-action:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
         @keyframes highlight {
-            0% { box-shadow: 0 0 0 rgba(78, 115, 223, 0); }
-            50% { box-shadow: 0 0 20px rgba(78, 115, 223, 0.8); }
-            100% { box-shadow: 0 0 0 rgba(78, 115, 223, 0); }
+            0% { box-shadow: 0 0 0 rgba(135, 201, 71, 0); }
+            50% { box-shadow: 0 0 20px rgba(135, 201, 71, 0.8); }
+            100% { box-shadow: 0 0 0 rgba(135, 201, 71, 0); }
         }
         
         /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/img/hero-background.jpg');
+            background: linear-gradient(rgba(0, 65, 34, 0.95), rgba(0, 65, 34, 0.95)), url('/img/hero-background.jpg');
             background-size: cover;
             background-position: center;
             color: white;
@@ -48,13 +164,48 @@
         }
         
         .navbar.scrolled {
-            background-color: white !important;
+            background-color: var(--ensek-white) !important;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         
         .navbar.scrolled .navbar-brand,
         .navbar.scrolled .nav-link {
-            color: #333 !important;
+            color: var(--ensek-gray) !important;
+        }
+        
+        .navbar-dark .navbar-toggler-icon {
+            filter: brightness(1);
+        }
+        
+        .navbar-light .navbar-toggler-icon {
+            filter: brightness(0.5);
+        }
+        
+        .login-link:hover, .login-link:focus {
+            color: var(--ensek-green-light) !important;
+            transition: color 0.3s ease;
+        }
+        
+        .register-link:hover, .register-link:focus {
+            color: var(--ensek-green-light) !important;
+            transition: color 0.3s ease;
+        }
+        
+        /* Estilos para el dropdown del usuario */
+        .dropdown-menu {
+            border-color: var(--ensek-green-light);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .dropdown-item:active, 
+        .dropdown-item:focus,
+        .dropdown-item:hover {
+            background-color: var(--ensek-green-light) !important;
+            color: var(--ensek-white);
+        }
+        
+        .dropdown-toggle:hover {
+            color: var(--ensek-green-light) !important;
         }
         
         /* Service Cards */
@@ -73,7 +224,7 @@
         .service-icon {
             font-size: 40px;
             margin-bottom: 20px;
-            color: #4e73df;
+            color: var(--ensek-green-light);
         }
         
         /* Form Styles */
@@ -85,19 +236,19 @@
         }
         
         .form-control:focus {
-            border-color: #4e73df;
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+            border-color: var(--ensek-green-light);
+            box-shadow: 0 0 0 0.2rem rgba(135, 201, 71, 0.25);
         }
         
         /* Footer */
         footer {
-            background-color: #222;
-            color: white;
+            background-color: var(--ensek-gray);
+            color: var(--ensek-white);
             padding: 60px 0 30px;
         }
         
         .footer-links h5 {
-            color: #4e73df;
+            color: var(--ensek-green-light);
             margin-bottom: 20px;
         }
         
@@ -120,6 +271,11 @@
             color: white;
         }
         
+        .footer-login-link:hover {
+            color: var(--ensek-green-light) !important;
+            transition: color 0.3s ease;
+        }
+        
         .social-icons a {
             display: inline-block;
             margin-right: 15px;
@@ -132,27 +288,44 @@
             transform: translateY(-5px);
         }
         
-        /* Testimonials */
-        .testimonial {
+        /* Empresas Asociadas */
+        .logo-card {
             background-color: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 130px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
         }
         
-        .testimonial-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 15px;
+        .logo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-color: rgba(135, 201, 71, 0.4);
+        }
+        
+        .logo-card img {
+            max-height: 90px;
+            max-width: 100%;
+            object-fit: contain;
+            filter: grayscale(70%);
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-card:hover img {
+            filter: grayscale(0%);
+            opacity: 1;
         }
         
         /* About Us */
         .about-icon {
             font-size: 30px;
-            color: #4e73df;
+            color: var(--ensek-green-light);
             margin-bottom: 20px;
         }
         
@@ -161,8 +334,8 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background-color: #4e73df;
-            color: white;
+            background-color: var(--ensek-green-light);
+            color: var(--ensek-white);
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -182,7 +355,9 @@
         }
         
         .back-to-top:hover {
-            background-color: #2e59d9;
+            background-color: var(--ensek-white);
+            color: var(--ensek-green-dark);
+            border: 2px solid var(--ensek-green-light);
         }
     </style>
 </head>
@@ -191,7 +366,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand fw-bold" href="#">
-                <i class="fas fa-tools me-2"></i>EMPRESA
+                <i class="fas fa-recycle me-2"></i><span class="text-ensek-logo navbar-logo">e</span><span class="text-ensek-logo-green">ns</span><span class="text-ensek-logo navbar-logo">e</span><span class="text-ensek-logo-green">k</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -208,19 +383,19 @@
                         <a class="nav-link" href="#nosotros">Nosotros</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#testimonios">Testimonios</a>
+                        <a class="nav-link" href="#empresas-asociadas">Empresas Asociadas</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#contacto">Contacto</a>
                     </li>
                     @guest
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">
+                            <a class="nav-link login-link" href="{{ route('login') }}">
                                 <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">
+                            <a class="nav-link register-link" href="{{ route('register') }}">
                                 <i class="fas fa-user-plus me-1"></i> Registrarse
                             </a>
                         </li>
@@ -234,9 +409,8 @@
                                     <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Panel de Administración</a></li>
                                 @elseif(Auth::user()->role->name === 'Técnico')
                                     <li><a class="dropdown-item" href="{{ route('technician.dashboard') }}">Panel de Técnico</a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                 @endif
-                                <li><a class="dropdown-item" href="#solicitar">Solicitar Servicio</a></li>
-                                <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -255,11 +429,11 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero d-flex align-items-center" id="inicio">
+    <section class="hero d-flex align-items-center bg-dark" id="inicio">
         <div class="container text-center">
-            <h1 class="display-4 fw-bold mb-4">Servicios Técnicos Profesionales</h1>
-            <p class="lead mb-5">Soluciones efectivas y rápidas para todas sus necesidades técnicas y de mantenimiento</p>
-            <a href="#solicitar" class="btn btn-primary btn-lg px-5 py-3">Solicitar Servicio</a>
+            <h1 class="display-4 fw-bold mb-4"><span class="text-ensek-logo hero-logo">e</span><span class="text-ensek-logo-green">ns</span><span class="text-ensek-logo hero-logo">e</span><span class="text-ensek-logo-green">k</span> - Saneamiento Ambiental</h1>
+            <p class="lead mb-5">Soluciones ecológicas para entornos limpios, seguros y saludables</p>
+            <a href="#solicitar" class="btn btn-hero-action btn-lg px-5 py-3">Solicitar Servicio</a>
         </div>
     </section>
 
@@ -269,7 +443,7 @@
             <div class="row text-center mb-5">
                 <div class="col-12">
                     <h2 class="fw-bold">Nuestros Servicios</h2>
-                    <p class="text-muted">Ofrecemos una amplia gama de servicios técnicos de alta calidad</p>
+                    <p class="text-muted">Soluciones profesionales de saneamiento ambiental para hogares y empresas</p>
                 </div>
             </div>
             <div class="row">
@@ -282,7 +456,7 @@
                             </div>
                             <h4 class="card-title">{{ $service->name }}</h4>
                             <p class="card-text text-muted">{{ $service->description }}</p>
-                            <a href="#solicitar" class="btn btn-outline-primary mt-3" onclick="preSelectService('{{ $service->id }}', '{{ $service->name }}')">Solicitar</a>
+                            <a href="#solicitar" class="btn btn-outline-ensek-green mt-3" onclick="preSelectService('{{ $service->id }}', '{{ $service->name }}')">Solicitar</a>
                         </div>
                     </div>
                 </div>
@@ -344,71 +518,54 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="py-5" id="testimonios">
+    <!-- Empresas Asociadas Section -->
+    <section class="py-5" id="empresas-asociadas">
         <div class="container">
             <div class="row text-center mb-5">
                 <div class="col-12">
-                    <h2 class="fw-bold">Testimonios</h2>
-                    <p class="text-muted">Lo que dicen nuestros clientes sobre nuestros servicios</p>
+                    <h2 class="fw-bold">Empresas que Confían en Nosotros</h2>
+                    <p class="text-muted">Brindamos servicios técnicos a organizaciones líderes en múltiples industrias</p>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial h-100">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente" class="testimonial-img">
-                            <div>
-                                <h5 class="mb-0">Juan Pérez</h5>
-                                <small class="text-muted">Cliente desde 2019</small>
-                            </div>
-                        </div>
-                        <p class="mb-0">"Excelente servicio. Llegaron puntualmente y resolvieron el problema rápidamente. Definitivamente los recomendaría."</p>
-                        <div class="mt-2">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                        </div>
+            <div class="row justify-content-center align-items-center">
+                <div class="col-md-3 col-sm-4 col-6 mb-4">
+                    <div class="logo-card">
+                        <img src="https://via.placeholder.com/240x120?text=Constructora+ABC" alt="Constructora ABC" class="img-fluid">
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial h-100">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Cliente" class="testimonial-img">
-                            <div>
-                                <h5 class="mb-0">María García</h5>
-                                <small class="text-muted">Cliente desde 2020</small>
-                            </div>
-                        </div>
-                        <p class="mb-0">"El técnico fue muy amable y profesional. Me explicó todo el proceso y me dio recomendaciones para evitar futuros problemas."</p>
-                        <div class="mt-2">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star-half-alt text-warning"></i>
-                        </div>
+                <div class="col-md-3 col-sm-4 col-6 mb-4">
+                    <div class="logo-card">
+                        <img src="https://via.placeholder.com/240x120?text=Hospital+San+Vicente" alt="Hospital San Vicente" class="img-fluid">
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial h-100">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Cliente" class="testimonial-img">
-                            <div>
-                                <h5 class="mb-0">Carlos López</h5>
-                                <small class="text-muted">Cliente desde 2018</small>
-                            </div>
-                        </div>
-                        <p class="mb-0">"He contratado sus servicios varias veces y siempre quedé satisfecho. Son rápidos, eficientes y sus precios son justos."</p>
-                        <div class="mt-2">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                        </div>
+                <div class="col-md-3 col-sm-4 col-6 mb-4">
+                    <div class="logo-card">
+                        <img src="https://via.placeholder.com/240x120?text=Hotel+Ejecutivo" alt="Hotel Ejecutivo" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-4 col-6 mb-4">
+                    <div class="logo-card">
+                        <img src="https://via.placeholder.com/240x120?text=Centro+Comercial+Plaza" alt="Centro Comercial Plaza" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-4 col-6 mb-4">
+                    <div class="logo-card">
+                        <img src="https://via.placeholder.com/240x120?text=Industrias+MetalTech" alt="Industrias MetalTech" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-4 col-6 mb-4">
+                    <div class="logo-card">
+                        <img src="https://via.placeholder.com/240x120?text=Colegio+San+José" alt="Colegio San José" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-4 col-6 mb-4">
+                    <div class="logo-card">
+                        <img src="https://via.placeholder.com/240x120?text=Supermercados+Express" alt="Supermercados Express" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-4 col-6 mb-4">
+                    <div class="logo-card">
+                        <img src="https://via.placeholder.com/240x120?text=Banco+Nacional" alt="Banco Nacional" class="img-fluid">
                     </div>
                 </div>
             </div>
@@ -430,13 +587,13 @@
                         @guest
                             <div class="text-center py-4">
                                 <div class="mb-4">
-                                    <i class="fas fa-user-lock fa-4x text-primary mb-3"></i>
+                                    <i class="fas fa-user-lock fa-4x mb-3" style="color: var(--ensek-green-light);"></i>
                                     <h4>Necesita iniciar sesión para solicitar un servicio</h4>
                                     <p class="text-muted">Para brindarle un mejor servicio y llevar un seguimiento adecuado de sus solicitudes, es necesario que tenga una cuenta.</p>
                                 </div>
                                 <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
-                                    <a href="{{ route('login') }}" class="btn btn-primary btn-lg">Iniciar Sesión</a>
-                                    <a href="{{ route('register') }}" class="btn btn-outline-primary btn-lg">Registrarse</a>
+                                    <a href="{{ route('login') }}" class="btn btn-login-action btn-lg">Iniciar Sesión</a>
+                                    <a href="{{ route('register') }}" class="btn btn-register-action btn-lg">Registrarse</a>
                                 </div>
                             </div>
                         @else
@@ -496,7 +653,7 @@
                                 </div>
                                 
                                 <div class="text-center">
-                                    <button type="submit" id="submitBtn" class="btn btn-primary btn-lg px-5">
+                                    <button type="submit" id="submitBtn" class="btn btn-ensek-green btn-lg px-5">
                                         <span>Enviar Solicitud</span>
                                         <span id="submitSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                                     </button>
@@ -591,8 +748,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-5 mb-md-0 footer-links">
-                    <h5>EMPRESA</h5>
-                    <p>Brindando servicios técnicos de calidad desde 2010. Nuestro compromiso es ofrecer soluciones efectivas para todas sus necesidades técnicas.</p>
+                    <h5><span class="text-ensek-logo">e</span><span class="text-ensek-logo-green">ns</span><span class="text-ensek-logo">e</span><span class="text-ensek-logo-green">k</span></h5>
+                    <p>Brindando servicios de saneamiento ambiental de calidad desde 2010. Nuestro compromiso es ofrecer soluciones efectivas para preservar entornos limpios y saludables.</p>
                     <div class="social-icons mt-4">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -606,7 +763,7 @@
                         <li><a href="#inicio">Inicio</a></li>
                         <li><a href="#servicios">Servicios</a></li>
                         <li><a href="#nosotros">Nosotros</a></li>
-                        <li><a href="#testimonios">Testimonios</a></li>
+                        <li><a href="#empresas-asociadas">Empresas Asociadas</a></li>
                         <li><a href="#contacto">Contacto</a></li>
                     </ul>
                 </div>
@@ -622,14 +779,14 @@
             <hr class="my-4 bg-light">
             <div class="row">
                 <div class="col-md-6 text-center text-md-start">
-                    <p class="mb-0">&copy; {{ date('Y') }} EMPRESA. Todos los derechos reservados.</p>
+                    <p class="mb-0">&copy; {{ date('Y') }} <span class="text-ensek-logo">e</span><span class="text-ensek-logo-green">ns</span><span class="text-ensek-logo">e</span><span class="text-ensek-logo-green">k</span>. Todos los derechos reservados.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <p class="mb-0">
                         <a href="#" class="text-white me-3">Términos y Condiciones</a>
                         <a href="#" class="text-white me-3">Política de Privacidad</a>
                         @guest
-                            <a href="{{ route('login') }}" class="text-white">Acceso <i class="fas fa-sign-in-alt fa-xs"></i></a>
+                            <a href="{{ route('login') }}" class="text-white footer-login-link">Acceso <i class="fas fa-sign-in-alt fa-xs"></i></a>
                         @else
                             @if(Auth::user()->role->name === 'Administrador')
                                 <a href="{{ route('admin.dashboard') }}" class="text-white">Panel de Administración <i class="fas fa-tachometer-alt fa-xs"></i></a>
@@ -652,13 +809,29 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        // Check scroll position on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+                navbar.classList.remove('navbar-dark');
+                navbar.classList.add('navbar-light');
+            } else {
+                navbar.classList.add('navbar-dark');
+            }
+        });
+        
         // Navbar scroll effect
         window.addEventListener('scroll', function() {
             const navbar = document.querySelector('.navbar');
             if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
+                navbar.classList.remove('navbar-dark');
+                navbar.classList.add('navbar-light');
             } else {
                 navbar.classList.remove('scrolled');
+                navbar.classList.remove('navbar-light');
+                navbar.classList.add('navbar-dark');
             }
         });
         
