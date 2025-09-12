@@ -29,6 +29,50 @@
             </div>
         </div>
     </div>
+    
+    <div class="filters-container mb-3 p-2 bg-light rounded shadow-sm">
+        <div class="row align-items-center">
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label for="technicianFilter" class="form-label small mb-1">Técnico</label>
+                <select id="technicianFilter" class="form-select form-select-sm">
+                    <option value="">Todos los Técnicos</option>
+                    @foreach($technicians as $technician)
+                        <option value="{{ $technician->id }}">{{ $technician->user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label for="statusFilter" class="form-label small mb-1">Estado</label>
+                <select id="statusFilter" class="form-select form-select-sm">
+                    <option value="">Todos los Estados</option>
+                    <option value="pending">Pendiente</option>
+                    <option value="in_progress">En Proceso</option>
+                    <option value="completed">Completado</option>
+                    <option value="cancelled">Cancelado</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label for="confirmationFilter" class="form-label small mb-1">Confirmación</label>
+                <select id="confirmationFilter" class="form-select form-select-sm">
+                    <option value="">Todas las Confirmaciones</option>
+                    <option value="confirmed">Confirmadas</option>
+                    <option value="pending">Pendientes</option>
+                    <option value="declined">Rechazadas</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small mb-1">&nbsp;</label>
+                <div class="d-flex">
+                    <button id="refreshCalendar" class="btn btn-sm btn-outline-primary flex-grow-1 me-2">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
+                    <button id="sendRemindersBtn" class="btn btn-sm btn-warning">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <!-- Solicitudes de servicio pendientes -->
@@ -285,6 +329,28 @@
         </div>
     </div>
 </div>
+<!-- Modal para confirmar envío de recordatorios -->
+<div class="modal fade" id="sendRemindersModal" tabindex="-1" aria-labelledby="sendRemindersModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendRemindersModalLabel">Enviar Recordatorios</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Desea enviar recordatorios para las citas programadas para mañana?</p>
+                <p>Esta acción enviará correos electrónicos a los clientes y técnicos.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmSendReminders">
+                    <span id="sendRemindersSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    Enviar Recordatorios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('styles')
@@ -362,6 +428,66 @@
     .schedule-cancelled {
         background-color: #dc3545 !important;
         border-color: #dc3545 !important;
+    }
+    
+    /* Estilos para estados de confirmación */
+    .confirmation-confirmed {
+        border-left: 4px solid #28a745 !important;
+    }
+    
+    .confirmation-declined {
+        border-left: 4px solid #dc3545 !important;
+        opacity: 0.7;
+    }
+    
+    .confirmation-pending {
+        border-left: 4px solid #ffc107 !important;
+    }
+    
+    /* Indicadores visuales para estados de confirmación */
+    .confirmation-confirmed::before {
+        content: "✓";
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background-color: #28a745;
+        color: white;
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+        line-height: 16px;
+        text-align: center;
+        border-radius: 50%;
+    }
+    
+    .confirmation-declined::before {
+        content: "×";
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background-color: #dc3545;
+        color: white;
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+        line-height: 16px;
+        text-align: center;
+        border-radius: 50%;
+    }
+    
+    .confirmation-pending::before {
+        content: "?";
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background-color: #ffc107;
+        color: white;
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+        line-height: 16px;
+        text-align: center;
+        border-radius: 50%;
     }
     
     /* Fix for FullCalendar resource timeline */
@@ -488,9 +614,6 @@
         // Datos de recursos (técnicos)
         const resources = JSON.parse('@json($resourcesJson)');
         
-        // Datos de eventos (agendamientos)
-        const events = JSON.parse('@json($eventsJson)');
-        
         // Detectar si es móvil o tablet
         const isMobile = window.innerWidth < 768;
         const isTablet = window.innerWidth >= 768 && window.innerWidth < 992;
@@ -530,7 +653,31 @@
             
             // Datos iniciales
             resources: resources,
-            events: events,
+            events: function(info, successCallback, failureCallback) {
+                // Obtener valores de los filtros
+                const technicianId = $('#technicianFilter').val();
+                const status = $('#statusFilter').val();
+                const confirmation = $('#confirmationFilter').val();
+                
+                const startDate = info.start.toISOString();
+                const endDate = info.end.toISOString();
+                
+                // Construir URL con parámetros de filtrado
+                let url = `/api/schedules?start=${startDate}&end=${endDate}`;
+                if (technicianId) url += `&technician_id=${technicianId}`;
+                if (status) url += `&status=${status}`;
+                if (confirmation) url += `&confirmation=${confirmation}`;
+                
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        successCallback(data);
+                    })
+                    .catch(error => {
+                        console.error('Error cargando eventos:', error);
+                        failureCallback(error);
+                    });
+            },
             
             // Funcionalidades de interacción
             editable: true,
@@ -594,16 +741,34 @@
                 }
             },
             eventClassNames: function(arg) {
-                // Agregar clase según el estado del agendamiento
+                // Clases base según el estado del agendamiento
+                let classes = [];
+                
+                // Estado del servicio
                 if (arg.event.extendedProps.status === 'pendiente') {
-                    return ['schedule-pending'];
+                    classes.push('schedule-pending');
                 } else if (arg.event.extendedProps.status === 'en proceso') {
-                    return ['schedule-inprogress'];
+                    classes.push('schedule-inprogress');
                 } else if (arg.event.extendedProps.status === 'completado') {
-                    return ['schedule-completed'];
+                    classes.push('schedule-completed');
                 } else if (arg.event.extendedProps.status === 'cancelado') {
-                    return ['schedule-cancelled'];
+                    classes.push('schedule-cancelled');
                 }
+                
+                // Añadir clase para el estado de confirmación
+                if (arg.event.extendedProps.confirmation_status) {
+                    if (arg.event.extendedProps.confirmation_status === 'confirmed') {
+                        classes.push('confirmation-confirmed');
+                    } else if (arg.event.extendedProps.confirmation_status === 'declined') {
+                        classes.push('confirmation-declined');
+                    } else {
+                        classes.push('confirmation-pending');
+                    }
+                } else {
+                    classes.push('confirmation-pending');
+                }
+                
+                return classes;
             },
             eventClick: function(info) {
                 // Mostrar detalles del agendamiento al hacer clic
@@ -681,6 +846,58 @@
         document.getElementById('next-btn').addEventListener('click', function() {
             calendar.next();
             updateCalendarTitle(calendar);
+        });
+        
+        // Manejar filtros del calendario
+        $('#technicianFilter, #statusFilter, #confirmationFilter').change(function() {
+            calendar.refetchEvents();
+        });
+        
+        // Manejar botón de actualizar
+        $('#refreshCalendar').click(function() {
+            calendar.refetchEvents();
+        });
+        
+        // Manejar botón de enviar recordatorios
+        $('#sendRemindersBtn').click(function() {
+            $('#sendRemindersModal').modal('show');
+        });
+        
+        // Evento para enviar recordatorios
+        $('#confirmSendReminders').click(function() {
+            // Mostrar spinner
+            $('#sendRemindersSpinner').removeClass('d-none');
+            $(this).prop('disabled', true);
+            
+            // Enviar la solicitud para los recordatorios
+            fetch("{{ route('appointments.send-reminders') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Ocultar spinner
+                $('#sendRemindersSpinner').addClass('d-none');
+                $(this).prop('disabled', false);
+                
+                // Cerrar el modal
+                $('#sendRemindersModal').modal('hide');
+                
+                // Mostrar mensaje de éxito
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Ocultar spinner
+                $('#sendRemindersSpinner').addClass('d-none');
+                $(this).prop('disabled', false);
+                
+                // Mostrar mensaje de error
+                alert('Ocurrió un error al enviar los recordatorios.');
+            });
         });
         
         // Función para actualizar el título del calendario

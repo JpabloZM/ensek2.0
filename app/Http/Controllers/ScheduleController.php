@@ -7,6 +7,7 @@ use App\Models\ServiceRequest;
 use App\Models\Technician;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class ScheduleController extends Controller
 {
@@ -359,5 +360,77 @@ class ScheduleController extends Controller
         
         return redirect()->route('schedules.index')
             ->with('success', 'Agendamiento eliminado correctamente.');
+    }
+    
+    /**
+     * Obtener datos para el calendario con soporte para filtros
+     */
+    public function getCalendarData(Request $request)
+    {
+        $query = Schedule::with(['serviceRequest.service', 'technician.user']);
+        
+        // Aplicar filtros si existen
+        if ($request->has('technician_id') && $request->technician_id) {
+            $query->where('technician_id', $request->technician_id);
+        }
+        
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+        
+        // Solo aplicar filtro de confirmación si la columna existe
+        if ($request->has('confirmation') && $request->confirmation && Schema::hasColumn('schedules', 'confirmation_status')) {
+            $query->where('confirmation_status', $request->confirmation);
+        }
+        
+        // Si se proporcionan fechas de inicio y fin, filtrar por rango
+        if ($request->has('start') && $request->has('end')) {
+            $query->whereBetween('scheduled_date', [$request->start, $request->end]);
+        }
+        
+        $schedules = $query->get();
+        
+        // Preparar datos para el calendario
+        $events = $schedules->map(function ($schedule) {
+            $start = $schedule->scheduled_date->format('Y-m-d\TH:i:s');
+            
+            // Calcular la hora de finalización (por defecto 1 hora si no hay duración)
+            $duration = $schedule->duration ?? 60; // minutos
+            $end = $schedule->scheduled_date->addMinutes($duration)->format('Y-m-d\TH:i:s');
+            
+            // Determinar el color según el estado
+            $color = '#3498db'; // Azul por defecto (pendiente)
+            switch ($schedule->status) {
+                case 'en proceso':
+                    $color = '#f39c12'; // Naranja
+                    break;
+                case 'completado':
+                    $color = '#2ecc71'; // Verde
+                    break;
+                case 'cancelado':
+                    $color = '#e74c3c'; // Rojo
+                    break;
+            }
+            
+            return [
+                'id' => $schedule->id,
+                'resourceId' => $schedule->technician_id,
+                'title' => $schedule->serviceRequest->service->name . ' - ' . $schedule->serviceRequest->client_name,
+                'start' => $start,
+                'end' => $end,
+                'color' => $color,
+                'extendedProps' => [
+                    'status' => $schedule->status,
+                    'confirmation_status' => Schema::hasColumn('schedules', 'confirmation_status') ? ($schedule->confirmation_status ?? 'pending') : 'pending',
+                    'clientName' => $schedule->serviceRequest->client_name,
+                    'serviceId' => $schedule->serviceRequest->service_id,
+                    'serviceName' => $schedule->serviceRequest->service->name,
+                    'address' => $schedule->serviceRequest->address,
+                    'notes' => $schedule->notes
+                ]
+            ];
+        });
+        
+        return response()->json($events);
     }
 }

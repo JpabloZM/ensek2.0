@@ -21,6 +21,7 @@ class Schedule extends Model
         'duration',
         'estimated_end_time',
         'status',
+        'confirmation_status',
         'notes',
         'completed_at',
     ];

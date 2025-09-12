@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryCategoryController;
 use App\Http\Controllers\InventoryItemController;
@@ -86,6 +87,23 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         // Agendamientos
         Route::resource('schedules', ScheduleController::class)->names('admin.schedules');
         Route::patch('/schedules/{schedule}/update-duration', [ScheduleController::class, 'updateDuration'])->name('admin.schedules.updateDuration');
+        Route::get('/api/schedules', [ScheduleController::class, 'getCalendarData'])->name('api.schedules');
+        
+        // Rutas de citas y calendario
+        Route::prefix('appointments')->name('appointments.')->middleware(['auth'])->group(function () {
+            Route::get('/', [AppointmentController::class, 'index'])->name('index');
+            Route::get('/calendar', [AppointmentController::class, 'calendar'])->name('calendar');
+            Route::get('/calendar-data', [AppointmentController::class, 'getCalendarData'])->name('calendar-data');
+            Route::post('/store', [AppointmentController::class, 'store'])->name('store');
+            Route::get('/{appointment}/edit', [AppointmentController::class, 'edit'])->name('edit');
+            Route::put('/{appointment}', [AppointmentController::class, 'update'])->name('update');
+            Route::delete('/{appointment}', [AppointmentController::class, 'destroy'])->name('destroy');
+            
+            // Nuevas rutas para las funcionalidades de agendamiento
+            Route::post('/suggest-technicians', [AppointmentController::class, 'suggestTechnicians'])->name('suggest-technicians');
+            Route::post('/check-conflicts', [AppointmentController::class, 'checkConflicts'])->name('check-conflicts');
+            Route::post('/send-reminders', [AppointmentController::class, 'sendReminders'])->name('send-reminders');
+        });
     });
 });
 
@@ -131,3 +149,6 @@ Route::get('/home', function () {
         return redirect()->route('public.landing');
     }
 })->name('home');
+
+// Ruta pública para confirmar citas (accesible sin autenticación)
+Route::get('/appointments/confirm/{id}/{token}', [AppointmentController::class, 'confirmAppointment'])->name('appointments.confirm');
