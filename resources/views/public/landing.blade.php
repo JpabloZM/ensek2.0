@@ -76,10 +76,8 @@
             color: var(--ensek-white);
         }
         
-        .btn-login-action {
-            background-color: #0d6efd; /* Color azul de Bootstrap */
-            border-color: #0d6efd;
-            color: var(--ensek-white);
+        /* Mejoras para los botones de acción */
+        .btn-ensek-green, .btn-outline-ensek-green {
             position: relative;
             z-index: 1;
             overflow: hidden;
@@ -88,32 +86,16 @@
             border-width: 2px;
         }
         
-        .btn-login-action:hover, .btn-login-action:focus {
-            background-color: #0b5ed7; /* Un poco más oscuro */
-            border-color: #0b5ed7;
-            color: var(--ensek-white);
+        .btn-ensek-green:hover, .btn-ensek-green:focus,
+        .btn-outline-ensek-green:hover, .btn-outline-ensek-green:focus {
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
             transform: translateY(-3px);
         }
         
-        .btn-register-action {
-            color: var(--ensek-white);
-            border-color: var(--ensek-white);
-            background-color: transparent;
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            border-width: 2px;
-        }
-        
-        .btn-register-action:hover, .btn-register-action:focus {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--ensek-white);
-            border-color: var(--ensek-white);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-3px);
+        .btn-ensek-green:active,
+        .btn-outline-ensek-green:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
         
         .btn-hero-action {
@@ -592,8 +574,8 @@
                                     <p class="text-muted">Para brindarle un mejor servicio y llevar un seguimiento adecuado de sus solicitudes, es necesario que tenga una cuenta.</p>
                                 </div>
                                 <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
-                                    <a href="{{ route('login') }}" class="btn btn-login-action btn-lg">Iniciar Sesión</a>
-                                    <a href="{{ route('register') }}" class="btn btn-register-action btn-lg">Registrarse</a>
+                                    <a href="{{ route('login') }}" class="btn btn-ensek-green btn-lg">Iniciar Sesión</a>
+                                    <a href="{{ route('register') }}" class="btn btn-outline-ensek-green btn-lg">Registrarse</a>
                                 </div>
                             </div>
                         @else
