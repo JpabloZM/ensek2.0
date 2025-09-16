@@ -1,51 +1,87 @@
 @extends('layouts.admin')
 
-@section('page-title', 'Dashboard')
+@section('page-title', 'Panel de Control')
 
 @section('content')
 <div class="container-fluid">
-    <div class="row g-3 my-2">
+    <div class="row g-4 my-4">
         <!-- Solicitudes pendientes -->
         <div class="col-md-3">
-            <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
-                <div>
-                    <h3 class="fs-2">{{ $stats['pendingRequests'] }}</h3>
-                    <p class="fs-5">Solicitudes Pendientes</p>
+            <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                <div class="card-body position-relative p-0">
+                    <div class="position-absolute w-100" style="height: 4px; background-color: #ffc107; top: 0;"></div>
+                    <div class="px-4 pt-4 pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex flex-column">
+                                <p class="text-muted mb-1 fw-light">Solicitudes Pendientes</p>
+                                <h2 class="fs-1 fw-bold mb-0">{{ $stats['pendingRequests'] }}</h2>
+                            </div>
+                            <div class="icon-wrapper d-flex align-items-center justify-content-center rounded-circle" style="width: 60px; height: 60px; background-color: #ffc107;">
+                                <i class="fas fa-clipboard-list fs-3 text-white"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <i class="fas fa-clipboard-list fs-1 primary-text border rounded-full secondary-bg p-3"></i>
             </div>
         </div>
 
         <!-- Servicios agendados -->
         <div class="col-md-3">
-            <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
-                <div>
-                    <h3 class="fs-2">{{ $stats['scheduledServices'] }}</h3>
-                    <p class="fs-5">Servicios Agendados</p>
+            <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                <div class="card-body position-relative p-0">
+                    <div class="position-absolute w-100" style="height: 4px; background-color: var(--ensek-green-dark); top: 0;"></div>
+                    <div class="px-4 pt-4 pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex flex-column">
+                                <p class="text-muted mb-1 fw-light">Servicios Agendados</p>
+                                <h2 class="fs-1 fw-bold mb-0">{{ $stats['scheduledServices'] }}</h2>
+                            </div>
+                            <div class="icon-wrapper d-flex align-items-center justify-content-center rounded-circle" style="width: 60px; height: 60px; background-color: var(--ensek-green-dark);">
+                                <i class="fas fa-calendar-check fs-3 text-white"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <i class="fas fa-calendar-check fs-1 primary-text border rounded-full secondary-bg p-3"></i>
             </div>
         </div>
 
         <!-- Servicios completados -->
         <div class="col-md-3">
-            <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
-                <div>
-                    <h3 class="fs-2">{{ $stats['completedServices'] }}</h3>
-                    <p class="fs-5">Servicios Completados</p>
+            <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                <div class="card-body position-relative p-0">
+                    <div class="position-absolute w-100" style="height: 4px; background-color: var(--ensek-green-light); top: 0;"></div>
+                    <div class="px-4 pt-4 pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex flex-column">
+                                <p class="text-muted mb-1 fw-light">Servicios Completados</p>
+                                <h2 class="fs-1 fw-bold mb-0">{{ $stats['completedServices'] }}</h2>
+                            </div>
+                            <div class="icon-wrapper d-flex align-items-center justify-content-center rounded-circle" style="width: 60px; height: 60px; background-color: var(--ensek-green-light);">
+                                <i class="fas fa-check-circle fs-3 text-white"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <i class="fas fa-check-circle fs-1 primary-text border rounded-full secondary-bg p-3"></i>
             </div>
         </div>
 
         <!-- Ítems de inventario con bajo stock -->
         <div class="col-md-3">
-            <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
-                <div>
-                    <h3 class="fs-2">{{ $stats['lowStockItems'] }}</h3>
-                    <p class="fs-5">Ítems con Bajo Stock</p>
+            <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                <div class="card-body position-relative p-0">
+                    <div class="position-absolute w-100" style="height: 4px; background-color: #e74a3b; top: 0;"></div>
+                    <div class="px-4 pt-4 pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex flex-column">
+                                <p class="text-muted mb-1 fw-light">Ítems con Bajo Stock</p>
+                                <h2 class="fs-1 fw-bold mb-0">{{ $stats['lowStockItems'] }}</h2>
+                            </div>
+                            <div class="icon-wrapper d-flex align-items-center justify-content-center rounded-circle" style="width: 60px; height: 60px; background-color: #e74a3b;">
+                                <i class="fas fa-exclamation-triangle fs-3 text-white"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <i class="fas fa-exclamation-triangle fs-1 primary-text border rounded-full secondary-bg p-3"></i>
             </div>
         </div>
     </div>
@@ -53,17 +89,17 @@
     <div class="row my-5">
         <!-- Solicitudes recientes -->
         <div class="col-md-6">
-            <h3 class="fs-4 mb-3">Solicitudes de servicio recientes</h3>
-            <div class="card">
+            <h3 class="fs-5 fw-bold mb-3">Solicitudes de servicio recientes</h3>
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <table class="table bg-white rounded shadow-sm table-hover">
+                    <table class="table bg-white table-hover mb-0">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Cliente</th>
-                                <th scope="col">Servicio</th>
-                                <th scope="col">Estado</th>
-                                <th scope="col">Fecha</th>
+                                <th scope="col" class="fw-semibold border-bottom-0">#</th>
+                                <th scope="col" class="fw-semibold border-bottom-0">Cliente</th>
+                                <th scope="col" class="fw-semibold border-bottom-0">Servicio</th>
+                                <th scope="col" class="fw-semibold border-bottom-0">Estado</th>
+                                <th scope="col" class="fw-semibold border-bottom-0">Fecha</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -74,13 +110,13 @@
                                     <td>{{ $request->service->name }}</td>
                                     <td>
                                         @if($request->status == 'pendiente')
-                                            <span class="badge bg-warning">Pendiente</span>
+                                            <span class="badge text-bg-warning rounded-pill">Pendiente</span>
                                         @elseif($request->status == 'agendado')
-                                            <span class="badge bg-primary">Agendado</span>
+                                            <span class="badge rounded-pill" style="background-color: var(--ensek-green-dark);">Agendado</span>
                                         @elseif($request->status == 'completado')
-                                            <span class="badge bg-success">Completado</span>
+                                            <span class="badge rounded-pill" style="background-color: var(--ensek-green-light);">Completado</span>
                                         @else
-                                            <span class="badge bg-danger">Cancelado</span>
+                                            <span class="badge text-bg-danger rounded-pill">Cancelado</span>
                                         @endif
                                     </td>
                                     <td>{{ $request->created_at->format('d/m/Y') }}</td>
@@ -98,16 +134,16 @@
 
         <!-- Próximos servicios agendados -->
         <div class="col-md-6">
-            <h3 class="fs-4 mb-3">Próximos servicios agendados</h3>
-            <div class="card">
+            <h3 class="fs-5 fw-bold mb-3">Próximos servicios agendados</h3>
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <table class="table bg-white rounded shadow-sm table-hover">
+                    <table class="table bg-white table-hover mb-0">
                         <thead>
                             <tr>
-                                <th scope="col">Fecha</th>
-                                <th scope="col">Cliente</th>
-                                <th scope="col">Técnico</th>
-                                <th scope="col">Estado</th>
+                                <th scope="col" class="fw-semibold border-bottom-0">Fecha</th>
+                                <th scope="col" class="fw-semibold border-bottom-0">Cliente</th>
+                                <th scope="col" class="fw-semibold border-bottom-0">Técnico</th>
+                                <th scope="col" class="fw-semibold border-bottom-0">Estado</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -118,13 +154,13 @@
                                     <td>{{ $schedule->technician->user->name }}</td>
                                     <td>
                                         @if($schedule->status == 'pendiente')
-                                            <span class="badge bg-warning">Pendiente</span>
+                                            <span class="badge text-bg-warning rounded-pill">Pendiente</span>
                                         @elseif($schedule->status == 'en proceso')
-                                            <span class="badge bg-info">En proceso</span>
+                                            <span class="badge rounded-pill" style="background-color: var(--ensek-green-dark);">En proceso</span>
                                         @elseif($schedule->status == 'completado')
-                                            <span class="badge bg-success">Completado</span>
+                                            <span class="badge rounded-pill" style="background-color: var(--ensek-green-light);">Completado</span>
                                         @else
-                                            <span class="badge bg-danger">Cancelado</span>
+                                            <span class="badge text-bg-danger rounded-pill">Cancelado</span>
                                         @endif
                                     </td>
                                 </tr>

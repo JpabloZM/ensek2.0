@@ -41,6 +41,14 @@
     <!-- Estilos personalizados -->
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
     <style>
+        /* Variables para colores de ENSEK */
+        :root {
+            --ensek-green-light: #87c947;
+            --ensek-green-dark: #004122;
+            --ensek-gray: #2c2e35;
+            --ensek-white: #ffffff;
+        }
+        
         /* Alert styles */
         .alert {
             border-radius: 0.25rem;
@@ -108,7 +116,7 @@
         }
         
         .bg-success {
-            background-color: #1cc88a !important;
+            background-color: var(--ensek-green-light) !important;
         }
         
         .bg-danger {
@@ -117,6 +125,15 @@
         
         .bg-info {
             background-color: #36b9cc !important;
+        }
+        
+        /* Colores personalizados para los badges */
+        .badge.bg-success {
+            background-color: var(--ensek-green-light) !important;
+        }
+        
+        .badge.bg-primary {
+            background-color: var(--ensek-green-dark) !important;
         }
         
         html, body {
@@ -194,7 +211,7 @@
         }
         
         #sidebar-wrapper .list-group-item.active {
-            background-color: #007bff !important;
+            background-color: var(--ensek-green-light) !important;
             color: #fff !important;
             border-radius: 5px;
         }
@@ -233,6 +250,13 @@
             #wrapper.toggled #sidebar-wrapper {
                 margin-left: 0;
             }
+        }
+        
+        /* Personalización para el dropdown del panel de administración */
+        .navbar .dropdown-item:hover:not(.text-danger), 
+        .navbar .dropdown-item:focus:not(.text-danger) {
+            background-color: var(--ensek-green-light) !important;
+            color: var(--ensek-white);
         }
     </style>
     
@@ -277,13 +301,13 @@
 
     <div id="wrapper">
         <!-- Sidebar -->
-        <div class="bg-dark border-right" id="sidebar-wrapper">
+        <div class="border-right" id="sidebar-wrapper" style="background-color: var(--ensek-gray);">
             <div class="sidebar-heading text-center py-4 text-white fs-4 fw-bold text-uppercase">
-                <i class="fas fa-tools me-2"></i>SISTEMA EMPRESA
+                <i class="fas fa-recycle me-2"></i>SISTEMA EMPRESA
             </div>
             <div class="list-group list-group-flush my-3">
                 <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    <i class="fas fa-tachometer-alt me-2"></i>Panel de Control
                 </a>
                 <a href="{{ route('admin.service-requests.index') }}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold {{ request()->routeIs('admin.service-requests.*') ? 'active' : '' }}">
                     <i class="fas fa-clipboard-list me-2"></i>Solicitudes
@@ -313,7 +337,7 @@
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg navbar-light bg-white py-4 px-4 shadow-sm">
                 <div class="d-flex align-items-center">
-                    <i class="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
+                    <i class="fas fa-align-left fs-4 me-3" id="menu-toggle" style="color: var(--ensek-gray);"></i>
                     <h2 class="fs-2 m-0">@yield('page-title', 'Panel Administrativo')</h2>
                 </div>
                 
@@ -327,7 +351,7 @@
                             <a class="nav-link dropdown-toggle fw-bold text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user me-2"></i>{{ Auth::user()->name }}
                             </a>
-                            <div class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
+                            <div class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown" style="border-color: var(--ensek-green-light);">
                                 <a class="dropdown-item" href="#"><i class="fas fa-user-circle me-2"></i>Perfil</a>
                                 <a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a>
                                 <div class="dropdown-divider"></div>
