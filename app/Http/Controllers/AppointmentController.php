@@ -126,6 +126,13 @@ class AppointmentController extends Controller
         ]);
 
         if ($validator->fails()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'error' => 'Datos inválidos',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
@@ -151,6 +158,13 @@ class AppointmentController extends Controller
             );
 
             if ($conflictingAppointments->count() > 0) {
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'error' => 'El técnico ya tiene una cita programada en ese horario.',
+                        'conflicts' => $conflictingAppointments
+                    ], 409); // Código 409 Conflict
+                }
+                
                 return redirect()->back()
                     ->with('error', 'El técnico ya tiene una cita programada en ese horario.')
                     ->withInput();
@@ -166,7 +180,7 @@ class AppointmentController extends Controller
         $appointment->date = $appointmentDate;
         $appointment->start_time = $startTime;
         $appointment->end_time = $endTime;
-        $appointment->notes = $request->notes;
+        $appointment->notes = isset($request->notes) ? $request->notes : $appointment->notes; // Mantener las notas si no se proporcionan
         $appointment->status = $request->status;
         $appointment->save();
 
@@ -184,6 +198,15 @@ class AppointmentController extends Controller
         // Enviar notificaciones si la cita fue reprogramada
         if ($wasRescheduled) {
             $this->sendRescheduledNotifications($appointment);
+        }
+        
+        // Responder en formato JSON si es una petición AJAX
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'La cita ha sido actualizada exitosamente.',
+                'appointment' => $appointment
+            ]);
         }
 
         return redirect()->route('appointments.index')
@@ -247,6 +270,7 @@ class AppointmentController extends Controller
                 'color' => $color,
                 'extendedProps' => [
                     'technician' => $appointment->technician->name,
+                    'technician_id' => $appointment->technician_id, // Añadir ID del técnico para la vista de recursos
                     'client' => $appointment->serviceRequest->client->name,
                     'service' => $appointment->serviceRequest->service->name,
                     'address' => $appointment->serviceRequest->address,
@@ -562,5 +586,62 @@ class AppointmentController extends Controller
             'has_conflicts' => $conflicts->count() > 0,
             'conflicts' => $conflictDetails
         ]);
+    }
+    
+    /**
+     * Obtiene todos los técnicos para la vista del calendario
+     * Incluye información sobre especialidades
+     */
+    public function getTechnicians()
+    {
+        $technicians = User::whereHas('role', function($query) {
+            $query->where('name', 'Técnico');
+        })
+        ->with(['technician.specialtyService', 'technician.skills'])
+        ->get();
+        
+        $formattedTechnicians = $technicians->map(function($tech) {
+            $specialtyName = $tech->technician && $tech->technician->specialtyService 
+                ? $tech->technician->specialtyService->name 
+                : 'General';
+                
+            $skills = $tech->technician && $tech->technician->skills 
+                ? $tech->technician->skills->pluck('name')->implode(', ') 
+                : '';
+                
+            return [
+                'id' => $tech->id,
+                'name' => $tech->name,
+                'title' => $specialtyName, // Para mostrar la especialidad como título
+                'specialty' => $specialtyName,
+                'skills' => $skills,
+                'eventColor' => $this->getTechnicianColor($specialtyName) // Color basado en la especialidad
+            ];
+        });
+        
+        return response()->json($formattedTechnicians);
+    }
+    
+    /**
+     * Obtiene un color basado en la especialidad del técnico
+     * para diferenciar visualmente en el calendario
+     */
+    private function getTechnicianColor($specialty)
+    {
+        // Mapeo de especialidades a colores
+        $specialtyColors = [
+            'Electricidad' => '#1E88E5', // Azul
+            'Plomería' => '#43A047',     // Verde
+            'Climatización' => '#E53935', // Rojo
+            'Carpintería' => '#8D6E63',  // Marrón
+            'Albañilería' => '#757575',  // Gris
+            'Pintura' => '#FB8C00',      // Naranja
+            'Jardinería' => '#7CB342',   // Verde claro
+            'Cerrajería' => '#5E35B1',   // Púrpura
+            'Informática' => '#00ACC1',  // Cian
+            'Electrónica' => '#F9A825',  // Amarillo
+        ];
+        
+        return $specialtyColors[$specialty] ?? '#546E7A'; // Color por defecto para especialidades no mapeadas
     }
 }

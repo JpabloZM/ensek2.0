@@ -1,0 +1,71 @@
+/* AJUSTES URGENTES PARA EL CALENDARIO */
+
+/* FIX 1: Nombres de técnicos claramente visibles */
+.fc-datagrid-cell-cushion {
+    white-space: normal !important; /* Permitir múltiples líneas */
+    overflow: visible !important; /* No ocultar contenido */
+    text-overflow: clip !important; /* No truncar texto */
+    word-break: break-word !important;
+    hyphens: auto !important;
+    line-height: 1.2 !important;
+    font-size: 14px !important;
+    text-align: center !important;
+    padding: 5px !important;
+}
+
+/* Fijar ancho mínimo para columnas de técnicos */
+.fc-datagrid-cell {
+    min-width: 150px !important;
+    width: 150px !important;
+}
+
+/* Resaltar columna de técnicos */
+.fc-datagrid-body .fc-datagrid-cell {
+    background-color: #f0f8ff !important; /* Azul muy claro para destacar */
+    border: 2px solid #004122 !important;
+    border-bottom: 2px solid #004122 !important;
+}
+
+/* FIX 2: Líneas horizontales que abarquen todo el espacio */
+/* Crear líneas horizontales muy visibles */
+.fc-timeline-slot.fc-timeline-slot-lane {
+    border-top: 2px solid #87c947 !important;
+    position: relative !important;
+}
+
+/* Forzar líneas horizontales en todas las celdas */
+.fc-timeline-slots td {
+    border-top: 2px solid #87c947 !important;
+}
+
+/* Asegurar que el ancho sea completo */
+.fc-timeline-slots table {
+    width: 100% !important;
+}
+
+/* Aumentar visibilidad de bordes */
+.fc .fc-timeline-slot-minor {
+    border-top: 1px dashed #87c947 !important;
+}
+
+.fc .fc-timeline-slot-major {
+    border-top: 2px solid #87c947 !important;
+}
+
+/* Hacer que las líneas abarquen todo el ancho */
+.fc-timeline-body .fc-scroller-liquid-absolute {
+    overflow: hidden !important; /* Evitar scroll horizontal */
+}
+
+/* Estilos forzados para líneas horizontales continuas */
+.fc-timeline-body tr {
+    border-top: 2px solid #87c947 !important;
+    display: table-row !important;
+    width: 100% !important;
+}
+
+/* Hacer líneas de hora muy visibles */
+.fc-timeline-slot-label {
+    border-right: 3px solid #004122 !important;
+    background: #e0f0d9 !important;
+}

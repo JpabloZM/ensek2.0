@@ -255,26 +255,64 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<!-- Estilos básicos de FullCalendar -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<!-- Nuestros estilos personalizados para FullCalendar -->
+<link href="{{ asset('css/fullcalendar-custom.css') }}" rel="stylesheet">
+
+<!-- Librerías en orden correcto -->
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+<!-- FullCalendar Bundle (incluye todos los plugins básicos) -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+
+<!-- FullCalendar Scheduler (para vistas de recursos) -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@5.11.3/main.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar FullCalendar
+        // Inicializar FullCalendar con vista de recursos
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
+            schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
             locale: 'es',
-            initialView: 'timeGridWeek',
+            initialView: 'resourceTimeGridDay',
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                right: 'resourceTimeGridDay,resourceTimeGridWeek'
             },
+            // Configuración de recursos (técnicos como columnas)
+            resources: function(fetchInfo, successCallback, failureCallback) {
+                // Obtener todos los técnicos
+                fetch("{{ route('appointments.technicians') }}")
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Técnicos cargados:", data); // Depuración
+                        // Formatear los técnicos como recursos
+                        const resources = data.map(tech => ({
+                            id: tech.id,
+                            title: tech.name,
+                            eventColor: tech.eventColor || '#87c947' // Color ENSEK para los eventos de este técnico
+                        }));
+                        successCallback(resources);
+                    })
+                    .catch(error => {
+                        console.error('Error cargando técnicos:', error);
+                        failureCallback(error);
+                    });
+            },
+            allDaySlot: false,
+            slotMinTime: '08:00:00',
+            slotMaxTime: '20:00:00',
+            slotDuration: '00:30:00',
             navLinks: true,
             selectable: true,
             selectMirror: true,
             editable: true,
-            dayMaxEvents: true,
+            dayMaxEvents: false, // Permitir mostrar todos los eventos
             nowIndicator: true,
             businessHours: {
                 daysOfWeek: [1, 2, 3, 4, 5], // Lunes a viernes
@@ -303,7 +341,22 @@
                 fetch(url)
                     .then(response => response.json())
                     .then(data => {
-                        successCallback(data);
+                        console.log("Eventos cargados:", data); // Depuración
+                        // Adaptar datos para la vista de recursos
+                        const adaptedEvents = data.map(event => {
+                            // Asegurarnos de que el evento tenga un resourceId válido
+                            return {
+                                id: event.id,
+                                title: event.title,
+                                start: event.start,
+                                end: event.end,
+                                resourceId: event.extendedProps.technician_id.toString(), // Asegurarse de que sea string
+                                color: event.color,
+                                extendedProps: event.extendedProps
+                            };
+                        });
+                        console.log("Eventos adaptados:", adaptedEvents); // Depuración
+                        successCallback(adaptedEvents);
                     })
                     .catch(error => {
                         console.error('Error cargando eventos:', error);
@@ -316,7 +369,119 @@
             },
             select: function(info) {
                 // Preparar modal para crear una nueva cita
-                prepareCreateModal(info.startStr, info.endStr);
+                // Si el recurso (técnico) está seleccionado, lo pre-seleccionamos en el formulario
+                const resourceId = info.resource ? info.resource.id : '';
+                prepareCreateModal(info.startStr, info.endStr, resourceId);
+            },
+            eventDrop: function(info) {
+                // Cuando un evento se arrastra y suelta en otra posición
+                const event = info.event;
+                const resourceId = info.newResource ? info.newResource.id : info.event.getResources()[0].id;
+                const startDateTime = event.start;
+                const endDateTime = event.end || new Date(startDateTime.getTime() + 60*60*1000); // Si no hay hora de fin, añadir 1 hora
+                
+                // Confirmar cambio
+                if (confirm('¿Está seguro de reprogramar esta cita a ' + 
+                          startDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ' - ' + 
+                          endDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '?')) {
+                    
+                    // Convertir fechas a formato adecuado para el servidor
+                    const date = startDateTime.toISOString().split('T')[0];
+                    const startTime = startDateTime.toTimeString().substr(0, 5);
+                    const endTime = endDateTime.toTimeString().substr(0, 5);
+                    
+                    // Enviar actualización al servidor
+                    fetch("{{ route('appointments.update', '') }}/" + event.id, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            technician_id: resourceId,
+                            date: date,
+                            start_time: startTime,
+                            end_time: endTime,
+                            status: 'rescheduled', // Marcar como reprogramada
+                            _method: 'PUT' // Para métodos PUT en formularios
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            // Si hay un error, revertir el cambio
+                            info.revert();
+                            return response.json().then(data => Promise.reject(data));
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Mostrar mensaje de éxito
+                        alert('Cita reprogramada exitosamente');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error al reprogramar la cita: ' + (error.message || 'Error desconocido'));
+                        info.revert();
+                    });
+                } else {
+                    // Si el usuario cancela, revertir el cambio
+                    info.revert();
+                }
+            },
+            eventResize: function(info) {
+                // Cuando un evento se redimensiona (cambiar duración)
+                const event = info.event;
+                const startDateTime = event.start;
+                const endDateTime = event.end;
+                
+                // Confirmar cambio
+                if (confirm('¿Está seguro de cambiar la duración de esta cita a ' + 
+                          startDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ' - ' + 
+                          endDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '?')) {
+                    
+                    // Convertir fechas a formato adecuado para el servidor
+                    const date = startDateTime.toISOString().split('T')[0];
+                    const startTime = startDateTime.toTimeString().substr(0, 5);
+                    const endTime = endDateTime.toTimeString().substr(0, 5);
+                    
+                    // Enviar actualización al servidor
+                    fetch("{{ route('appointments.update', '') }}/" + event.id, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            date: date,
+                            start_time: startTime,
+                            end_time: endTime,
+                            status: 'rescheduled', // Marcar como reprogramada
+                            _method: 'PUT' // Para métodos PUT en formularios
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            // Si hay un error, revertir el cambio
+                            info.revert();
+                            return response.json().then(data => Promise.reject(data));
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Mostrar mensaje de éxito
+                        alert('Duración de cita actualizada exitosamente');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error al actualizar la duración de la cita: ' + (error.message || 'Error desconocido'));
+                        info.revert();
+                    });
+                } else {
+                    // Si el usuario cancela, revertir el cambio
+                    info.revert();
+                }
             }
         });
         
@@ -369,7 +534,7 @@
         }
         
         // Función para preparar el modal de creación con la fecha y hora seleccionadas
-        function prepareCreateModal(startStr, endStr) {
+        function prepareCreateModal(startStr, endStr, resourceId = '') {
             var start = new Date(startStr);
             var end = new Date(endStr);
             
@@ -387,8 +552,11 @@
             
             // Limpiar otros campos
             document.getElementById('service_request_id').value = '';
-            document.getElementById('technician_id').value = '';
+            document.getElementById('technician_id').value = resourceId; // Pre-seleccionar el técnico si se ha proporcionado
             document.getElementById('notes').value = '';
+            
+            // Ocultar la sección de recomendaciones ya que estamos seleccionando manualmente
+            document.getElementById('techniciansRecommendation').classList.add('d-none');
             
             // Mostrar el modal
             $('#createAppointmentModal').modal('show');

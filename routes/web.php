@@ -103,6 +103,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
             Route::post('/suggest-technicians', [AppointmentController::class, 'suggestTechnicians'])->name('suggest-technicians');
             Route::post('/check-conflicts', [AppointmentController::class, 'checkConflicts'])->name('check-conflicts');
             Route::post('/send-reminders', [AppointmentController::class, 'sendReminders'])->name('send-reminders');
+            Route::get('/technicians', [AppointmentController::class, 'getTechnicians'])->name('technicians');
         });
     });
 });

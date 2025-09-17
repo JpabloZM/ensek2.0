@@ -1,0 +1,502 @@
+/**
+ * ENSEK Calendar Redesign - Estilo profesional y moderno
+ * Este archivo redefine la apariencia del calendario de técnicos
+ */
+
+/* Variables globales para consistencia de diseño */
+:root {
+    /* Paleta de colores ENSEK */
+    --ensek-green-dark: #004122;
+    --ensek-green-light: #87c947;
+    --ensek-white: #ffffff;
+    --ensek-gray-100: #f8f9fa;
+    --ensek-gray-200: #e9ecef;
+    --ensek-gray-300: #dee2e6;
+    --ensek-gray-400: #ced4da;
+    --ensek-gray-500: #adb5bd;
+    --ensek-gray-600: #6c757d;
+    --ensek-gray-700: #495057;
+    --ensek-gray-800: #343a40;
+    --ensek-gray-900: #212529;
+
+    /* Medidas estándar */
+    --header-height: 50px;
+    --row-height: 68px;
+    --event-height: 32px;
+    --border-radius: 6px;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+    /* Transiciones */
+    --transition: all 0.2s ease;
+}
+
+/* Reset y configuración base */
+.calendar-container {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.5;
+    color: var(--ensek-gray-800);
+}
+
+/* MEJORAS GENERALES DEL CALENDARIO */
+.technician-calendar {
+    border: none !important;
+    box-shadow: var(--shadow-md);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+/* Eliminar bordes externos */
+.fc-scrollgrid {
+    border: none !important;
+}
+
+.fc .fc-scrollgrid-section-header > *,
+.fc .fc-scrollgrid-section-body > * {
+    border-width: 0 !important;
+}
+
+/* CABECERAS */
+/* Cabecera principal del calendario */
+.fc .fc-toolbar.fc-header-toolbar {
+    background-color: var(--ensek-green-dark);
+    margin: 0 !important;
+    padding: 1.25rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fc .fc-toolbar-title {
+    color: var(--ensek-white);
+    font-size: 1.5rem !important;
+    font-weight: 600;
+}
+
+/* Botones en la cabecera */
+.fc .fc-button-primary {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border: none !important;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 1rem;
+    transition: var(--transition);
+}
+
+.fc .fc-button-primary:hover {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: var(--shadow-sm);
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    background-color: var(--ensek-green-light) !important;
+    font-weight: 600;
+    color: var(--ensek-green-dark) !important;
+}
+
+.fc .fc-button-group {
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.fc .fc-button-group .fc-button-primary {
+    border-radius: 0 !important;
+}
+
+/* Mejora de la cabecera de columnas */
+.fc .fc-col-header {
+    background-color: var(--ensek-green-dark);
+}
+
+.fc .fc-col-header-cell {
+    background-color: var(--ensek-green-dark);
+    border: none !important;
+    height: var(--header-height) !important;
+    vertical-align: middle;
+}
+
+.fc .fc-col-header-cell-cushion {
+    color: var(--ensek-white) !important;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 1rem 0.75rem !important;
+    text-decoration: none !important;
+}
+
+/* ÁREA DE RECURSOS (TÉCNICOS) */
+/* Cabecera del área de recursos */
+.fc .fc-datagrid-header {
+    background-color: var(--ensek-green-dark);
+}
+
+.fc .fc-datagrid-cell-cushion {
+    color: var(--ensek-white) !important;
+}
+
+/* Área de recursos - cabecera */
+.fc-datagrid-header .fc-datagrid-cell {
+    background-color: var(--ensek-green-dark);
+    height: var(--header-height) !important;
+    border: none !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    vertical-align: middle;
+}
+
+.fc-datagrid-header .fc-datagrid-cell-cushion {
+    color: var(--ensek-white);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 0.75rem !important;
+    text-align: center;
+}
+
+/* Celdas de recursos (técnicos) */
+.fc-datagrid-body .fc-datagrid-row {
+    height: var(--row-height) !important;
+    background-color: var(--ensek-gray-100);
+}
+
+.fc-datagrid-body .fc-datagrid-cell {
+    background-color: var(--ensek-gray-100);
+    border-bottom: 1px solid var(--ensek-gray-200) !important;
+    border-right: 3px solid var(--ensek-green-light) !important;
+    box-shadow: inset -3px 0 5px -3px rgba(0, 65, 34, 0.1);
+}
+
+/* Contenido de celdas de recursos */
+.fc-datagrid-cell-cushion {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0.5rem !important;
+    font-weight: 600;
+    color: var(--ensek-gray-800);
+    text-align: center;
+    overflow: hidden;
+    word-break: break-word;
+    hyphens: auto;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Mejorar visualización de nombres largos */
+.fc-datagrid-cell-cushion .tech-name {
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+    line-height: 1.2;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fc-datagrid-cell-cushion .tech-specialty {
+    font-size: 0.8rem;
+    color: var(--ensek-gray-600);
+    font-weight: normal;
+    opacity: 0.9;
+    line-height: 1.2;
+}
+
+/* CELDAS DE TIEMPO */
+/* Cabeceras de horas */
+.fc-timeline-slot.fc-timeline-slot-label {
+    background-color: var(--ensek-gray-100);
+    border-top: 0;
+    border-right: 1px solid var(--ensek-gray-200);
+    height: var(--row-height) !important;
+    vertical-align: middle;
+}
+
+.fc-timeline-slot-label-frame {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 0;
+}
+
+.fc-timeline-slot-label-cushion {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ensek-gray-700);
+    padding: 0.25rem 0;
+}
+
+/* Filas de tiempo (donde van los eventos) */
+.fc-timeline-slot.fc-timeline-slot-lane {
+    height: var(--row-height) !important;
+    border-right: 1px solid var(--ensek-gray-200);
+    border-top: 1px solid var(--ensek-gray-200);
+    background-color: var(--ensek-white);
+}
+
+.fc-timeline-overlap-enabled .fc-timeline-lane-frame {
+    height: var(--row-height) !important;
+    background-color: var(--ensek-white);
+    border-top: none;
+}
+
+/* Asegurar que las líneas horizontales abarquen todo el espacio */
+.fc-timeline-slots tr {
+    border-top: 1px solid var(--ensek-gray-200);
+}
+
+/* Líneas de horas que abarquen todos los técnicos */
+.fc .fc-timeline-slot-minor {
+    border-top: 1px dotted var(--ensek-gray-300);
+    border-top-width: 1px !important;
+    z-index: 2;
+    position: relative;
+}
+
+.fc .fc-timeline-slot-major {
+    border-top: 1px solid var(--ensek-gray-300);
+    border-top-width: 1px !important;
+    z-index: 2;
+    position: relative;
+}
+
+/* EVENTOS */
+.fc-event {
+    border: none !important;
+    border-radius: calc(var(--border-radius) - 2px) !important;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.fc-event:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.fc-timeline-event {
+    height: var(--event-height) !important;
+    line-height: var(--event-height) !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+}
+
+.fc-event-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fc-event-time {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    font-weight: 500;
+    padding-left: 0.5rem;
+}
+
+/* Estilos por tipo de estado */
+.schedule-pending {
+    background-color: #ffc107 !important;
+    border-left: 3px solid #e0a800 !important;
+}
+
+.schedule-inprogress {
+    background-color: #17a2b8 !important;
+    border-left: 3px solid #138496 !important;
+}
+
+.schedule-completed {
+    background-color: var(--ensek-green-light) !important;
+    border-left: 3px solid #67a32c !important;
+    color: var(--ensek-green-dark) !important;
+}
+
+.schedule-cancelled {
+    background-color: #dc3545 !important;
+    border-left: 3px solid #bd2130 !important;
+}
+
+/* Estados de confirmación */
+.confirmation-confirmed::after {
+    content: "✓";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #28a745;
+    color: white;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.confirmation-declined::after {
+    content: "×";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #dc3545;
+    color: white;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.confirmation-pending::after {
+    content: "?";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #ffc107;
+    color: white;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* INDICADOR DE HORA ACTUAL */
+.fc .fc-timeline-now-indicator-line {
+    border-color: var(--ensek-green-dark);
+    border-width: 2px;
+    box-shadow: 0 0 10px rgba(0, 65, 34, 0.3);
+    z-index: 1000;
+}
+
+.fc .fc-timeline-now-indicator-arrow {
+    border-color: var(--ensek-green-dark);
+    filter: drop-shadow(0 0 3px rgba(0, 65, 34, 0.5));
+    z-index: 1000;
+}
+
+/* SCROLLBARS */
+.fc-scroller::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.fc-scroller::-webkit-scrollbar-track {
+    background: var(--ensek-gray-100);
+}
+
+.fc-scroller::-webkit-scrollbar-thumb {
+    background: var(--ensek-gray-400);
+    border-radius: 4px;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb:hover {
+    background: var(--ensek-gray-500);
+}
+
+/* COHERENCIA EN TAMAÑOS Y DIMENSIONES */
+.fc-resource-timeline-divider {
+    width: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+.fc-resource-timeline-divider + div {
+    width: 100% !important;
+}
+
+.fc-datagrid-cell-frame,
+.fc-timeline-lane-frame {
+    min-height: var(--row-height) !important;
+    max-height: var(--row-height) !important;
+}
+
+/* Alineación del timeline con las filas de técnicos */
+.fc-resource-timeline .fc-datagrid-body .fc-scroller-harness,
+.fc-resource-timeline .fc-timeline-body .fc-scroller-harness {
+    overflow: hidden !important;
+}
+
+/* Diseño responsivo */
+@media (max-width: 992px) {
+    :root {
+        --row-height: 65px;
+        --event-height: 30px;
+    }
+
+    .fc-datagrid-cell-cushion {
+        font-size: 0.9rem;
+    }
+
+    .fc .fc-toolbar.fc-header-toolbar {
+        padding: 1rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --row-height: 60px;
+        --event-height: 28px;
+        --header-height: 45px;
+    }
+
+    .fc .fc-toolbar.fc-header-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.75rem !important;
+        gap: 0.5rem;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.2rem !important;
+    }
+
+    .fc-datagrid-cell-cushion {
+        font-size: 0.85rem;
+        padding: 0.25rem !important;
+    }
+
+    .fc-timeline-slot-label-cushion {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --row-height: 55px;
+        --event-height: 26px;
+        --header-height: 40px;
+    }
+
+    .fc-event-title {
+        font-size: 0.8rem;
+    }
+
+    .fc-event-time {
+        font-size: 0.75rem;
+    }
+
+    .fc-datagrid-cell-cushion {
+        font-size: 0.8rem;
+    }
+
+    .fc-toolbar-chunk .fc-button {
+        padding: 0.35rem 0.7rem !important;
+        font-size: 0.85rem !important;
+    }
+}

@@ -1,0 +1,423 @@
+/* Estilos personalizados para FullCalendar con colores corporativos ENSEK */
+
+/* Variables de colores corporativos */
+:root {
+    --ensek-green-light: #87c947;
+    --ensek-green-dark: #004122;
+    --ensek-gray: #2c2e35;
+    --ensek-light-gray: #f8f9fa;
+    --ensek-white: #ffffff;
+    --ensek-border: #e2e8f0;
+    --ensek-hover: #005a30;
+
+    /* Variables adicionales para mejor coherencia */
+    --fc-resource-row-height: 65px;
+    --fc-header-height: 48px;
+    --fc-border-color: var(--ensek-border);
+}
+
+/* ===== ESTILOS GENERALES DEL CALENDARIO ===== */
+.calendar-container {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    background-color: var(--ensek-white);
+    font-family: "Segoe UI", Arial, sans-serif;
+    height: 100%;
+}
+
+.technician-calendar {
+    height: 700px;
+    max-width: 100%;
+}
+
+/* Cabecera del calendario */
+.fc .fc-toolbar.fc-header-toolbar {
+    padding: 12px 16px;
+    margin-bottom: 0;
+    background-color: var(--ensek-green-dark);
+    color: var(--ensek-white);
+    border-radius: 6px 6px 0 0;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--ensek-white);
+}
+
+/* Botones de navegación */
+.fc .fc-button-primary {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: var(--ensek-white);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    box-shadow: none;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--ensek-white);
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    background-color: var(--ensek-green-light);
+    border-color: var(--ensek-green-light);
+    color: var(--ensek-green-dark);
+    font-weight: 600;
+}
+
+/* ===== ÁREA DE RECURSOS (TÉCNICOS) ===== */
+.fc .fc-resource-area .fc-datagrid-cell-cushion {
+    padding: 12px 10px;
+    font-weight: 600;
+    color: var(--ensek-green-dark);
+}
+
+/* Cabecera del área de recursos */
+.fc-resource-timeline .fc-resource-timeline-divider {
+    width: 0 !important;
+    padding: 0 !important;
+}
+
+.fc-datagrid-header,
+.fc-resource-timeline-divider + div {
+    width: 100% !important;
+}
+
+/* Armonizar cabecera de recursos con cabecera de horas */
+.fc-datagrid-header .fc-datagrid-cell {
+    background-color: var(--ensek-green-dark);
+    color: var(--ensek-white);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    padding: 12px !important;
+    text-align: center;
+    height: 48px;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Asegurar alineación de cabeceras */
+.fc .fc-resource-timeline-divider,
+.fc .fc-resource-timeline-divider + div .fc-scroller-harness {
+    border-bottom: 0 !important;
+}
+
+/* Filas de recursos (técnicos) */
+.fc-datagrid-body .fc-datagrid-row {
+    height: 65px; /* Altura estandarizada para alinearse con las celdas de tiempo */
+    box-sizing: border-box;
+}
+
+.fc-datagrid-body .fc-datagrid-cell {
+    background-color: var(--ensek-light-gray);
+    border-right: 3px solid var(--ensek-green-light);
+    border-bottom: 1px solid var(--ensek-border);
+    vertical-align: middle; /* Centrar verticalmente el contenido */
+    box-sizing: border-box;
+}
+
+/* Mejorar la presentación de los nombres de técnicos */
+.fc-datagrid-cell-cushion {
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 8px !important;
+}
+
+/* ===== CELDAS DE TIEMPO Y EVENTOS ===== */
+/* Cabeceras de tiempo */
+.fc-col-header-cell {
+    background-color: var(--ensek-green-dark);
+    border-bottom: none !important;
+}
+
+.fc-col-header-cell a {
+    color: var(--ensek-white) !important;
+    font-weight: 600;
+    padding: 12px 0;
+    text-decoration: none !important;
+}
+
+/* Slot de horas */
+.fc-timeline-slot.fc-timeline-slot-label {
+    background-color: var(--ensek-light-gray);
+    border-right: 1px solid var(--ensek-border);
+    vertical-align: middle;
+    min-width: 80px; /* Ancho mínimo para las etiquetas de hora */
+}
+
+.fc-timeline-slot-label-frame {
+    text-align: center;
+    font-weight: 600;
+    color: var(--ensek-green-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+/* Mejorar formato de horas */
+.fc-timeline-slot-label-cushion {
+    font-size: 0.9rem;
+    padding: 2px 0;
+}
+
+/* Asegurar que todas las etiquetas de hora tienen el mismo ancho */
+.fc-timeline-header-row {
+    height: 48px;
+}
+
+/* ===== EVENTOS ===== */
+.fc-event {
+    border-radius: 4px !important;
+    border: none !important;
+    padding: 4px 8px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 3px 0 !important;
+}
+
+.fc-event .fc-event-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.fc-event .fc-event-time {
+    font-weight: 400;
+    opacity: 0.9;
+    font-size: 0.85rem;
+    margin-right: 5px;
+}
+
+.fc-timeline-event {
+    height: 30px !important;
+    line-height: 30px !important;
+    border-radius: 4px;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Estados de eventos */
+.schedule-pending {
+    background-color: #ffc107 !important;
+    border-left: 3px solid #e0a800 !important;
+    color: #664d03 !important;
+}
+
+.schedule-inprogress {
+    background-color: #17a2b8 !important;
+    border-left: 3px solid #138496 !important;
+    color: #fff !important;
+}
+
+.schedule-completed {
+    background-color: var(--ensek-green-light) !important;
+    border-left: 3px solid #67a32c !important;
+    color: #004122 !important;
+}
+
+.schedule-cancelled {
+    background-color: #dc3545 !important;
+    border-left: 3px solid #bd2130 !important;
+    color: #fff !important;
+}
+
+/* Espaciado de celdas */
+.fc-timegrid-slot,
+.fc-timeline-slot {
+    height: 3.5em !important;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+}
+
+/* Indicador de hora actual */
+.fc .fc-timeline-now-indicator-line {
+    border-color: var(--ensek-green-dark);
+    border-width: 2px;
+    z-index: 10;
+    box-shadow: 0 0 5px rgba(0, 65, 34, 0.5);
+}
+
+.fc .fc-timeline-now-indicator-arrow {
+    border-color: var(--ensek-green-dark);
+    border-width: 5px;
+    filter: drop-shadow(0 0 3px rgba(0, 65, 34, 0.5));
+}
+
+/* Indicador de hora actual */
+.fc .fc-timegrid-now-indicator-line,
+.fc .fc-timeline-now-indicator-line {
+    border-color: var(--ensek-green-dark);
+    border-width: 2px;
+}
+
+/* Mejorar la visualización del calendario eliminando espacios innecesarios */
+.fc-scroller {
+    overflow: hidden !important;
+}
+
+/* Ajustar el contenido del calendario para que ocupe todo el espacio disponible */
+.fc-view-harness,
+.fc-view-harness-active {
+    height: 100% !important;
+}
+
+/* Eliminar el espacio gris innecesario y asegurar coherencia */
+.fc-timeline-overlap-enabled .fc-timeline-lane-frame {
+    background-color: white;
+    height: 65px !important; /* Mismo alto que las filas de técnicos */
+    box-sizing: border-box;
+}
+
+.fc-timeline-slot-frame {
+    background-color: white;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+/* Asegurar que los slots ocupen todo el espacio disponible */
+.fc-timeline-slots td {
+    background-color: white;
+    width: auto !important;
+}
+
+/* Optimizar espacio para la vista de resourceTimelineDay */
+.fc .fc-resource-timeline-divider {
+    width: 0 !important;
+    background: none !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+.fc-resource-timeline-divider + div {
+    width: 100% !important;
+}
+
+/* Asegurar coherencia entre columnas de técnicos y celdas de tiempo */
+.fc-resource-timeline .fc-datagrid-cell,
+.fc-resource-timeline .fc-timeline-lane-frame {
+    border-bottom-width: 1px !important;
+    border-style: solid !important;
+    border-color: var(--ensek-border) !important;
+}
+
+/* Título del área de recursos */
+.fc-resource-area .fc-datagrid-header-table th {
+    background-color: var(--ensek-green-dark);
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 8px;
+}
+
+/* Eliminar completamente el área gris */
+.fc-timeline-slot.fc-timeline-slot-label {
+    border-top: 0;
+}
+
+/* Mejorar contraste de horas */
+.fc-timeline-slot-label-frame {
+    font-weight: 500;
+}
+
+.fc .fc-timegrid-now-indicator-arrow,
+.fc .fc-timeline-now-indicator-arrow {
+    border-color: var(--ensek-green-dark);
+    border-width: 5px;
+}
+
+/* Eliminar bordes innecesarios */
+.fc-scrollgrid {
+    border: none !important;
+}
+
+/* Hacer el área de visualización más limpia */
+.fc-scrollgrid-section-body table,
+.fc-scrollgrid-section-body td {
+    border-bottom-width: 0 !important;
+}
+
+/* Mejorar visualización de horas en timeline */
+.fc .fc-timeline-slot-minor {
+    border-top: 1px dotted rgba(0, 65, 34, 0.15); /* Más sutiles */
+}
+
+.fc .fc-timeline-slot-major {
+    border-top: 1px solid rgba(0, 65, 34, 0.3); /* Más visibles */
+}
+
+/* Mejorar el look de la columna de recursos */
+.fc-resource-timeline .fc-datagrid-cell-cushion {
+    padding: 8px;
+    font-weight: 600;
+}
+
+/* Eliminar espacios entre filas de recursos */
+.fc-datagrid-body .fc-datagrid-row {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* ===== DISEÑO RESPONSIVE ===== */
+/* Tablets */
+@media (max-width: 992px) {
+    .fc .fc-toolbar.fc-header-toolbar {
+        padding: 8px 12px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.2rem;
+    }
+
+    .fc-datagrid-body .fc-datagrid-row {
+        height: 60px;
+    }
+
+    .fc-timeline-slot.fc-timeline-slot-lane {
+        height: 65px; /* Match the height of technician rows (fc-datagrid-row) */
+        border-top: 1px solid var(--ensek-border); /* Add consistent border */
+        background-color: white; /* Ensure consistent background */
+    }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+    .fc .fc-toolbar.fc-header-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .fc .fc-toolbar-chunk {
+        margin-bottom: 8px;
+        width: 100%;
+    }
+
+    .fc-datagrid-body .fc-datagrid-row {
+        height: 50px;
+    }
+
+    .fc-timeline-slot.fc-timeline-slot-lane {
+        height: 50px;
+    }
+
+    .fc-event .fc-event-title {
+        font-size: 0.8rem;
+    }
+
+    .fc-resource-timeline .fc-datagrid-cell-cushion {
+        padding: 4px;
+    }
+}

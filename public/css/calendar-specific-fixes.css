@@ -1,0 +1,75 @@
+/* 
+ * Este archivo contiene ajustes específicos para el calendario
+ * que aseguran que las líneas horizontales abarquen todo el espacio
+ * y que los nombres de los técnicos se muestren correctamente
+ */
+
+/* Asegurar que las líneas horizontales de las horas abarquen todo el ancho */
+.fc-timeline-body .fc-timeline-slots,
+.fc-timeline-body .fc-timeline-slots table {
+    width: 100% !important;
+}
+
+.fc-timeline-body .fc-timeline-slots td {
+    border-top-width: 1px !important;
+}
+
+/* Líneas horizontales continuas en todo el calendario */
+.fc .fc-timeline-body {
+    position: relative;
+}
+
+/* Líneas para horas principales */
+.fc .fc-timeline-body:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background-image: linear-gradient(
+        to bottom,
+        transparent calc(var(--row-height) - 1px),
+        var(--ensek-gray-300) calc(var(--row-height) - 1px),
+        var(--ensek-gray-300) var(--row-height),
+        transparent var(--row-height)
+    );
+    background-size: 100% var(--row-height);
+    z-index: 1;
+}
+
+/* Mejoras para nombres de técnicos */
+.fc-datagrid-cell-cushion {
+    padding: 0.25rem !important;
+    overflow: visible;
+}
+
+/* Asegurar que los nombres largos no se corten */
+.fc-resource-timeline .fc-datagrid-cell {
+    overflow: visible;
+    min-width: 120px;
+    max-width: 180px;
+}
+
+.fc-resource-timeline .fc-datagrid-cell-cushion {
+    overflow: visible;
+    white-space: normal;
+    text-align: center;
+    word-break: break-word;
+}
+
+/* Mejorar visualización de horas */
+.fc-timeline-slot.fc-timeline-slot-label {
+    min-width: 80px !important;
+}
+
+/* Mejorar las líneas divisorias para horas */
+.fc-timeline-body tr:not(:first-child) .fc-timeline-slot.fc-timeline-slot-lane {
+    border-top: 1px solid var(--ensek-gray-300) !important;
+}
+
+/* Garantizar que los eventos estén por encima de las líneas */
+.fc-timeline-event {
+    z-index: 3;
+}

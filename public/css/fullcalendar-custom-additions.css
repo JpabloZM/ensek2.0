@@ -1,0 +1,79 @@
+/* Additional CSS rules for better coherence between technician columns and time slots */
+
+/* These styles address specific alignment issues between technician columns and time slots.
+   They ensure consistent heights, borders, and vertical alignment across all elements. */
+
+/* Set consistent box-sizing for all calendar elements */
+.fc-datagrid-body,
+.fc-datagrid-cell,
+.fc-resource-timeline-divider,
+.fc-timeline-slot,
+.fc-timeline-slot-lane,
+.fc-timeline-lane-frame,
+.fc .fc-timeline-body,
+.fc-timeline-slots td {
+    box-sizing: border-box !important;
+}
+
+/* Fix alignment between resource area and timeline slots */
+.fc
+    .fc-resource-timeline-divider
+    + .fc-resource-timeline-body
+    .fc-scroller-harness {
+    overflow: hidden !important;
+}
+
+/* Ensure consistent row heights */
+.fc-timeline-slot.fc-timeline-slot-lane,
+.fc-datagrid-body .fc-datagrid-row {
+    height: var(--fc-resource-row-height) !important;
+    min-height: var(--fc-resource-row-height) !important;
+    max-height: var(--fc-resource-row-height) !important;
+}
+
+/* Ensure all borders are visible with consistent colors */
+.fc-resource-timeline-divider
+    + .fc-resource-timeline-body
+    .fc-timeline-slot-lane {
+    border-right: 1px solid var(--fc-border-color) !important;
+    border-top: 1px solid var(--fc-border-color) !important;
+}
+
+/* Alignment fixes for events */
+.fc-timeline-event-harness {
+    margin-top: 17px !important; /* Center events vertically in the 65px cell */
+}
+
+/* Fix scrolling alignment between the two sections */
+.fc-scroller-harness {
+    overflow: hidden !important;
+}
+
+.fc-scroller-liquid-absolute {
+    overflow: scroll !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+}
+
+/* Enforce the same height between resource and timeline headers */
+.fc-col-header-cell,
+.fc-datagrid-cell-cushion,
+.fc-resource-timeline-divider {
+    height: var(--fc-header-height) !important;
+}
+
+/* Improve the alignment of the resource row cells */
+.fc-datagrid-cell-frame {
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Make sure the cells maintain their dimensions */
+.fc .fc-timeline-slot {
+    min-width: 80px !important;
+}

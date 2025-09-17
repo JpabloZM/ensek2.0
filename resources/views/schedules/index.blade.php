@@ -4,37 +4,40 @@
 
 @section('content')
 <div class="container-fluid px-0 px-sm-3 overflow-hidden">
+    <!-- Encabezado con controles del calendario -->
     <div class="row mb-4 align-items-center">
         <div class="col-md-6 col-12 mb-2 mb-md-0">
             <div class="d-flex align-items-center flex-wrap">
-                <div class="btn-group me-2 mb-2 mb-sm-0">
-                    <button id="prev-btn" class="btn btn-sm btn-outline-secondary">
+                <div class="btn-group me-3 mb-2 mb-sm-0">
+                    <button id="prev-btn" class="btn btn-sm btn-outline-secondary border-dark-subtle">
                         <i class="fas fa-chevron-left"></i><span class="d-none d-sm-inline"> Anterior</span>
                     </button>
-                    <button id="next-btn" class="btn btn-sm btn-outline-secondary">
+                    <button id="next-btn" class="btn btn-sm btn-outline-secondary border-dark-subtle">
                         <i class="fas fa-chevron-right"></i><span class="d-none d-sm-inline"> Siguiente</span>
                     </button>
                 </div>
-                <h4 id="calendar-title" class="mb-0 text-truncate">Calendario</h4>
+                <h4 id="calendar-title" class="mb-0 text-truncate fw-bold">Calendario</h4>
             </div>
         </div>
         <div class="col-md-6 col-12 text-md-end">
             <div class="d-flex justify-content-end flex-wrap">
-                <button type="button" class="btn btn-success me-2 mb-2 mb-md-0" data-bs-toggle="modal" data-bs-target="#newTechnicianModal">
+                <button type="button" class="btn btn-success me-2 mb-2 mb-md-0 text-white" style="background-color: #004122; border: none;" data-bs-toggle="modal" data-bs-target="#newTechnicianModal">
                     <i class="fas fa-user-plus"></i><span class="d-none d-sm-inline"> Agregar Técnico</span>
                 </button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newScheduleModal">
+                <button type="button" class="btn btn-primary" style="background-color: #87c947; border: none; color: #004122;" data-bs-toggle="modal" data-bs-target="#newScheduleModal">
                     <i class="fas fa-plus"></i><span class="d-none d-sm-inline"> Nuevo Agendamiento</span>
                 </button>
             </div>
         </div>
     </div>
     
-    <div class="filters-container mb-3 p-2 bg-light rounded shadow-sm">
+    <div class="filters-container mb-3 p-3 bg-white rounded shadow-sm" style="border: 1px solid rgba(0, 65, 34, 0.1);">
         <div class="row align-items-center">
             <div class="col-md-3 mb-2 mb-md-0">
-                <label for="technicianFilter" class="form-label small mb-1">Técnico</label>
-                <select id="technicianFilter" class="form-select form-select-sm">
+                <label for="technicianFilter" class="form-label small mb-1 fw-semibold text-secondary">
+                    <i class="fas fa-user-hard-hat me-1 text-green-dark"></i> Técnico
+                </label>
+                <select id="technicianFilter" class="form-select form-select-sm border-light-subtle">
                     <option value="">Todos los Técnicos</option>
                     @foreach($technicians as $technician)
                         <option value="{{ $technician->id }}">{{ $technician->user->name }}</option>
@@ -42,8 +45,10 @@
                 </select>
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
-                <label for="statusFilter" class="form-label small mb-1">Estado</label>
-                <select id="statusFilter" class="form-select form-select-sm">
+                <label for="statusFilter" class="form-label small mb-1 fw-semibold text-secondary">
+                    <i class="fas fa-tasks me-1 text-green-dark"></i> Estado
+                </label>
+                <select id="statusFilter" class="form-select form-select-sm border-light-subtle">
                     <option value="">Todos los Estados</option>
                     <option value="pending">Pendiente</option>
                     <option value="in_progress">En Proceso</option>
@@ -52,8 +57,10 @@
                 </select>
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
-                <label for="confirmationFilter" class="form-label small mb-1">Confirmación</label>
-                <select id="confirmationFilter" class="form-select form-select-sm">
+                <label for="confirmationFilter" class="form-label small mb-1 fw-semibold text-secondary">
+                    <i class="fas fa-check-circle me-1 text-green-dark"></i> Confirmación
+                </label>
+                <select id="confirmationFilter" class="form-select form-select-sm border-light-subtle">
                     <option value="">Todas las Confirmaciones</option>
                     <option value="confirmed">Confirmadas</option>
                     <option value="pending">Pendientes</option>
@@ -63,10 +70,10 @@
             <div class="col-md-3">
                 <label class="form-label small mb-1">&nbsp;</label>
                 <div class="d-flex">
-                    <button id="refreshCalendar" class="btn btn-sm btn-outline-primary flex-grow-1 me-2">
+                    <button id="refreshCalendar" class="btn btn-sm btn-outline-primary flex-grow-1 me-2" style="border-color: #004122; color: #004122;">
                         <i class="fas fa-sync-alt"></i> Actualizar
                     </button>
-                    <button id="sendRemindersBtn" class="btn btn-sm btn-warning">
+                    <button id="sendRemindersBtn" class="btn btn-sm" style="background-color: #FFC107; color: #212529;">
                         <i class="fas fa-bell"></i>
                     </button>
                 </div>
@@ -77,37 +84,85 @@
     <div class="row">
         <!-- Solicitudes de servicio pendientes -->
         <div class="col-lg-3 col-md-4 d-none d-md-block mb-3">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white py-2">
+            <div class="card shadow-sm h-100 border-0" style="border-radius: 8px;">
+                <div class="card-header bg-green-dark text-white py-3" style="border-top-left-radius: 8px; border-top-right-radius: 8px;">
                     <h6 class="mb-0 d-flex align-items-center">
                         <i class="fas fa-clipboard-list me-2"></i>
                         Solicitudes Pendientes
-                        <span class="badge bg-light text-primary ms-2">{{ count($pendingRequests) }}</span>
+                        <span class="badge bg-light text-green-dark ms-2 fw-semibold">{{ count($pendingRequests) }}</span>
                     </h6>
                 </div>
+                <style>
+                    .bg-green-dark {
+                        background-color: #004122;
+                    }
+                    .text-green-dark {
+                        color: #004122;
+                    }
+                    
+                    /* Estilos para la leyenda del calendario */
+                    .legend-dot {
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 50%;
+                        margin-right: 5px;
+                        display: inline-block;
+                    }
+                    
+                    /* Mejoras para el panel lateral */
+                    .pending-requests-list {
+                        scrollbar-width: thin;
+                        scrollbar-color: #adb5bd #f8f9fa;
+                    }
+                    
+                    .pending-requests-list::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    
+                    .pending-requests-list::-webkit-scrollbar-track {
+                        background: #f8f9fa;
+                        border-radius: 3px;
+                    }
+                    
+                    .pending-requests-list::-webkit-scrollbar-thumb {
+                        background-color: #adb5bd;
+                        border-radius: 3px;
+                    }
+                    
+                    .pending-requests-list .list-group-item {
+                        transition: all 0.2s ease;
+                        border-left: 3px solid transparent;
+                    }
+                    
+                    .pending-requests-list .list-group-item:hover {
+                        background-color: #f8f9fa;
+                        border-left-color: #87c947;
+                    }
+                </style>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush pending-requests-list" style="max-height: 650px; overflow-y: auto;">
                         @forelse($pendingRequests as $request)
-                            <div class="list-group-item list-group-item-action py-3 lh-sm">
+                            <div class="list-group-item list-group-item-action py-3 lh-sm border-0 border-bottom">
                                 <div class="d-flex w-100 justify-content-between mb-1">
-                                    <h6 class="mb-1 text-primary">{{ $request->service->name }}</h6>
+                                    <h6 class="mb-1 fw-bold text-green-dark">{{ $request->service->name }}</h6>
                                     <small class="text-muted">{{ $request->created_at->diffForHumans() }}</small>
                                 </div>
-                                <p class="mb-1">{{ $request->client_name }}</p>
-                                <small class="d-block mb-2">{{ Str::limit($request->description, 60) }}</small>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{{ route('admin.schedules.create', ['service_request_id' => $request->id]) }}" class="btn btn-outline-primary">
+                                <p class="mb-1 fw-semibold">{{ $request->client_name }}</p>
+                                <small class="d-block mb-3 text-secondary">{{ Str::limit($request->description, 60) }}</small>
+                                <div class="btn-group btn-group-sm w-100" role="group">
+                                    <a href="{{ route('admin.schedules.create', ['service_request_id' => $request->id]) }}" class="btn btn-sm" style="background-color: #87c947; color: #004122; flex: 1; border: none;">
                                         <i class="fas fa-calendar-plus"></i> Agendar
                                     </a>
-                                    <a href="{{ route('admin.service-requests.show', $request->id) }}" class="btn btn-outline-info">
+                                    <a href="{{ route('admin.service-requests.show', $request->id) }}" class="btn btn-sm btn-outline-secondary" style="flex: 1; border-color: #dee2e6;">
                                         <i class="fas fa-eye"></i> Ver
                                     </a>
                                 </div>
                             </div>
                         @empty
-                            <div class="list-group-item py-4 text-center text-muted">
-                                <i class="fas fa-check-circle fa-2x mb-2"></i>
-                                <p class="mb-0">No hay solicitudes pendientes</p>
+                            <div class="list-group-item py-5 text-center text-muted border-0">
+                                <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                                <p class="mb-0 fw-semibold">No hay solicitudes pendientes</p>
+                                <p class="small mb-0 mt-1">¡Todo está agendado!</p>
                             </div>
                         @endforelse
                     </div>
@@ -117,8 +172,28 @@
         
         <!-- Calendario -->
         <div class="col-lg-9 col-md-8 col-12 mb-3">
-            <div class="card">
-                <div class="card-body p-0 p-sm-3">
+            <div class="card shadow-sm h-100 overflow-hidden border-0">
+                <div class="card-header bg-white py-3 px-3 d-flex justify-content-between align-items-center border-bottom">
+                    <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-calendar-alt me-2"></i>Calendario de Servicios</h6>
+                    <div class="d-flex align-items-center">
+                        <div class="legend-item me-3 d-none d-sm-flex align-items-center">
+                            <span class="legend-dot bg-warning"></span>
+                            <span class="text-muted small">Pendiente</span>
+                        </div>
+                        <div class="legend-item me-3 d-none d-sm-flex align-items-center">
+                            <span class="legend-dot bg-info"></span>
+                            <span class="text-muted small">En proceso</span>
+                        </div>
+                        <div class="legend-item d-flex align-items-center">
+                            <span class="legend-dot" style="background-color:#87c947"></span>
+                            <span class="text-muted small">Completado</span>
+                        </div>
+                        <span class="badge bg-light text-dark ms-3">
+                            <i class="far fa-clock me-1"></i>UTC-6
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
                     <div class="calendar-container overflow-hidden">
                         <div id="technician-calendar" class="technician-calendar"></div>
                     </div>
@@ -354,16 +429,41 @@
 @endsection
 
 @push('styles')
+<!-- Estilos principales de FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<!-- Nuevo diseño moderno para el calendario -->
+<link href="{{ asset('css/calendar-redesign.css') }}" rel="stylesheet">
+<!-- Ajustes específicos para líneas horizontales y nombres de técnicos -->
+<link href="{{ asset('css/calendar-specific-fixes.css') }}" rel="stylesheet">
+<!-- AJUSTES URGENTES - PRIORIDAD MÁXIMA -->
+<link href="{{ asset('css/urgent-fixes.css') }}" rel="stylesheet">
 <style>
     .calendar-container {
         width: 100%;
         max-width: 100%;
         overflow-x: hidden;
+        border-radius: 5px;
+        background-color: #fff;
     }
 
     .technician-calendar {
-        height: 650px;
+        height: 700px; /* Altura fija para un mejor control del espacio */
         max-width: 100%;
+        font-family: 'Arial', sans-serif;
+    }
+    
+    /* Mejorar la apariencia de los encabezados */
+    .fc-col-header-cell {
+        background-color: #f1f5f9;
+        font-weight: bold;
+    }
+    
+    /* Mejorar la columna de recursos */
+    .fc-resource-cell {
+        background-color: #f8fafc;
+        font-weight: bold;
+        border-right: 2px solid #e2e8f0;
+        padding: 10px !important;
     }
     
     .fc-header-toolbar {
@@ -399,9 +499,25 @@
         height: 60px;
     }
     
+    /* Estilo mejorado para los encabezados */
     .fc-col-header-cell {
-        background-color: #f8f9fa;
+        background-color: #f1f5f9;
         font-weight: bold;
+        color: #334155;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    /* Mejorar el aspecto de los eventos */
+    .fc-event {
+        border-radius: 4px !important;
+        border: none !important;
+        padding: 2px 4px !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Dar más espacio para las celdas del tiempo */
+    .fc-timegrid-slot, .fc-timeline-slot {
+        height: 3em !important;
     }
     
     .fc-resource-cell {
@@ -493,6 +609,44 @@
     /* Fix for FullCalendar resource timeline */
     .fc-timeline .fc-timeline-slots {
         width: 100%;
+    }
+    
+    /* Estilo personalizado con colores corporativos ENSEK */
+    .fc-button-primary {
+        background-color: #004122 !important;
+        border-color: #004122 !important;
+    }
+    
+    .fc-button-primary:hover {
+        background-color: #005a30 !important;
+        border-color: #005a30 !important;
+    }
+    
+    .fc-button-primary:not(:disabled).fc-button-active, 
+    .fc-button-primary:not(:disabled):active {
+        background-color: #87c947 !important;
+        border-color: #87c947 !important;
+    }
+    
+    .fc-col-header {
+        background-color: #f8fafc;
+    }
+    
+    /* Eliminar bordes innecesarios */
+    .fc-scrollgrid {
+        border: none !important;
+    }
+    
+    /* Añadir un poco de espacio entre filas */
+    .fc-timeline-slot, .fc-timegrid-slot {
+        padding-top: 1px !important;
+        padding-bottom: 1px !important;
+    }
+    
+    /* Hacer las barras de eventos más anchas */
+    .fc-timeline-event {
+        height: 24px !important;
+        line-height: 24px !important;
     }
     
     /* Estilos para la lista de solicitudes pendientes */
@@ -609,6 +763,16 @@
 @endpush
 
 @push('scripts')
+<!-- Cargar las librerías en orden correcto -->
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+<!-- FullCalendar Bundle (incluye todos los plugins básicos) -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+
+<!-- FullCalendar Scheduler (para vistas de recursos) -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@5.11.3/main.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Datos de recursos (técnicos)
@@ -630,16 +794,55 @@
         // Inicializar el calendario con más funcionalidades
         const calendarEl = document.getElementById('technician-calendar');
         const calendar = new FullCalendar.Calendar(calendarEl, {
-            // Vista principal - ajustar según tamaño de pantalla
+            // No necesitamos definir plugins aquí ya que importamos los scripts específicos
+            // La vista principal depende del tamaño de la pantalla
             initialView: isMobile ? 'timeGridDay' : 'resourceTimelineDay',
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
             
-            // Barra de herramientas personalizada
-            headerToolbar: {
-                left: isMobile ? 'today' : 'today dayGridMonth,timeGridWeek,resourceTimelineDay',
-                center: 'title',
-                right: isMobile ? 'prev,next' : 'prevYear,prev,next,nextYear'
+            // Barra de herramientas personalizada - movida fuera del calendario
+            headerToolbar: false,
+            
+            // Mejoras visuales
+            aspectRatio: 1.8,
+            expandRows: true,
+            height: 'auto',
+            
+            // Personalizar la apariencia
+            eventBorderColor: '#fff',
+            eventTextColor: '#fff',
+            eventTimeFormat: {
+                hour: '2-digit',
+                minute: '2-digit',
+                meridiem: true,
+                hour12: true
             },
+            
+            // Personalización avanzada para mejor legibilidad
+            slotLabelFormat: {
+                hour: 'numeric',
+                minute: '2-digit',
+                omitZeroMinute: true,
+                meridiem: 'short',
+                hour12: true
+            },
+            
+            // Personalizar el área de recursos
+            resourceAreaHeaderContent: 'Técnicos',
+            resourceLabelClassNames: 'resource-label',
+            resourceTimelineDay: {
+                slotDuration: '00:30:00',
+                slotLabelFormat: [
+                    { hour: 'numeric', minute: '2-digit', omitZeroMinute: true, meridiem: 'short' }
+                ],
+                slotLabelInterval: '01:00'
+            },
+            
+            // Mejorar aspecto general
+            dayMaxEvents: false,
+            stickyHeaderDates: true,
+            nowIndicator: true,
+            eventMaxStack: 2,
+            slotEventOverlap: false,
             
             // Configuración de tiempo
             slotDuration: isMobile ? '01:00:00' : '00:30:00',
@@ -648,8 +851,8 @@
             snapDuration: '00:15:00',
             
             // Personalización de la vista
-            resourceAreaWidth: isMobile ? '25%' : (isTablet ? '20%' : '15%'),
-            height: isMobile ? 'auto' : undefined,
+            resourceAreaWidth: isMobile ? '25%' : (isTablet ? '18%' : '15%'),
+            height: 'auto', // Ajustarse automáticamente al contenido
             
             // Datos iniciales
             resources: resources,
@@ -663,7 +866,7 @@
                 const endDate = info.end.toISOString();
                 
                 // Construir URL con parámetros de filtrado
-                let url = `/api/schedules?start=${startDate}&end=${endDate}`;
+                let url = `/admin/api/schedules?start=${startDate}&end=${endDate}`;
                 if (technicianId) url += `&technician_id=${technicianId}`;
                 if (status) url += `&status=${status}`;
                 if (confirmation) url += `&confirmation=${confirmation}`;
@@ -699,18 +902,55 @@
             },
             // Personalización de la columna de recursos (técnicos)
             resourceLabelDidMount: function(info) {
+                // Crear estructura para el nombre del técnico
+                const techContainer = document.createElement('div');
+                techContainer.style.width = '100%';
+                techContainer.style.display = 'flex';
+                techContainer.style.flexDirection = 'column';
+                techContainer.style.alignItems = 'center';
+                techContainer.style.justifyContent = 'center';
+                techContainer.style.padding = '5px';
+                techContainer.style.height = '100%';
+                
+                // Nombre del técnico con formato mejorado y muy visible
                 const techName = document.createElement('div');
                 techName.innerHTML = info.resource.title;
-                techName.classList.add('fw-bold');
+                techName.style.fontSize = '14px';
+                techName.style.fontWeight = 'bold';
+                techName.style.lineHeight = '1.2';
+                techName.style.color = '#004122';
+                techName.style.textAlign = 'center';
+                techName.style.width = '100%';
+                techName.style.padding = '2px';
+                techName.style.wordBreak = 'break-word';
                 
-                info.el.querySelector('.fc-datagrid-cell-main').innerHTML = '';
-                info.el.querySelector('.fc-datagrid-cell-main').appendChild(techName);
-                
-                // Añadir color personalizado
-                const resourceColor = info.resource.extendedProps && info.resource.extendedProps.color;
-                if (resourceColor) {
-                    info.el.style.borderLeft = `4px solid ${resourceColor}`;
+                // Añadir especialidad si está disponible
+                if (info.resource.extendedProps && info.resource.extendedProps.specialty) {
+                    const techSpecialty = document.createElement('div');
+                    techSpecialty.innerHTML = info.resource.extendedProps.specialty;
+                    techSpecialty.style.fontSize = '12px';
+                    techSpecialty.style.color = '#666';
+                    techSpecialty.style.marginTop = '3px';
+                    techContainer.appendChild(techName);
+                    techContainer.appendChild(techSpecialty);
+                } else {
+                    techContainer.appendChild(techName);
                 }
+                
+                // Reemplazar contenido existente
+                const cellMain = info.el.querySelector('.fc-datagrid-cell-main');
+                cellMain.innerHTML = '';
+                cellMain.style.width = '100%';
+                cellMain.style.height = '100%';
+                cellMain.appendChild(techContainer);
+                
+                // Añadir borde muy visible
+                info.el.style.border = '2px solid #004122';
+                info.el.style.borderLeft = '4px solid #87c947';
+                
+                // Forzar ancho mínimo en celda
+                info.el.style.minWidth = '150px';
+                info.el.style.width = '150px';
             },
             
             // Permitir seleccionar un rango para crear un nuevo agendamiento
@@ -837,7 +1077,12 @@
         // Actualizar título del calendario
         updateCalendarTitle(calendar);
         
-        // Botones de navegación
+        // Aplicar correcciones urgentes inmediatamente
+        setTimeout(syncResourceAndTimelineHeights, 500);
+        setTimeout(syncResourceAndTimelineHeights, 1000);
+        setTimeout(syncResourceAndTimelineHeights, 1500);
+        
+        // Botones de navegación - conectamos los botones externos con el calendario
         document.getElementById('prev-btn').addEventListener('click', function() {
             calendar.prev();
             updateCalendarTitle(calendar);
@@ -847,6 +1092,9 @@
             calendar.next();
             updateCalendarTitle(calendar);
         });
+        
+        // Actualizar título al inicio
+        updateCalendarTitle(calendar);
         
         // Manejar filtros del calendario
         $('#technicianFilter, #statusFilter, #confirmationFilter').change(function() {
@@ -900,12 +1148,39 @@
             });
         });
         
-        // Función para actualizar el título del calendario
+        // Función mejorada para actualizar el título del calendario
         function updateCalendarTitle(calendar) {
             const dateStr = calendar.view.currentStart;
             const date = new Date(dateStr);
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('calendar-title').textContent = date.toLocaleDateString('es-ES', options);
+            
+            // Formato diferente según la vista
+            let formattedDate = '';
+            if (calendar.view.type === 'resourceTimelineDay' || calendar.view.type === 'timeGridDay') {
+                // Para vista diaria
+                const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+                formattedDate = date.toLocaleDateString('es-ES', options);
+                // Capitalizar primera letra
+                formattedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+            } else if (calendar.view.type === 'timeGridWeek') {
+                // Para vista semanal
+                const endDate = new Date(calendar.view.currentEnd);
+                endDate.setDate(endDate.getDate() - 1); // Ajustar porque la fecha final es exclusiva
+                
+                const startDay = date.getDate();
+                const endDay = endDate.getDate();
+                const monthName = date.toLocaleDateString('es-ES', { month: 'long' });
+                const yearNum = date.getFullYear();
+                
+                formattedDate = `${startDay} al ${endDay} de ${monthName}, ${yearNum}`;
+            } else if (calendar.view.type === 'dayGridMonth') {
+                // Para vista mensual
+                const options = { month: 'long', year: 'numeric' };
+                formattedDate = date.toLocaleDateString('es-ES', options);
+                // Capitalizar primera letra
+                formattedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+            }
+            
+            document.getElementById('calendar-title').textContent = formattedDate;
         }
         
         // Responder a cambios en el tamaño de la ventana
@@ -938,6 +1213,9 @@
             // Forzar refrescado del calendario
             calendar.updateSize();
             
+            // Asegurar coherencia entre columnas y filas
+            syncResourceAndTimelineHeights();
+            
             // Refrescar eventos para asegurar que se muestran correctamente
             if (width < 500) {
                 calendar.setOption('eventMaxStack', 1);
@@ -946,6 +1224,100 @@
             } else {
                 calendar.setOption('eventMaxStack', 3);
             }
+        });
+        
+        // Función para asegurar coherencia de alturas entre columnas de técnicos y celdas de tiempo
+        function syncResourceAndTimelineHeights() {
+            // Pequeño delay para asegurar que el DOM está actualizado
+            setTimeout(() => {
+                console.log("Aplicando correcciones urgentes...");
+                
+                // MEJORA 1: FORZAR NOMBRES DE TÉCNICOS VISIBLES
+                const resourceCells = document.querySelectorAll('.fc-datagrid-cell');
+                resourceCells.forEach(cell => {
+                    cell.style.minWidth = '150px';
+                    cell.style.width = '150px';
+                    cell.style.borderRight = '2px solid #004122';
+                    cell.style.borderBottom = '2px solid #004122';
+                    cell.style.backgroundColor = '#f0f8ff';
+                    
+                    // Asegurarse que el contenido es visible
+                    const cushion = cell.querySelector('.fc-datagrid-cell-cushion');
+                    if (cushion) {
+                        cushion.style.whiteSpace = 'normal';
+                        cushion.style.overflow = 'visible';
+                        cushion.style.fontSize = '14px';
+                        cushion.style.fontWeight = 'bold';
+                        cushion.style.wordBreak = 'break-word';
+                        cushion.style.padding = '5px';
+                    }
+                });
+                
+                // MEJORA 2: LÍNEAS HORIZONTALES COMPLETAS
+                const standardHeight = 68; // Altura estándar fija
+                
+                // Aplicar líneas horizontales a todas las filas
+                const rows = document.querySelectorAll('.fc-timeline-slots tr');
+                rows.forEach(row => {
+                    row.style.borderTop = '2px solid #87c947';
+                    row.style.display = 'table-row';
+                    row.style.width = '100%';
+                });
+                
+                // Hacer muy visibles las líneas horizontales
+                const timeSlots = document.querySelectorAll('.fc-timeline-slot-lane');
+                timeSlots.forEach(slot => {
+                    slot.style.borderTop = '2px solid #87c947';
+                    slot.style.height = `${standardHeight}px`;
+                });
+                
+                // Marcar claramente las líneas de horas
+                const timeLabels = document.querySelectorAll('.fc-timeline-slot-label');
+                timeLabels.forEach(label => {
+                    label.style.borderRight = '3px solid #004122';
+                    label.style.backgroundColor = '#e0f0d9';
+                });
+                
+                // Forzar que las tablas de timeline ocupen todo el ancho
+                const tables = document.querySelectorAll('.fc-timeline-body table');
+                tables.forEach(table => {
+                    table.style.width = '100%';
+                });
+                
+                // Centrar eventos verticalmente
+                const events = document.querySelectorAll('.fc-timeline-event');
+                events.forEach(event => {
+                    event.style.height = '32px';
+                    event.style.lineHeight = '32px';
+                    event.style.top = '50%';
+                    event.style.transform = 'translateY(-50%)';
+                    event.style.zIndex = '1000';
+                });
+                
+                // Mejorar apariencia de las cabeceras
+                const headerHeight = parseInt(styles.getPropertyValue('--header-height') || '50px');
+                const headers = document.querySelectorAll('.fc-col-header-cell, .fc-datagrid-header .fc-datagrid-cell');
+                headers.forEach(header => {
+                    header.style.height = `${headerHeight}px`;
+                    header.style.minHeight = `${headerHeight}px`;
+                    header.style.maxHeight = `${headerHeight}px`;
+                });
+            }, 150);
+        }
+        
+        // Llamar a la función de sincronización después de que el calendario se renderiza
+        calendar.on('datesSet', function() {
+            syncResourceAndTimelineHeights();
+        });
+        
+        // Asegurar sincronización también cuando se actualiza la vista
+        calendar.on('viewDidMount', function() {
+            setTimeout(syncResourceAndTimelineHeights, 150);
+        });
+        
+        // Sincronizar cuando cambia el tamaño de ventana
+        window.addEventListener('resize', function() {
+            setTimeout(syncResourceAndTimelineHeights, 150);
         });
         
         // Función para mostrar detalles de un agendamiento
@@ -1219,6 +1591,65 @@
                 document.getElementById('saveTechnicianBtn').disabled = false;
             });
         });
+    });
+</script>
+
+<!-- Script de corrección URGENTE para asegurar que las líneas horizontales abarcan todo el calendario -->
+<script>
+    // Esta función se ejecuta al final para asegurar que los cambios se apliquen
+    document.addEventListener('DOMContentLoaded', function() {
+        // Esperar a que todo esté cargado
+        setTimeout(function() {
+            console.log("¡APLICANDO CORRECCIONES CRÍTICAS!");
+            
+            // MEJORA 1: NOMBRES DE TÉCNICOS LEGIBLES
+            // Forzar estilo en celdas de técnicos
+            var techCells = document.querySelectorAll('.fc-datagrid-cell');
+            techCells.forEach(function(cell) {
+                cell.style.minWidth = '150px';
+                cell.style.width = '150px';
+                cell.style.backgroundColor = '#f0f8ff';
+                cell.style.border = '2px solid #004122';
+            });
+            
+            // Forzar estilo en nombres de técnicos
+            var techNames = document.querySelectorAll('.fc-datagrid-cell-cushion');
+            techNames.forEach(function(name) {
+                name.style.whiteSpace = 'normal';
+                name.style.overflow = 'visible';
+                name.style.wordBreak = 'break-word';
+                name.style.fontWeight = 'bold';
+                name.style.fontSize = '14px';
+                name.style.color = '#000';
+                name.style.padding = '5px';
+            });
+            
+            // MEJORA 2: LÍNEAS HORIZONTALES COMPLETAS
+            // Hacer líneas muy visibles
+            var rows = document.querySelectorAll('.fc-timeline-slots tr');
+            rows.forEach(function(row) {
+                row.style.borderTop = '2px solid #87c947';
+            });
+            
+            var lanes = document.querySelectorAll('.fc-timeline-slot-lane');
+            lanes.forEach(function(lane) {
+                lane.style.borderTop = '2px solid #87c947';
+            });
+            
+            // Aplicar a todas las celdas
+            var timeSlotCells = document.querySelectorAll('.fc-timeline-slots td');
+            timeSlotCells.forEach(function(cell) {
+                cell.style.borderTop = '2px solid #87c947';
+            });
+            
+            // Hacer que las tablas ocupen todo el ancho
+            var tables = document.querySelectorAll('.fc-timeline-body table');
+            tables.forEach(function(table) {
+                table.style.width = '100%';
+            });
+            
+            console.log("¡Correcciones aplicadas con éxito!");
+        }, 2000); // Retrasar para asegurar que FullCalendar ha terminado de renderizar
     });
 </script>
 @endpush
