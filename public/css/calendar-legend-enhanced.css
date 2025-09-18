@@ -1,0 +1,73 @@
+.calendar-legend {
+    font-size: 14px !important;
+    padding: 12px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.legend-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #004122;
+    margin-right: 15px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    background-color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 5px;
+}
+
+.legend-color {
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 3px;
+    margin-right: 8px;
+    display: inline-block;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Colores específicos */
+.appointment-color {
+    background-color: #7caad4 !important;
+}
+
+.meeting-color {
+    background-color: #a8d7a8 !important;
+}
+
+.break-color {
+    background-color: #f9d971 !important;
+}
+
+.conference-color {
+    background-color: #a2c4e5 !important;
+}
+
+/* Botón de vista Día */
+.fc-resourceTimeGridDay-button.fc-button-active {
+    background-color: #87c947 !important;
+    border-color: #87c947 !important;
+    color: #004122 !important;
+    font-weight: bold !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Encabezado de leyenda */
+.calendar-header-legend {
+    position: relative;
+    z-index: 100;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+    padding: 10px 15px;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 5px;
+    border-radius: 5px;
+}

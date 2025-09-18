@@ -1,0 +1,225 @@
+/* Estilos específicos para la vista de recursos (técnicos en columnas) */
+
+/* Mejorar la columna de recursos */
+.fc-resource-cell {
+    background-color: #f0f8ff !important;
+    font-weight: bold !important;
+    border-right: 2px solid #004122 !important;
+    padding: 10px !important;
+    min-width: 150px !important;
+    width: 180px !important;
+}
+
+/* Estilos para los nombres de técnicos */
+.resource-label-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 5px;
+    text-align: center;
+}
+
+.resource-label-content i {
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: #004122;
+}
+
+.resource-label-content span {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+/* Mejorar aspecto de la cabecera de recursos */
+.fc-resource-area .fc-datagrid-header {
+    background-color: #004122 !important;
+}
+
+.fc-resource-area .fc-datagrid-header .fc-datagrid-cell {
+    color: white !important;
+    font-weight: bold !important;
+    text-align: center !important;
+}
+
+/* Mejorar la visualización de las filas de tiempo */
+.fc-resource-timeline-divider {
+    width: 3px !important;
+    background-color: #004122 !important;
+}
+
+/* Mejorar las celdas de tiempo */
+.fc-timeline-slot-label {
+    background-color: #e0f0d9 !important;
+    border-right: 3px solid #004122 !important;
+    font-weight: bold !important;
+}
+
+.fc-timeline-slot-label-cushion {
+    font-size: 12px !important;
+    padding: 4px !important;
+    border-radius: 4px !important;
+    background-color: rgba(135, 201, 71, 0.15) !important;
+}
+
+/* Líneas horizontales más claras */
+.fc-timeline-slots tr {
+    border-top: 2px solid #87c947 !important;
+}
+
+.fc-timeline-slot-lane {
+    border-top: 2px solid #87c947 !important;
+    height: 68px !important;
+}
+
+/* Estilos para los eventos */
+.fc-timeline-event {
+    height: 32px !important;
+    line-height: 32px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 1000 !important;
+    border-radius: 4px !important;
+    border: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Tipos de eventos por color */
+.event-appointment {
+    background-color: #7caad4 !important;
+    border-color: #7caad4 !important;
+}
+
+.event-meeting {
+    background-color: #a8d7a8 !important;
+    border-color: #a8d7a8 !important;
+}
+
+.event-break {
+    background-color: #f9d971 !important;
+    border-color: #f9d971 !important;
+    color: #212529 !important;
+}
+
+.event-conference {
+    background-color: #a2c4e5 !important;
+    border-color: #a2c4e5 !important;
+}
+
+.event-other {
+    background-color: #87c947 !important;
+    border-color: #87c947 !important;
+}
+
+/* Estados de eventos */
+.status-pending {
+    border-left: 4px solid #ffc107 !important;
+}
+
+.status-in-progress {
+    border-left: 4px solid #17a2b8 !important;
+}
+
+.status-completed {
+    border-left: 4px solid #28a745 !important;
+}
+
+.status-cancelled {
+    border-left: 4px solid #dc3545 !important;
+    opacity: 0.7 !important;
+}
+
+/* Estados de confirmación */
+.confirmation-confirmed::before {
+    content: "✓";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #28a745;
+    color: white;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 50%;
+}
+
+.confirmation-declined::before {
+    content: "×";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #dc3545;
+    color: white;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 50%;
+}
+
+.confirmation-pending::before {
+    content: "?";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #ffc107;
+    color: white;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 50%;
+}
+
+/* Mejorar contenido de los eventos */
+.fc-event-content-wrapper {
+    padding: 2px 6px;
+    line-height: 1.2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.fc-event-title {
+    font-size: 13px;
+    font-weight: 600 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.fc-event-client {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .fc-resource-cell {
+        min-width: 120px !important;
+        width: 120px !important;
+        padding: 5px !important;
+    }
+
+    .resource-label-content span {
+        font-size: 12px;
+    }
+
+    .fc-event-title {
+        font-size: 12px;
+    }
+
+    .fc-event-client {
+        font-size: 10px;
+    }
+}

@@ -176,11 +176,16 @@
                 <div class="card-header bg-white py-3 px-3 d-flex justify-content-between align-items-center border-bottom">
                     <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-calendar-alt me-2"></i>Calendario de Servicios</h6>
                     <div class="d-flex align-items-center">
-                        <div class="legend-item me-3 d-none d-sm-flex align-items-center">
+                        <div class="view-toggle-button me-3 d-none d-md-block">
+                            <button class="btn btn-sm btn-outline-primary" id="dayViewBtn" style="background-color: #87c947; color: #004122; border: none;">
+                                <i class="fas fa-calendar-day me-1"></i> DÍA
+                            </button>
+                        </div>
+                        <div class="legend-item me-2 d-flex align-items-center">
                             <span class="legend-dot bg-warning"></span>
                             <span class="text-muted small">Pendiente</span>
                         </div>
-                        <div class="legend-item me-3 d-none d-sm-flex align-items-center">
+                        <div class="legend-item me-2 d-flex align-items-center">
                             <span class="legend-dot bg-info"></span>
                             <span class="text-muted small">En proceso</span>
                         </div>
@@ -188,12 +193,42 @@
                             <span class="legend-dot" style="background-color:#87c947"></span>
                             <span class="text-muted small">Completado</span>
                         </div>
-                        <span class="badge bg-light text-dark ms-3">
+                        <span class="badge bg-light text-dark ms-2">
                             <i class="far fa-clock me-1"></i>UTC-6
                         </span>
                     </div>
                 </div>
                 <div class="card-body p-0">
+                    <!-- Leyenda para tipos de eventos - DESTACADA -->
+                    <div class="calendar-header-legend mb-2">
+                        <div class="container-fluid p-0">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-12">
+                                    <div class="d-flex flex-wrap align-items-center py-2 px-3" style="border-bottom: 2px solid #eaeaea; background-color: #f8f9fa;">
+                                        <span class="fw-bold me-3" style="color: #004122; font-size: 16px;">Tipos de eventos:</span>
+                                        <div class="d-flex flex-wrap">
+                                            <div class="legend-item me-2 mb-1">
+                                                <span class="legend-color" style="background-color: #7CAAD4;"></span>
+                                                <span>Citas con clientes</span>
+                                            </div>
+                                            <div class="legend-item me-2 mb-1">
+                                                <span class="legend-color" style="background-color: #A8D7A8;"></span>
+                                                <span>Reuniones</span>
+                                            </div>
+                                            <div class="legend-item me-2 mb-1">
+                                                <span class="legend-color" style="background-color: #F9D971;"></span>
+                                                <span>Descansos/Comidas</span>
+                                            </div>
+                                            <div class="legend-item mb-1">
+                                                <span class="legend-color" style="background-color: #a2c4e5;"></span>
+                                                <span>Conferencias/Llamadas</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="calendar-container overflow-hidden">
                         <div id="technician-calendar" class="technician-calendar"></div>
                     </div>
@@ -243,13 +278,35 @@
                             </select>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="scheduled_date" class="form-label">Fecha y Hora</label>
-                        <input type="datetime-local" class="form-control" id="scheduled_date" name="scheduled_date" required>
+                    <div class="alert alert-info d-none" id="selected-time-info">
                     </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="scheduled_date" class="form-label">Fecha y Hora de Inicio</label>
+                            <input type="datetime-local" class="form-control" id="scheduled_date" name="scheduled_date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="end_time" class="form-label">Hora de Finalización</label>
+                            <input type="time" class="form-control" id="end_time" name="end_time" required>
+                            <div class="form-text">Hora estimada de finalización del servicio</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="duration" class="form-label">Duración (minutos)</label>
+                            <input type="number" class="form-control" id="duration" name="duration" min="15" step="15" value="60">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="estimated_cost" class="form-label">Costo Estimado ($)</label>
+                            <input type="number" class="form-control" id="estimated_cost" name="estimated_cost" step="0.01">
+                        </div>
+                    </div>
+                    
                     <div class="mb-3">
                         <label for="notes" class="form-label">Notas</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Detalles adicionales del servicio..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -273,9 +330,18 @@
                 <!-- El contenido se cargará dinámicamente -->
             </div>
             <div class="modal-footer">
-                <div class="d-flex flex-wrap w-100">
-                    <button type="button" class="btn btn-secondary me-md-2 mb-2 mb-md-0 flex-fill" data-bs-dismiss="modal">Cerrar</button>
-                    <a href="#" id="editScheduleBtn" class="btn btn-primary flex-fill">Editar</a>
+                <div class="row w-100">
+                    <div class="col-12 col-md-6 mb-2 mb-md-0" id="additionalActions">
+                        <!-- Botones adicionales se cargarán dinámicamente aquí -->
+                    </div>
+                    <div class="col-12 col-md-6 d-flex">
+                        <button type="button" class="btn btn-secondary me-2 flex-fill" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cerrar
+                        </button>
+                        <a href="#" id="editScheduleBtn" class="btn btn-primary flex-fill">
+                            <i class="fas fa-edit me-1"></i>Editar
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -437,6 +503,18 @@
 <link href="{{ asset('css/calendar-specific-fixes.css') }}" rel="stylesheet">
 <!-- AJUSTES URGENTES - PRIORIDAD MÁXIMA -->
 <link href="{{ asset('css/urgent-fixes.css') }}" rel="stylesheet">
+<!-- Mejoras visuales y efectos avanzados -->
+<link href="{{ asset('css/calendar-enhancements.css') }}" rel="stylesheet">
+<!-- Correcciones específicas de layout y distribución -->
+<link href="{{ asset('css/calendar-layout-fixes.css') }}" rel="stylesheet">
+<!-- Correcciones críticas para layout -->
+<link href="{{ asset('css/calendar-critical-fixes.css') }}" rel="stylesheet">
+<!-- Estilo para vista semanal -->
+<link href="{{ asset('css/calendar-weekly-view.css') }}" rel="stylesheet">
+<!-- Estilo para vista de recursos (técnicos en columnas) -->
+<link href="{{ asset('css/calendar-resource-view.css') }}" rel="stylesheet">
+<!-- Mejoras en la leyenda del calendario -->
+<link href="{{ asset('css/calendar-legend-enhanced.css') }}" rel="stylesheet">
 <style>
     .calendar-container {
         width: 100%;
@@ -759,6 +837,96 @@
             height: 450px;
         }
     }
+    
+    /* Nuevos estilos para mejorar contenido de eventos */
+    .fc-event-content-wrapper {
+        padding: 2px 4px;
+        line-height: 1.2;
+    }
+    
+    .fc-event-title {
+        font-size: 13px;
+        font-weight: 600 !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 2px;
+    }
+    
+    .fc-event-client {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 2px;
+    }
+    
+    .fc-event-time {
+        font-size: 10px;
+        opacity: 0.9;
+    }
+    
+    /* Mejorar la apariencia de la cabecera de recursos */
+    .fc-resource-area-header {
+        background-color: var(--ensek-green-dark) !important;
+        color: white !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        padding: 8px 4px !important;
+    }
+    
+    /* Mejorar apariencia de horas */
+    .fc-timeline-slot-label-cushion {
+        font-weight: 600;
+        padding: 4px;
+        border-radius: 4px;
+        background-color: rgba(135, 201, 71, 0.15);
+    }
+    
+    /* Separación más clara entre técnicos */
+    .fc-timeline-lane {
+        border-bottom: 2px solid rgba(0,0,0,0.1);
+    }
+    
+    /* Estilos para la leyenda del calendario */
+    .calendar-legend {
+        background-color: #f8f9fa;
+        font-size: 0.85rem;
+    }
+    
+    .legend-title {
+        font-weight: 600;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0;
+    }
+    
+    .legend-color {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border-radius: 3px;
+        margin-right: 5px;
+    }
+    
+    .appointment-color {
+        background-color: #7CAAD4;
+    }
+    
+    .meeting-color {
+        background-color: #A8D7A8;
+    }
+    
+    .break-color {
+        background-color: #F9D971;
+    }
+    
+    .conference-color {
+        background-color: #a2c4e5;
+    }
 </style>
 @endpush
 
@@ -773,6 +941,23 @@
 
 <!-- FullCalendar Scheduler (para vistas de recursos) -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@5.11.3/main.min.js"></script>
+
+<!-- Tooltips y Popovers de Bootstrap -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Activar todos los tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Botón de vista diaria
+        document.getElementById('dayViewBtn').addEventListener('click', function() {
+            calendar.changeView('resourceTimeGridDay');
+            updateCalendarTitle(calendar);
+        });
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Datos de recursos (técnicos)
@@ -794,21 +979,212 @@
         // Inicializar el calendario con más funcionalidades
         const calendarEl = document.getElementById('technician-calendar');
         const calendar = new FullCalendar.Calendar(calendarEl, {
-            // No necesitamos definir plugins aquí ya que importamos los scripts específicos
-            // La vista principal depende del tamaño de la pantalla
-            initialView: isMobile ? 'timeGridDay' : 'resourceTimelineDay',
+            // Vista adaptable - Técnicos en columnas, horas en filas para una vista diaria
+            initialView: isMobile ? 'timeGridDay' : 'resourceTimeGridDay',
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
             
-            // Barra de herramientas personalizada - movida fuera del calendario
-            headerToolbar: false,
+            // Recursos (técnicos)
+            resources: resources,
             
-            // Mejoras visuales
-            aspectRatio: 1.8,
-            expandRows: true,
+            // Barra de herramientas dentro del calendario - Simplificada
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'resourceTimeGridDay,timeGridDay,timeGridWeek,dayGridMonth'
+            },
+            
+            // Títulos personalizados para los botones
+            buttonText: {
+                today: 'Hoy',
+                resourceTimeGridDay: 'Técnicos',
+                timeGridDay: 'Día',
+                timeGridWeek: 'Semana',
+                dayGridMonth: 'Mes'
+            },
+            
+            // Configuraciones de tamaño y visualización optimizadas para vista semanal
             height: 'auto',
+            expandRows: true,
+            navLinks: true, // clickeable days/week names
+            nowIndicator: true, // mostrar indicador de "ahora"
+            allDaySlot: false, // no mostrar slot "todo el día"
+            weekends: true, // incluir sábado y domingo
+            slotDuration: '00:30:00', // intervalos de 30 min
+            slotLabelInterval: '01:00', // etiquetas cada hora
+            slotMinTime: '08:00:00', // hora de inicio del día
+            slotMaxTime: '18:00:00', // hora de fin del día
             
-            // Personalizar la apariencia
+            // Mejora en la visualización de recursos (técnicos)
+            resourceAreaHeaderContent: 'Técnicos',
+            resourceAreaWidth: '180px',
+            
+            // Configuración de la escala de tiempo
+            slotDuration: '01:00:00', // slots de 1 hora
+            snapDuration: '00:15:00', // snap a intervalos de 15 min
+            slotLabelInterval: '01:00', // etiquetas cada hora
+            slotLabelFormat: {
+                hour: 'numeric',
+                minute: '2-digit',
+                omitZeroMinute: true,
+                meridiem: 'short'
+            },
+            
+            // Personalizar la apariencia y comportamiento de eventos
             eventBorderColor: '#fff',
+            eventBackgroundColor: '#87c947',
+            eventTextColor: '#fff',
+            eventMinHeight: 30,
+            
+            // Formateo de los contenidos de los eventos para vista semanal
+            eventContent: function(arg) {
+                // Determinar el tipo de evento para estilo específico
+                let eventType = '';
+                let icon = '';
+                
+                // Identificar el tipo de evento según el título o servicio
+                const eventTitle = arg.event.title.toLowerCase();
+                const serviceName = arg.event.extendedProps.service_name || '';
+                const serviceNameLower = serviceName.toLowerCase();
+                
+                if (eventTitle.includes('appointment') || eventTitle.includes('cita') || 
+                    serviceNameLower.includes('appointment') || serviceNameLower.includes('cita')) {
+                    eventType = 'event-appointment';
+                    icon = '<i class="fas fa-user-clock me-1"></i>';
+                } else if (eventTitle.includes('meeting') || eventTitle.includes('reunión') || 
+                          serviceNameLower.includes('meeting') || serviceNameLower.includes('reunión')) {
+                    eventType = 'event-meeting';
+                    icon = '<i class="fas fa-users me-1"></i>';
+                } else if (eventTitle.includes('lunch') || eventTitle.includes('break') || 
+                          eventTitle.includes('almuerzo') || eventTitle.includes('descanso') ||
+                          serviceNameLower.includes('lunch') || serviceNameLower.includes('break')) {
+                    eventType = 'event-break';
+                    icon = '<i class="fas fa-utensils me-1"></i>';
+                } else if (eventTitle.includes('conference') || eventTitle.includes('call') || 
+                          eventTitle.includes('conferencia') || eventTitle.includes('llamada') ||
+                          serviceNameLower.includes('conference') || serviceNameLower.includes('call')) {
+                    eventType = 'event-conference';
+                    icon = '<i class="fas fa-phone-alt me-1"></i>';
+                } else {
+                    eventType = 'event-other';
+                    icon = '<i class="fas fa-calendar-check me-1"></i>';
+                }
+                
+                // Aplicar la clase CSS al elemento del evento
+                if (arg.view.type === 'timeGridWeek' || arg.view.type === 'timeGridDay') {
+                    arg.el.classList.add(eventType);
+                }
+                
+                const clientName = arg.event.extendedProps.client_name || '';
+                const displayTitle = arg.event.extendedProps.service_name || arg.event.title || '';
+                
+                // Solo mostrar hora si no es vista semanal (la vista semanal ya muestra horas)
+                let timeInfo = '';
+                if (arg.view.type !== 'timeGridWeek' && arg.view.type !== 'timeGridDay') {
+                    if (arg.event.start) {
+                        const startTime = new Date(arg.event.start).toLocaleTimeString('es-ES', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+                        
+                        const endTime = arg.event.end ? new Date(arg.event.end).toLocaleTimeString('es-ES', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                        }) : '';
+                        
+                        timeInfo = `<div class="fc-event-time">${startTime}${endTime ? ' - ' + endTime : ''}</div>`;
+                    }
+                }
+                
+                return { 
+                    html: `
+                        <div class="fc-event-content-wrapper">
+                            <div class="fc-event-title">
+                                ${icon} ${displayTitle}
+                            </div>
+                            ${clientName ? `<div class="fc-event-client">${clientName}</div>` : ''}
+                            ${timeInfo}
+                        </div>
+                    `
+                };
+            },
+            
+            // Personalización de apariencia de eventos según su estado y tipo
+            eventDidMount: function(info) {
+                const event = info.event;
+                const el = info.el;
+                
+                // Clasificar evento por tipo (para vista semanal)
+                const eventTitle = (event.title || '').toLowerCase();
+                const serviceName = (event.extendedProps.service_name || '').toLowerCase();
+                
+                // Clasificación por tipo de evento para color
+                if (eventTitle.includes('appointment') || eventTitle.includes('cita') || 
+                    serviceName.includes('appointment') || serviceName.includes('cita') ||
+                    eventTitle.includes('client') || eventTitle.includes('cliente') || 
+                    serviceName.includes('client') || serviceName.includes('cliente')) {
+                    el.classList.add('event-appointment');
+                } else if (eventTitle.includes('meeting') || eventTitle.includes('reunión') || 
+                          serviceName.includes('meeting') || serviceName.includes('reunión')) {
+                    el.classList.add('event-meeting');
+                } else if (eventTitle.includes('lunch') || eventTitle.includes('break') || 
+                          eventTitle.includes('almuerzo') || eventTitle.includes('descanso') ||
+                          serviceName.includes('lunch') || serviceName.includes('break')) {
+                    el.classList.add('event-break');
+                } else if (eventTitle.includes('conference') || eventTitle.includes('call') || 
+                          eventTitle.includes('conferencia') || eventTitle.includes('llamada') ||
+                          serviceName.includes('conference') || serviceName.includes('call')) {
+                    el.classList.add('event-conference');
+                } 
+                
+                // Aplicar clases según el estado del evento (para vista de recursos)
+                if (event.extendedProps.status) {
+                    el.classList.add('status-' + event.extendedProps.status.replace(' ', '-').toLowerCase());
+                } else {
+                    el.classList.add('status-pending');
+                }
+                
+                // Aplicar clases según estado de confirmación
+                if (event.extendedProps.confirmation_status) {
+                    el.classList.add('confirmation-' + event.extendedProps.confirmation_status);
+                }
+                
+                // Si el evento fue modificado recientemente (menos de 1 minuto)
+                if (event.extendedProps.updated_at) {
+                    const updatedTime = new Date(event.extendedProps.updated_at);
+                    const now = new Date();
+                    const diffSeconds = (now - updatedTime) / 1000;
+                    
+                    if (diffSeconds < 60) {
+                        el.classList.add('recently-modified');
+                    }
+                }
+                
+                // Añadir tooltip con información del evento
+                let tooltipContent = event.title;
+                if (event.extendedProps.client_name) {
+                    tooltipContent += ' - ' + event.extendedProps.client_name;
+                }
+                
+                if (event.start) {
+                    const timeFormat = { hour: '2-digit', minute: '2-digit', hour12: true };
+                    tooltipContent += '<br>' + new Date(event.start).toLocaleTimeString('es-ES', timeFormat);
+                    
+                    if (event.end) {
+                        tooltipContent += ' - ' + new Date(event.end).toLocaleTimeString('es-ES', timeFormat);
+                    }
+                }
+                
+                // Agregar atributos para tooltip Bootstrap
+                el.setAttribute('data-bs-toggle', 'tooltip');
+                el.setAttribute('data-bs-html', 'true');
+                el.setAttribute('data-bs-placement', 'top');
+                el.setAttribute('title', tooltipContent);
+                
+                // Iniciar tooltips
+                new bootstrap.Tooltip(el);
+            },
             eventTextColor: '#fff',
             eventTimeFormat: {
                 hour: '2-digit',
@@ -816,6 +1192,14 @@
                 meridiem: true,
                 hour12: true
             },
+            // Permitir edición precisa de eventos
+            slotDuration: '00:15:00',     // Divisiones de 15 minutos para mejor precisión
+            snapDuration: '00:05:00',     // Ajustar a intervalos de 5 minutos al arrastrar
+            slotMinTime: '06:00:00',      // Comenzar a las 6 AM
+            slotMaxTime: '22:00:00',      // Terminar a las 10 PM
+            slotLabelInterval: '01:00',   // Mostrar etiquetas cada hora
+            slotEventOverlap: false,      // No permitir superposición visual de eventos
+            
             
             // Personalización avanzada para mejor legibilidad
             slotLabelFormat: {
@@ -834,7 +1218,26 @@
                 slotLabelFormat: [
                     { hour: 'numeric', minute: '2-digit', omitZeroMinute: true, meridiem: 'short' }
                 ],
-                slotLabelInterval: '01:00'
+                slotLabelInterval: '01:00',
+                slotMinWidth: 100, // Ancho mínimo para cada columna de hora
+                resourceAreaWidth: '180px', // Ancho fijo para columna de recursos
+                resourceLabelDidMount: function(info) {
+                    // Añadir clases y estilos a las etiquetas de recursos (técnicos)
+                    const resource = info.resource;
+                    const el = info.el;
+                    
+                    // Añadir un icono y mejorar presentación
+                    el.innerHTML = `
+                        <div class="resource-label-content">
+                            <i class="fas fa-user-hard-hat me-1"></i>
+                            <span>${resource.title}</span>
+                        </div>
+                    `;
+                    
+                    // Añadir tooltip con información adicional
+                    el.setAttribute('title', 'Técnico: ' + resource.title);
+                    el.style.cursor = 'pointer';
+                }
             },
             
             // Mejorar aspecto general
@@ -882,15 +1285,23 @@
                     });
             },
             
-            // Funcionalidades de interacción
-            editable: true,
-            eventResourceEditable: true,
-            nowIndicator: true,
-            navLinks: !isMobile, // desactivar en móviles
-            selectable: true,
-            selectMirror: true,
-            allDaySlot: false,
-            scrollTimeReset: false,
+            // Funcionalidades de interacción mejoradas
+            editable: true,              // Permitir edición de eventos
+            eventResourceEditable: true, // Permitir cambiar eventos entre recursos (técnicos)
+            eventDurationEditable: true, // Permitir cambiar la duración de eventos
+            nowIndicator: true,          // Mostrar indicador de hora actual
+            navLinks: !isMobile,         // Enlaces de navegación (desactivar en móviles)
+            selectable: true,            // Permitir seleccionar rangos de tiempo
+            selectMirror: true,          // Mostrar "fantasma" al seleccionar
+            selectMinDistance: 5,        // Distancia mínima para considerar una selección (evita clics accidentales)
+            selectConstraint: {          // Restringir selección a horas de trabajo
+                startTime: '06:00:00',
+                endTime: '22:00:00',
+            },
+            allDaySlot: false,           // No mostrar slot para eventos de día completo
+            scrollTimeReset: false,      // Mantener la posición de desplazamiento al cambiar de vista
+            unselectAuto: false,         // No deseleccionar automáticamente
+            longPressDelay: 200,         // Tiempo para activar selección en dispositivos táctiles (ms)
             
             // Texto en español
             locale: 'es',
@@ -953,7 +1364,7 @@
                 info.el.style.width = '150px';
             },
             
-            // Permitir seleccionar un rango para crear un nuevo agendamiento
+            // Permitir seleccionar un rango para crear un nuevo agendamiento con mejor precisión horaria
             select: function(info) {
                 // Mostrar un modal para crear un agendamiento
                 const startDate = info.startStr;
@@ -965,14 +1376,55 @@
                     const technicianSelect = document.getElementById('technician_id');
                     if (technicianSelect) {
                         technicianSelect.value = resourceId;
+                        
+                        // Obtener el nombre del técnico para mostrarlo
+                        const selectedOption = technicianSelect.options[technicianSelect.selectedIndex];
+                        const technicianName = selectedOption.text;
+                        
+                        // Actualizar título del modal para incluir el nombre del técnico
+                        document.getElementById('newScheduleModalLabel').textContent = `Nuevo Agendamiento para ${technicianName}`;
                     }
                     
-                    // Establecer la fecha y hora
+                    // Calcular y establecer el tiempo de finalización con una duración predeterminada
+                    // Primero convertir las fechas a objetos Date para manipularlas
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    
+                    // Calcular la duración en minutos (predeterminado: si no hay selección de rango, usar 1 hora)
+                    const durationInMinutes = end.getTime() && start.getTime() ? 
+                        (end.getTime() - start.getTime()) / (1000 * 60) : 60;
+                                        
+                    // Establecer la fecha y hora de inicio
                     const dateInput = document.getElementById('scheduled_date');
                     if (dateInput) {
                         // Formatear la fecha para el input datetime-local
-                        const formattedDate = startDate.slice(0, 16);
-                        dateInput.value = formattedDate;
+                        dateInput.value = startDate.slice(0, 16); // Formato YYYY-MM-DDTHH:MM
+                    }
+                    
+                    // Establecer la fecha y hora de finalización si existe el campo
+                    const endDateInput = document.getElementById('end_time');
+                    if (endDateInput) {
+                        // Sumar la duración calculada o predeterminada
+                        const endDateTime = new Date(start.getTime() + durationInMinutes * 60 * 1000);
+                        const hours = endDateTime.getHours().toString().padStart(2, '0');
+                        const minutes = endDateTime.getMinutes().toString().padStart(2, '0');
+                        endDateInput.value = `${hours}:${minutes}`;
+                    }
+                    
+                    // Si hay un campo de duración, establecerlo también
+                    const durationInput = document.getElementById('duration');
+                    if (durationInput) {
+                        durationInput.value = Math.round(durationInMinutes);
+                    }
+                    
+                    // Mostrar información sobre el horario seleccionado
+                    const infoText = document.getElementById('selected-time-info');
+                    if (infoText) {
+                        const startTime = start.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
+                        const endTime = new Date(start.getTime() + durationInMinutes * 60 * 1000)
+                            .toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
+                        infoText.innerHTML = `<i class="fas fa-info-circle"></i> Horario seleccionado: <strong>${startTime} - ${endTime}</strong>`;
+                        infoText.classList.remove('d-none');
                     }
                     
                     // Mostrar el modal
@@ -1016,26 +1468,218 @@
                 showScheduleDetails(scheduleId);
             },
             eventDrop: function(info) {
-                // Actualizar fecha y técnico cuando se arrastra un evento
+                // Obtener datos relevantes del evento
                 const scheduleId = info.event.id;
                 const resourceId = info.event.getResources()[0].id;
                 const startTime = info.event.start.toISOString();
+                const endTime = info.event.end ? info.event.end.toISOString() : null;
+                
+                // Obtener información del técnico antiguo y nuevo para comparar
+                const oldTechnicianId = info.oldResource ? info.oldResource.id : null;
+                const newTechnicianId = resourceId;
+                const technicianChanged = oldTechnicianId !== newTechnicianId;
+                
+                const oldTechnicianName = info.oldResource ? info.oldResource.title : 'Sin técnico';
+                const newTechnicianName = info.event.getResources()[0].title;
+                
+                // Obtener fechas y horas para comparar
+                const oldStartDate = info.oldEvent.start ? new Date(info.oldEvent.start) : new Date();
+                const oldEndDate = info.oldEvent.end ? new Date(info.oldEvent.end) : new Date(oldStartDate.getTime() + 3600000);
+                
+                const newStartDate = new Date(startTime);
+                const newEndDate = info.event.end ? new Date(info.event.end) : new Date(newStartDate.getTime() + 3600000);
+                
+                // Calcular duración para mostrar
+                const durationMs = newEndDate.getTime() - newStartDate.getTime();
+                const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+                const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+                
+                // Formatear opciones para mostrar fechas y horas
+                const formatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                
+                // Formatear fechas y horas
+                const oldStartFormatted = oldStartDate.toLocaleTimeString('es-ES', formatOptions);
+                const oldEndFormatted = oldEndDate.toLocaleTimeString('es-ES', formatOptions);
+                const oldDateFormatted = oldStartDate.toLocaleDateString('es-ES', dateOptions);
+                
+                const newStartFormatted = newStartDate.toLocaleTimeString('es-ES', formatOptions);
+                const newEndFormatted = newEndDate.toLocaleTimeString('es-ES', formatOptions);
+                const newDateFormatted = newStartDate.toLocaleDateString('es-ES', dateOptions);
+                
+                // Determinar si cambió la fecha
+                const dateChanged = oldDateFormatted !== newDateFormatted;
+                
+                // Determinar si cambió la hora
+                const timeChanged = oldStartFormatted !== newStartFormatted || oldEndFormatted !== newEndFormatted;
+                
+                // Preparar mensaje de confirmación con detalles de los cambios
+                let confirmTitle, confirmHTML;
+                
+                if (technicianChanged) {
+                    confirmTitle = 'Cambio de Técnico y/o Horario';
+                    confirmHTML = `
+                        <div class="change-container">
+                            <div class="change-summary p-3 mb-3 rounded">
+                                <div class="mb-3">
+                                    <div class="change-label"><i class="fas fa-user-alt"></i> Técnico:</div>
+                                    <div class="change-item-container">
+                                        <div class="change-old">${oldTechnicianName}</div>
+                                        <div class="change-arrow"><i class="fas fa-long-arrow-alt-right"></i></div>
+                                        <div class="change-new">${newTechnicianName}</div>
+                                    </div>
+                                </div>
+                                
+                                ${dateChanged ? `
+                                <div class="mb-3">
+                                    <div class="change-label"><i class="fas fa-calendar-day"></i> Fecha:</div>
+                                    <div class="change-item-container">
+                                        <div class="change-old">${oldDateFormatted}</div>
+                                        <div class="change-arrow"><i class="fas fa-long-arrow-alt-right"></i></div>
+                                        <div class="change-new">${newDateFormatted}</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                ${timeChanged ? `
+                                <div>
+                                    <div class="change-label"><i class="fas fa-clock"></i> Horario:</div>
+                                    <div class="change-item-container">
+                                        <div class="change-old">${oldStartFormatted} - ${oldEndFormatted}</div>
+                                        <div class="change-arrow"><i class="fas fa-long-arrow-alt-right"></i></div>
+                                        <div class="change-new">${newStartFormatted} - ${newEndFormatted}</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                Al cambiar de técnico, verifique que el nuevo técnico tenga las habilidades necesarias
+                                para el servicio requerido.
+                            </div>
+                        </div>
+                    `;
+                } else if (dateChanged || timeChanged) {
+                    confirmTitle = 'Cambio de Horario';
+                    confirmHTML = `
+                        <div class="change-container">
+                            <div class="mb-3">
+                                <div class="tech-info p-2 rounded">
+                                    <i class="fas fa-user-alt"></i> <strong>Técnico:</strong> ${newTechnicianName}
+                                </div>
+                            </div>
+                            
+                            ${dateChanged ? `
+                            <div class="change-summary p-3 mb-3 rounded">
+                                <div class="change-label"><i class="fas fa-calendar-day"></i> Fecha:</div>
+                                <div class="change-item-container">
+                                    <div class="change-old">${oldDateFormatted}</div>
+                                    <div class="change-arrow"><i class="fas fa-long-arrow-alt-right"></i></div>
+                                    <div class="change-new">${newDateFormatted}</div>
+                                </div>
+                            </div>
+                            ` : ''}
+                            
+                            <div class="change-summary p-3 mb-3 rounded">
+                                <div class="change-label"><i class="fas fa-clock"></i> Horario:</div>
+                                <div class="change-item-container">
+                                    <div class="change-old">${oldStartFormatted} - ${oldEndFormatted}</div>
+                                    <div class="change-arrow"><i class="fas fa-long-arrow-alt-right"></i></div>
+                                    <div class="change-new">${newStartFormatted} - ${newEndFormatted}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="duration-info text-center p-2 rounded">
+                                <i class="fas fa-hourglass-half"></i> <strong>Duración:</strong> 
+                                ${durationHours}h ${durationMinutes}min
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // No hay cambios significativos
+                    confirmTitle = 'Confirmar Agendamiento';
+                    confirmHTML = `
+                        <div class="text-start">
+                            <p><strong><i class="fas fa-user-alt"></i> Técnico:</strong> ${newTechnicianName}</p>
+                            <p><strong><i class="fas fa-calendar-day"></i> Fecha:</strong> ${newDateFormatted}</p>
+                            <p><strong><i class="fas fa-clock"></i> Hora:</strong> ${newStartFormatted} - ${newEndFormatted}</p>
+                            <p><strong><i class="fas fa-hourglass-half"></i> Duración:</strong> ${durationHours}h ${durationMinutes}min</p>
+                        </div>
+                    `;
+                }
+                
+                // Agregar estilos para la confirmación
+                const style = document.createElement('style');
+                style.textContent = `
+                    .change-container {
+                        text-align: left;
+                        padding: 5px;
+                    }
+                    .change-summary {
+                        background-color: #f8f9fa;
+                        border: 1px solid #e2e6ea;
+                    }
+                    .change-label {
+                        font-weight: bold;
+                        margin-bottom: 5px;
+                    }
+                    .change-item-container {
+                        display: flex;
+                        align-items: center;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                    }
+                    .change-old {
+                        color: #dc3545;
+                        text-decoration: line-through;
+                        background: rgba(220, 53, 69, 0.1);
+                        padding: 3px 8px;
+                        border-radius: 4px;
+                    }
+                    .change-arrow {
+                        color: #6c757d;
+                    }
+                    .change-new {
+                        color: #28a745;
+                        font-weight: bold;
+                        background: rgba(40, 167, 69, 0.1);
+                        padding: 3px 8px;
+                        border-radius: 4px;
+                    }
+                    .tech-info, .duration-info {
+                        background-color: #e9f1fd;
+                        border: 1px solid #c2d7f7;
+                    }
+                `;
+                document.head.appendChild(style);
                 
                 // Pedir confirmación antes de actualizar
                 Swal.fire({
-                    title: '¿Confirmar cambio?',
-                    html: `
-                        <p>¿Está seguro de cambiar este agendamiento?</p>
-                        <p><strong>Técnico:</strong> ${info.event.getResources()[0].title}</p>
-                        <p><strong>Nueva fecha:</strong> ${new Date(startTime).toLocaleString('es-ES')}</p>
-                    `,
+                    title: confirmTitle,
+                    html: confirmHTML,
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Sí, cambiar',
-                    cancelButtonText: 'Cancelar'
+                    confirmButtonText: '<i class="fas fa-check"></i> Confirmar Cambio',
+                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                    confirmButtonColor: '#87c947',
+                    cancelButtonColor: '#6c757d',
+                    focusConfirm: false,
+                    width: technicianChanged ? '550px' : '500px',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        updateSchedule(scheduleId, resourceId, startTime);
+                        // Mostrar indicador de carga
+                        Swal.fire({
+                            title: 'Actualizando...',
+                            text: technicianChanged ? 'Reasignando servicio' : 'Actualizando horario',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        // Llamar a función mejorada para actualizar con hora de finalización
+                        updateScheduleWithEndTime(scheduleId, resourceId, startTime, endTime);
                     } else {
                         // Revertir el cambio si el usuario cancela
                         info.revert();
@@ -1049,26 +1693,174 @@
                 const startTime = info.event.start.toISOString();
                 const endTime = info.event.end.toISOString();
                 
+                // Calcular duración exacta para mostrar
+                const start = new Date(startTime);
+                const end = new Date(endTime);
+                const durationMs = end.getTime() - start.getTime();
+                const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+                const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+                
+                // Formatear tiempo para mostrar
+                const formatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+                const startTimeFormatted = start.toLocaleTimeString('es-ES', formatOptions);
+                const endTimeFormatted = end.toLocaleTimeString('es-ES', formatOptions);
+                
                 // Pedir confirmación antes de actualizar
                 Swal.fire({
-                    title: '¿Confirmar cambio de duración?',
+                    title: '¿Confirmar nueva duración?',
                     html: `
-                        <p>¿Está seguro de cambiar la duración de este agendamiento?</p>
-                        <p><strong>Nueva hora inicio:</strong> ${new Date(startTime).toLocaleTimeString('es-ES')}</p>
-                        <p><strong>Nueva hora fin:</strong> ${new Date(endTime).toLocaleTimeString('es-ES')}</p>
+                        <div class="text-start p-2">
+                            <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
+                                <div>
+                                    <i class="fas fa-clock text-primary"></i> <strong>Hora inicio:</strong>
+                                </div>
+                                <div class="badge bg-primary">${startTimeFormatted}</div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
+                                <div>
+                                    <i class="fas fa-clock text-success"></i> <strong>Hora fin:</strong>
+                                </div>
+                                <div class="badge bg-success">${endTimeFormatted}</div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                                <div>
+                                    <i class="fas fa-hourglass-half text-info"></i> <strong>Nueva duración:</strong>
+                                </div>
+                                <div class="badge bg-info text-light">${durationHours}h ${durationMinutes}min</div>
+                            </div>
+                        </div>
                     `,
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Sí, cambiar',
-                    cancelButtonText: 'Cancelar'
+                    confirmButtonText: '<i class="fas fa-check"></i> Confirmar',
+                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                    confirmButtonColor: '#87c947',
+                    focusConfirm: false
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Mostrar indicador de carga
+                        Swal.fire({
+                            title: 'Actualizando...',
+                            text: 'Guardando nueva duración',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
                         // Actualizar con la nueva duración
                         updateScheduleDuration(scheduleId, startTime, endTime);
                     } else {
                         info.revert();
                     }
                 });
+            },
+            
+            // Mostrar información detallada al pasar el cursor por eventos
+            eventMouseEnter: function(info) {
+                // Obtener detalles del evento
+                const event = info.event;
+                const title = event.title;
+                const start = event.start;
+                const end = event.end || new Date(start.getTime() + 60 * 60 * 1000);
+                
+                // Calcular duración
+                const durationMs = end.getTime() - start.getTime();
+                const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+                const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+                
+                // Formatear horas
+                const formatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+                const startTimeFormatted = start.toLocaleTimeString('es-ES', formatOptions);
+                const endTimeFormatted = end.toLocaleTimeString('es-ES', formatOptions);
+                
+                // Obtener información adicional desde extendedProps
+                const status = event.extendedProps.status || 'pendiente';
+                const confirmation = event.extendedProps.confirmation_status || 'pending';
+                const client = event.extendedProps.client_name || 'Cliente';
+                const service = event.extendedProps.service_name || 'Servicio';
+                
+                // Crear tooltip con Bootstrap
+                const tooltip = document.createElement('div');
+                tooltip.classList.add('calendar-tooltip');
+                tooltip.innerHTML = `
+                    <div class="tooltip-header">
+                        <strong>${service}</strong>
+                    </div>
+                    <div class="tooltip-body">
+                        <div><i class="fas fa-user"></i> ${client}</div>
+                        <div><i class="fas fa-clock"></i> ${startTimeFormatted} - ${endTimeFormatted}</div>
+                        <div><i class="fas fa-hourglass-half"></i> ${durationHours}h ${durationMinutes}min</div>
+                    </div>
+                    <div class="tooltip-footer">
+                        <span class="badge ${status === 'pendiente' ? 'bg-warning' : status === 'en proceso' ? 'bg-info' : status === 'completado' ? 'bg-success' : 'bg-danger'}">
+                            ${status.charAt(0).toUpperCase() + status.slice(1)}
+                        </span>
+                        <span class="badge ${confirmation === 'confirmed' ? 'bg-success' : confirmation === 'pending' ? 'bg-warning' : 'bg-danger'}">
+                            ${confirmation === 'confirmed' ? 'Confirmado' : confirmation === 'pending' ? 'Pendiente' : 'Rechazado'}
+                        </span>
+                    </div>
+                `;
+                
+                // Aplicar estilos al tooltip
+                Object.assign(tooltip.style, {
+                    position: 'absolute',
+                    top: `${info.jsEvent.pageY + 10}px`,
+                    left: `${info.jsEvent.pageX + 10}px`,
+                    backgroundColor: 'white',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    padding: '8px',
+                    zIndex: '9999',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    minWidth: '200px',
+                    maxWidth: '300px',
+                    fontSize: '12px'
+                });
+                
+                // Añadir estilos específicos para las secciones
+                const style = document.createElement('style');
+                style.textContent = `
+                    .calendar-tooltip .tooltip-header {
+                        font-weight: bold;
+                        border-bottom: 1px solid #eee;
+                        padding-bottom: 5px;
+                        margin-bottom: 5px;
+                    }
+                    .calendar-tooltip .tooltip-body {
+                        padding: 5px 0;
+                    }
+                    .calendar-tooltip .tooltip-body div {
+                        margin-bottom: 3px;
+                    }
+                    .calendar-tooltip .tooltip-footer {
+                        margin-top: 5px;
+                        padding-top: 5px;
+                        border-top: 1px solid #eee;
+                        display: flex;
+                        justify-content: space-between;
+                    }
+                    .calendar-tooltip i {
+                        width: 14px;
+                        text-align: center;
+                        margin-right: 5px;
+                        opacity: 0.7;
+                    }
+                `;
+                
+                document.head.appendChild(style);
+                document.body.appendChild(tooltip);
+                
+                // Guardar referencia para eliminar el tooltip después
+                info.el.tooltip = tooltip;
+            },
+            
+            eventMouseLeave: function(info) {
+                // Eliminar el tooltip cuando el cursor sale del evento
+                if (info.el.tooltip) {
+                    info.el.tooltip.remove();
+                    delete info.el.tooltip;
+                }
             }
         });
         
@@ -1194,7 +1986,7 @@
             calendar.setOption('resourceAreaWidth', isMobile ? '25%' : (isTablet ? '20%' : '15%'));
             
             // Ajustar vista del calendario según el dispositivo
-            if (isMobile && calendar.view.type.includes('resource')) {
+            if (isMobile) {
                 calendar.changeView('timeGridDay');
                 calendar.setOption('headerToolbar', {
                     left: 'today',
@@ -1202,11 +1994,11 @@
                     right: 'prev,next'
                 });
             } else if (!isMobile && calendar.view.type === 'timeGridDay') {
-                calendar.changeView('resourceTimelineDay');
+                calendar.changeView('timeGridWeek');
                 calendar.setOption('headerToolbar', {
-                    left: 'today dayGridMonth,timeGridWeek,resourceTimelineDay',
+                    left: 'prev,next today',
                     center: 'title',
-                    right: 'prevYear,prev,next,nextYear'
+                    right: 'timeGridDay,timeGridWeek,dayGridMonth,resourceTimelineDay'
                 });
             }
             
@@ -1322,58 +2114,204 @@
         
         // Función para mostrar detalles de un agendamiento
         function showScheduleDetails(scheduleId) {
+            // Mostrar modal con indicador de carga mientras se obtienen los detalles
+            const loadingContent = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2">Cargando detalles del agendamiento...</p>
+                </div>
+            `;
+            
+            document.getElementById('scheduleDetailsContent').innerHTML = loadingContent;
+            const scheduleDetailsModal = new bootstrap.Modal(document.getElementById('scheduleDetailsModal'));
+            scheduleDetailsModal.show();
+            
             fetch(`/admin/schedules/${scheduleId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const schedule = data.schedule;
                         
-                        let statusBadge = '';
+                        // Generar badges para estados
+                        let statusBadge, confirmationBadge = '';
+                        
+                        // Estado del agendamiento
                         if (schedule.status === 'pendiente') {
-                            statusBadge = '<span class="badge bg-warning">Pendiente</span>';
+                            statusBadge = '<span class="badge bg-warning"><i class="fas fa-clock me-1"></i>Pendiente</span>';
                         } else if (schedule.status === 'en proceso') {
-                            statusBadge = '<span class="badge bg-info">En proceso</span>';
+                            statusBadge = '<span class="badge bg-info"><i class="fas fa-spinner me-1"></i>En proceso</span>';
                         } else if (schedule.status === 'completado') {
-                            statusBadge = '<span class="badge bg-success">Completado</span>';
+                            statusBadge = '<span class="badge bg-success"><i class="fas fa-check me-1"></i>Completado</span>';
                         } else {
-                            statusBadge = '<span class="badge bg-danger">Cancelado</span>';
+                            statusBadge = '<span class="badge bg-danger"><i class="fas fa-times me-1"></i>Cancelado</span>';
                         }
                         
+                        // Estado de confirmación
+                        if (schedule.confirmation_status === 'confirmed') {
+                            confirmationBadge = '<span class="badge bg-success"><i class="fas fa-user-check me-1"></i>Confirmado</span>';
+                        } else if (schedule.confirmation_status === 'pending') {
+                            confirmationBadge = '<span class="badge bg-warning"><i class="fas fa-user-clock me-1"></i>Pendiente de confirmación</span>';
+                        } else if (schedule.confirmation_status === 'rejected') {
+                            confirmationBadge = '<span class="badge bg-danger"><i class="fas fa-user-times me-1"></i>Rechazado</span>';
+                        }
+                        
+                        // Formato de fecha y hora
+                        const scheduledDate = new Date(schedule.scheduled_date);
+                        const endDate = schedule.end_date ? new Date(schedule.end_date) : new Date(scheduledDate.getTime() + 3600000);
+                        
+                        // Calcular duración
+                        const durationMs = endDate.getTime() - scheduledDate.getTime();
+                        const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+                        const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        const formattedDate = scheduledDate.toLocaleDateString('es-ES', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        
+                        const formattedStartTime = scheduledDate.toLocaleTimeString('es-ES', { 
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+                        
+                        const formattedEndTime = endDate.toLocaleTimeString('es-ES', { 
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+                        
                         let content = `
-                            <div class="mb-3">
-                                <h6>Cliente:</h6>
-                                <p>${schedule.service_request.client_name}</p>
+                            <div class="card mb-3 shadow-sm">
+                                <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información del Servicio</h6>
+                                    <div>
+                                        ${statusBadge} ${confirmationBadge}
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 text-muted">
+                                            <i class="fas fa-user me-2"></i>Cliente:
+                                        </div>
+                                        <div class="col-md-8 fw-bold">
+                                            ${schedule.service_request.client_name}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 text-muted">
+                                            <i class="fas fa-tools me-2"></i>Servicio:
+                                        </div>
+                                        <div class="col-md-8">
+                                            ${schedule.service_request.service.name}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 text-muted">
+                                            <i class="fas fa-phone me-2"></i>Contacto:
+                                        </div>
+                                        <div class="col-md-8">
+                                            ${schedule.service_request.client_phone || 'No disponible'}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <h6>Servicio:</h6>
-                                <p>${schedule.service_request.service.name}</p>
-                            </div>
-                            <div class="mb-3">
-                                <h6>Técnico:</h6>
-                                <p>${schedule.technician.user.name}</p>
-                            </div>
-                            <div class="mb-3">
-                                <h6>Fecha y hora:</h6>
-                                <p>${new Date(schedule.scheduled_date).toLocaleString('es-ES')}</p>
-                            </div>
-                            <div class="mb-3">
-                                <h6>Estado:</h6>
-                                <p>${statusBadge}</p>
+                            
+                            <div class="card mb-3 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Detalles del Agendamiento</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 text-muted">
+                                            <i class="fas fa-user-hard-hat me-2"></i>Técnico:
+                                        </div>
+                                        <div class="col-md-8">
+                                            ${schedule.technician.user.name}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 text-muted">
+                                            <i class="fas fa-calendar-day me-2"></i>Fecha:
+                                        </div>
+                                        <div class="col-md-8">
+                                            ${formattedDate}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 text-muted">
+                                            <i class="fas fa-clock me-2"></i>Horario:
+                                        </div>
+                                        <div class="col-md-8">
+                                            ${formattedStartTime} - ${formattedEndTime}
+                                            <span class="ms-2 text-muted">
+                                                (${durationHours}h ${durationMinutes}min)
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>`;
                             
                         if (schedule.notes) {
                             content += `
-                            <div class="mb-3">
-                                <h6>Notas:</h6>
-                                <p>${schedule.notes}</p>
+                            <div class="card mb-3 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Notas</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="p-3 bg-light rounded">
+                                        ${schedule.notes}
+                                    </div>
+                                </div>
+                            </div>`;
+                        }
+                        
+                        // Información de historial si está disponible
+                        if (schedule.created_at || schedule.updated_at) {
+                            const createdAt = schedule.created_at ? new Date(schedule.created_at).toLocaleString('es-ES') : 'Desconocido';
+                            const updatedAt = schedule.updated_at ? new Date(schedule.updated_at).toLocaleString('es-ES') : 'Desconocido';
+                            
+                            content += `
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-history me-2"></i>Historial</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row small text-muted">
+                                        <div class="col-md-6">
+                                            <i class="fas fa-plus-circle me-1"></i>Creado: ${createdAt}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <i class="fas fa-edit me-1"></i>Última actualización: ${updatedAt}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>`;
                         }
                         
                         document.getElementById('scheduleDetailsContent').innerHTML = content;
                         document.getElementById('editScheduleBtn').href = `/admin/schedules/${scheduleId}/edit`;
+                        document.getElementById('editScheduleBtn').innerHTML = '<i class="fas fa-edit me-1"></i>Editar';
                         
-                        const scheduleDetailsModal = new bootstrap.Modal(document.getElementById('scheduleDetailsModal'));
-                        scheduleDetailsModal.show();
+                        // Agregar botón para enviar recordatorio si está disponible
+                        if (schedule.status !== 'cancelado' && schedule.status !== 'completado') {
+                            document.getElementById('additionalActions').innerHTML = `
+                                <button class="btn btn-outline-info" onclick="sendReminderEmail(${scheduleId})">
+                                    <i class="fas fa-envelope me-1"></i>Enviar Recordatorio
+                                </button>
+                            `;
+                        } else {
+                            document.getElementById('additionalActions').innerHTML = '';
+                        }
+                        
                     } else {
                         alert('No se pudo cargar la información del agendamiento.');
                     }
@@ -1488,6 +2426,101 @@
                 Swal.fire({
                     title: 'Error',
                     text: 'Error al actualizar la duración del agendamiento',
+                    icon: 'error'
+                });
+                calendar.refetchEvents(); // Recargar eventos en caso de error
+            });
+        }
+        
+        // Función para enviar recordatorio por email
+        function sendReminderEmail(scheduleId) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            
+            // Mostrar indicador de carga
+            Swal.fire({
+                title: 'Enviando recordatorio...',
+                text: 'Esto puede tomar unos momentos',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            fetch(`/admin/schedules/${scheduleId}/send-reminder`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Recordatorio Enviado',
+                        text: 'Se ha enviado el recordatorio al cliente correctamente',
+                        icon: 'success',
+                        confirmButtonColor: '#87c947'
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.message || 'No se pudo enviar el recordatorio',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error al enviar el recordatorio',
+                    icon: 'error'
+                });
+            });
+        }
+        
+        // Función para actualizar horario y técnico con hora de finalización
+        function updateScheduleWithEndTime(scheduleId, technicianId, startDate, endDate) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            
+            fetch(`/admin/schedules/${scheduleId}/update-complete`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    technician_id: technicianId,
+                    start_date: startDate,
+                    end_date: endDate
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Actualizado',
+                        text: 'Agendamiento actualizado correctamente',
+                        icon: 'success',
+                        timer: 2000
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.message || 'No se pudo actualizar el agendamiento',
+                        icon: 'error'
+                    });
+                    calendar.refetchEvents(); // Recargar eventos en caso de error
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error al actualizar el agendamiento',
                     icon: 'error'
                 });
                 calendar.refetchEvents(); // Recargar eventos en caso de error

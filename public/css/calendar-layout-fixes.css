@@ -1,0 +1,199 @@
+/* 
+ * AJUSTES DE DISTRIBUCIÓN PARA EL CALENDARIO
+ * Estos estilos resuelven problemas específicos de layout y espaciado
+ */
+
+/* Mejora el contenedor principal del calendario */
+.fc {
+    height: calc(100vh - 180px) !important;
+    min-height: 600px !important;
+}
+
+/* Ajuste para ancho de columnas de recursos (técnicos) */
+.fc .fc-resource-timeline-divider {
+    width: 3px !important;
+    background-color: var(--ensek-green-dark);
+}
+
+.fc .fc-resource-area {
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+}
+
+/* Mejoras para las celdas de recursos (técnicos) */
+.fc-resource-area .fc-resource-cell {
+    height: 60px !important;
+    vertical-align: middle !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    padding: 10px !important;
+    background-color: rgba(0, 65, 34, 0.05) !important;
+    border-bottom: 1px solid rgba(0, 65, 34, 0.2) !important;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.fc-resource-area .fc-resource-cell:hover {
+    background-color: rgba(0, 65, 34, 0.1) !important;
+}
+
+/* Mejoras para las columnas de tiempo */
+.fc .fc-timeline-slot {
+    min-width: 100px !important;
+    border-right: 1px solid #e5e5e5 !important;
+}
+
+.fc-timeline-slot.fc-timeline-slot-label {
+    font-weight: 600;
+    color: var(--ensek-green-dark);
+    border-top: 2px solid rgba(135, 201, 71, 0.3) !important;
+}
+
+/* Mejorar las etiquetas de horas */
+.fc-timeline-slot-label-frame {
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 8px 0 !important;
+}
+
+.fc-timeline-slot-label-cushion {
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    background-color: rgba(135, 201, 71, 0.15) !important;
+    color: var(--ensek-green-dark) !important;
+}
+
+/* Mejorar la visibilidad de las celdas de contenido */
+.fc-timeline-lane {
+    border-bottom: 1px solid #e5e5e5 !important;
+}
+
+.fc-timeline-lane:nth-child(odd) {
+    background-color: rgba(240, 240, 240, 0.3) !important;
+}
+
+.fc-timeline-lane:hover {
+    background-color: rgba(135, 201, 71, 0.05) !important;
+}
+
+/* Mejorar la visualización del contenedor de eventos */
+.fc-timeline-events {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.fc-timeline-event-harness {
+    margin-top: 3px !important;
+    margin-bottom: 3px !important;
+}
+
+/* Mejorar la visualización de cada evento */
+.fc-timeline-event {
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    margin: 3px 0 !important;
+}
+
+.fc-timeline-event .fc-event-main {
+    padding: 3px !important;
+}
+
+.fc-timeline-event .fc-event-title {
+    font-weight: 600 !important;
+    white-space: normal !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.fc-timeline-event:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Indicador de tiempo actual más visible */
+.fc-timeline-now-indicator-line {
+    border-color: #ff6b6b !important;
+    border-width: 2px !important;
+    z-index: 100 !important;
+}
+
+.fc-timeline-now-indicator-arrow {
+    border-color: #ff6b6b !important;
+    width: 0 !important;
+    height: 0 !important;
+    border-width: 6px !important;
+    margin-top: -6px !important;
+}
+
+/* Mejorar la cabecera del calendario */
+.fc-toolbar {
+    margin-bottom: 15px !important;
+    padding: 10px !important;
+    background-color: #f8f9fa !important;
+    border-radius: 8px !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+/* Mejorar la distribución para pantallas pequeñas */
+@media (max-width: 768px) {
+    .fc .fc-resource-area {
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+    }
+
+    .fc-resource-area .fc-resource-cell {
+        font-size: 12px !important;
+        padding: 5px !important;
+    }
+
+    .fc .fc-timeline-slot {
+        min-width: 70px !important;
+    }
+}
+
+/* Estilos adicionales para mejorar la UX */
+.fc-event-dragging {
+    opacity: 0.7 !important;
+}
+
+.fc-event-resizing {
+    opacity: 0.7 !important;
+}
+
+/* Aumentar el contraste de las celdas disponibles/ocupadas */
+.fc-highlight {
+    background-color: rgba(135, 201, 71, 0.25) !important;
+}
+
+/* Mejorar el encabezado de las fechas */
+.fc-col-header-cell {
+    background-color: var(--ensek-green-dark) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 10px !important;
+    text-align: center !important;
+}
+
+/* Corregir padding inconsistente */
+.fc-scrollgrid {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.fc-scrollgrid td,
+.fc-scrollgrid th {
+    border: 1px solid #ddd !important;
+    padding: 0 !important;
+}
+
+/* Asegurar que la columna de recursos (técnicos) tenga un ancho fijo consistente */
+.fc-timeline-body .fc-resource-area-container {
+    flex-basis: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+}

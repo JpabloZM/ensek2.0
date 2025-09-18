@@ -1,0 +1,169 @@
+/* 
+ * ESTILO PARA CALENDARIO SEMANAL
+ * Optimizado para vista semanal con días en columnas y horas en filas
+ */
+
+/* Ajustar colores base */
+:root {
+    --appointment-color: #7caad4; /* Azul para citas con clientes */
+    --meeting-color: #a8d7a8; /* Verde para reuniones */
+    --break-color: #f9d971; /* Amarillo para descansos */
+    --conference-color: #a2c4e5; /* Azul claro para conferencias */
+    --other-color: #e8c1c1; /* Rojo claro para otros eventos */
+}
+
+/* Contenedor general del calendario */
+.fc-theme-standard {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background-color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+/* Cabeceras de días de la semana */
+.fc .fc-col-header-cell {
+    background-color: #3db9a6; /* Color turquesa para cabeceras */
+    border: 1px solid #ffffff;
+}
+
+.fc .fc-col-header-cell-cushion {
+    padding: 10px;
+    font-weight: 600;
+    color: #ffffff;
+    text-decoration: none !important;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+/* Diseño de celdas de hora */
+.fc .fc-timegrid-slot {
+    height: 45px !important; /* Altura consistente para celdas de hora */
+    border-bottom: 1px solid #eee;
+}
+
+.fc .fc-timegrid-slot-label {
+    background-color: #f8f9fa;
+    border-right: 1px solid #ddd;
+    vertical-align: middle;
+    font-weight: 500;
+    color: #666;
+    font-size: 13px;
+}
+
+.fc .fc-timegrid-slot-label-frame {
+    text-align: center;
+}
+
+.fc .fc-timegrid-slot-minor {
+    border-bottom: 1px dotted #eee;
+}
+
+/* Eventos según tipo */
+.fc-event.event-appointment {
+    background-color: var(--appointment-color);
+    border-color: var(--appointment-color);
+    color: #fff;
+}
+
+.fc-event.event-meeting {
+    background-color: var(--meeting-color);
+    border-color: var(--meeting-color);
+    color: #333;
+}
+
+.fc-event.event-break {
+    background-color: var(--break-color);
+    border-color: var(--break-color);
+    color: #333;
+}
+
+.fc-event.event-conference {
+    background-color: var(--conference-color);
+    border-color: var(--conference-color);
+    color: #333;
+}
+
+.fc-event.event-other {
+    background-color: var(--other-color);
+    border-color: var(--other-color);
+    color: #333;
+}
+
+/* Formato de los eventos */
+.fc-timegrid-event {
+    border-radius: 3px !important;
+    border: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.fc-timegrid-event .fc-event-main {
+    padding: 4px 6px;
+}
+
+.fc-timegrid-event .fc-event-title {
+    font-weight: 600;
+    font-size: 12px;
+}
+
+/* Diseño de la columna de horas */
+.fc .fc-timegrid-axis {
+    background-color: #f8f9fa;
+    border-right: 1px solid #ddd;
+    width: 70px !important;
+}
+
+/* Indicador de hora actual */
+.fc .fc-timegrid-now-indicator-line {
+    border-color: #ff5050;
+    border-width: 2px;
+    z-index: 100;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+    border-color: #ff5050;
+}
+
+/* Cambiar color de fondo para horas de almuerzo */
+.fc .fc-timegrid-slot[data-time="12:00:00"],
+.fc .fc-timegrid-slot[data-time="12:30:00"] {
+    background-color: rgba(249, 217, 113, 0.1); /* Color amarillo muy suave */
+}
+
+/* Estilo para diferentes tipos de eventos en vista semanal */
+.event-with-client .fc-event-main {
+    border-left: 5px solid #5c8eb9;
+}
+
+.event-meeting .fc-event-main {
+    border-left: 5px solid #6aaa6a;
+}
+
+.event-lunch .fc-event-main {
+    border-left: 5px solid #e0c341;
+}
+
+.event-conference .fc-event-main {
+    border-left: 5px solid #7da9d1;
+}
+
+/* Mejoras de responsive para dispositivos móviles */
+@media (max-width: 767px) {
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.2em;
+    }
+
+    .fc-timegrid-event .fc-event-title {
+        font-size: 10px;
+    }
+
+    .fc-timegrid-event .fc-event-main {
+        padding: 2px 4px;
+    }
+}

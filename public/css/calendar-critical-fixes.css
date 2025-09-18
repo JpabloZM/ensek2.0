@@ -1,0 +1,135 @@
+/* 
+ * AJUSTES CRÍTICOS DE LAYOUT
+ * Este archivo contiene correcciones específicas para asegurar la correcta visualización
+ * del calendario con horas y técnicos en columnas
+ */
+
+/* Estructura general del calendario */
+.fc .fc-scrollgrid {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+/* Alinear correctamente las columnas de técnicos */
+.fc .fc-resource-timeline-divider {
+    width: 3px !important;
+    background-color: var(--ensek-green-dark) !important;
+}
+
+.fc-resource-timeline-divider {
+    pointer-events: none;
+    border-right: 2px solid var(--ensek-green-dark) !important;
+}
+
+.fc .fc-resource-timeline-header {
+    border-bottom: 2px solid var(--ensek-green-dark) !important;
+}
+
+/* Nombre de los técnicos más visible */
+.resource-label-content {
+    display: flex;
+    align-items: center;
+    padding: 8px 5px;
+    border-radius: 4px;
+    background-color: rgba(0, 65, 34, 0.05);
+    transition: all 0.2s ease;
+}
+
+.resource-label-content:hover {
+    background-color: rgba(0, 65, 34, 0.1);
+}
+
+.resource-label-content i {
+    margin-right: 5px;
+    color: var(--ensek-green-dark);
+}
+
+.resource-label-content span {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Resaltar mejor las horas en el encabezado */
+.fc-timeline-slot-frame {
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100% !important;
+    padding: 4px 0 !important;
+}
+
+.fc-timeline-slot-label {
+    border-top: 2px solid rgba(135, 201, 71, 0.3) !important;
+}
+
+.fc-timeline-slot-cushion {
+    padding: 4px 8px !important;
+    font-weight: 600 !important;
+    border-radius: 4px !important;
+}
+
+/* Hacer más clara la separación vertical entre técnicos */
+.fc-timeline-body .fc-resource-group,
+.fc-timeline-body .fc-resource {
+    border-bottom: 1px solid rgba(0, 65, 34, 0.15) !important;
+}
+
+/* Celdas de horas más distinguibles */
+.fc-timeline-slot-lane {
+    min-height: 60px !important;
+    border-right: 1px solid #e5e5e5 !important;
+}
+
+/* Efecto alternante para filas */
+.fc .fc-timeline-slots td:nth-child(even) {
+    background-color: rgba(248, 249, 250, 0.7) !important;
+}
+
+.fc .fc-timeline-slots td:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Destacar el horario actual */
+.fc .fc-timeline-now-indicator-container {
+    z-index: 10 !important;
+}
+
+.fc .fc-timeline-now-indicator-line {
+    border-color: #ff6b6b !important;
+    border-width: 2px !important;
+    z-index: 10 !important;
+    opacity: 0.8 !important;
+}
+
+.fc .fc-timeline-now-indicator-arrow {
+    border-color: #ff6b6b !important;
+}
+
+/* Ajustes específicos para pantallas pequeñas */
+@media (max-width: 767.98px) {
+    .fc .fc-resource-timeline-divider {
+        width: 2px !important;
+    }
+
+    .fc-resource-cell {
+        padding: 4px !important;
+    }
+
+    .resource-label-content {
+        padding: 5px 3px;
+    }
+
+    .resource-label-content i {
+        font-size: 12px;
+    }
+
+    .resource-label-content span {
+        font-size: 12px;
+    }
+
+    .fc-timeline-slot-cushion {
+        padding: 3px 6px !important;
+        font-size: 12px !important;
+    }
+}

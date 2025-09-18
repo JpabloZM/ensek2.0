@@ -1,0 +1,163 @@
+/* Mejoras visuales para el calendario de agendamiento */
+
+/* Estilos para eventos en el calendario */
+.fc-event {
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2px;
+    transition: all 0.2s ease;
+}
+
+.fc-event:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Mejoras en la cabecera de los técnicos */
+.fc-timeline-header .fc-resource-cell {
+    background-color: var(--ensek-green-dark);
+    color: white;
+    font-weight: bold;
+    padding: 10px 5px;
+    border-bottom: 2px solid var(--ensek-green-light);
+}
+
+/* Mejoras en las celdas de tiempo */
+.fc-timeline-slot-frame {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+/* Efecto alternante para las horas */
+.fc-timeline-slot.fc-timeline-slot-hour:nth-child(odd) {
+    background-color: rgba(135, 201, 71, 0.05);
+}
+
+.fc-timeline-slot.fc-timeline-slot-hour:nth-child(even) {
+    background-color: rgba(0, 65, 34, 0.03);
+}
+
+/* Estilo para hora actual */
+.fc-timeline-now-indicator-line {
+    border-color: #ff6b6b;
+    border-width: 2px;
+    z-index: 5;
+}
+
+.fc-timeline-now-indicator-arrow {
+    border-color: #ff6b6b;
+    border-width: 5px;
+}
+
+/* Estilo para los tooltips personalizados */
+.calendar-tooltip {
+    max-width: 300px;
+    min-width: 200px;
+}
+
+.calendar-tooltip .tooltip-header {
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.calendar-tooltip .tooltip-body {
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.calendar-tooltip .tooltip-body div {
+    margin-bottom: 5px;
+}
+
+.calendar-tooltip .tooltip-footer {
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Estados de los eventos por colores */
+.fc-event.status-pending {
+    border-left: 3px solid #ffc107;
+}
+
+.fc-event.status-in-progress {
+    border-left: 3px solid #0dcaf0;
+}
+
+.fc-event.status-completed {
+    border-left: 3px solid #198754;
+}
+
+.fc-event.status-cancelled {
+    border-left: 3px solid #dc3545;
+    opacity: 0.7;
+}
+
+/* Indicadores de confirmación */
+.fc-event.confirmation-confirmed::after {
+    content: "✓";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #198754;
+    color: white;
+    width: 15px;
+    height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 10px;
+}
+
+.fc-event.confirmation-rejected::after {
+    content: "✕";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #dc3545;
+    color: white;
+    width: 15px;
+    height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 10px;
+}
+
+/* Animaciones para eventos modificados recientemente */
+@keyframes highlight {
+    0% {
+        box-shadow: 0 0 0 rgba(135, 201, 71, 0);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(135, 201, 71, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 0 rgba(135, 201, 71, 0);
+    }
+}
+
+.fc-event.recently-modified {
+    animation: highlight 2s ease-in-out;
+}
+
+/* Mejoras para dispositivos móviles y tabletas */
+@media (max-width: 768px) {
+    .fc-timeline-header .fc-resource-cell {
+        font-size: 12px;
+        padding: 5px 2px;
+    }
+
+    .fc-timeline-event .fc-event-main {
+        padding: 1px 2px;
+        font-size: 11px;
+    }
+}
