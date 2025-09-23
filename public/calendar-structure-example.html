@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Calendario de Técnicos - Estructura de Ejemplo</title>
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        />
+        <link rel="stylesheet" href="css/calendar-enhancements.css" />
+        <style>
+            :root {
+                --ensek-green-dark: #004122;
+                --ensek-green-light: #87c947;
+            }
+
+            body {
+                font-family: "Arial", sans-serif;
+                margin: 0;
+                padding: 20px;
+                background-color: #f5f7fa;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2 class="mb-4">Calendario de Técnicos - ENSEK</h2>
+
+            <!-- Controles del calendario -->
+            <div class="calendar-controls mb-3">
+                <div class="date-nav">
+                    <button id="prev-day">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span class="current-date">23 de Septiembre, 2023</span>
+                    <button id="next-day">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="ms-2" id="today">Hoy</button>
+                </div>
+
+                <div class="view-options">
+                    <button class="btn btn-sm btn-outline-primary me-2">
+                        Día
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary">
+                        Semana
+                    </button>
+                </div>
+            </div>
+
+            <!-- Leyenda del calendario -->
+            <div class="calendar-legend mb-3">
+                <div class="legend-item">
+                    <span
+                        class="legend-color"
+                        style="background-color: #7caad4"
+                    ></span>
+                    <span class="legend-label">Citas</span>
+                </div>
+                <div class="legend-item">
+                    <span
+                        class="legend-color"
+                        style="background-color: #a8d7a8"
+                    ></span>
+                    <span class="legend-label">Reuniones</span>
+                </div>
+                <div class="legend-item">
+                    <span
+                        class="legend-color"
+                        style="background-color: #f9d971"
+                    ></span>
+                    <span class="legend-label">Descansos</span>
+                </div>
+                <div class="legend-item">
+                    <span
+                        class="legend-color"
+                        style="background-color: #a2c4e5"
+                    ></span>
+                    <span class="legend-label">Llamadas</span>
+                </div>
+            </div>
+
+            <!-- Contenedor del calendario -->
+            <div class="technician-calendar-container">
+                <!-- Cabecera del calendario -->
+                <div class="calendar-header">
+                    <!-- Celda de hora en la cabecera -->
+                    <div class="calendar-header-hour">Hora</div>
+
+                    <!-- Celdas de técnicos en la cabecera -->
+                    <div class="calendar-header-tech">
+                        <div class="calendar-header-tech-name">
+                            Carlos Rodríguez
+                        </div>
+                        <div class="calendar-header-tech-specialty">
+                            Electricidad
+                        </div>
+                    </div>
+                    <div class="calendar-header-tech">
+                        <div class="calendar-header-tech-name">
+                            Ana Martínez
+                        </div>
+                        <div class="calendar-header-tech-specialty">
+                            Fontanería
+                        </div>
+                    </div>
+                    <div class="calendar-header-tech">
+                        <div class="calendar-header-tech-name">Juan Pérez</div>
+                        <div class="calendar-header-tech-specialty">
+                            Climatización
+                        </div>
+                    </div>
+                    <div class="calendar-header-tech">
+                        <div class="calendar-header-tech-name">Elena Gómez</div>
+                        <div class="calendar-header-tech-specialty">
+                            Carpintería
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filas de horas (se repetirá para cada hora del día) -->
+                <!-- Fila para las 8:00 AM -->
+                <div class="calendar-row">
+                    <div class="calendar-hour-cell">8:00 AM</div>
+                    <div class="calendar-service-cell">
+                        <!-- Un servicio programado -->
+                        <div
+                            class="calendar-service service-appointment status-pending confirmation-pending"
+                        >
+                            <div class="service-title">
+                                Reparación Eléctrica
+                            </div>
+                            <div class="service-client">Juan Gómez</div>
+                            <div class="service-time">8:00 - 9:00 AM</div>
+                        </div>
+                    </div>
+                    <div class="calendar-service-cell"></div>
+                    <div class="calendar-service-cell">
+                        <!-- Otro servicio programado -->
+                        <div
+                            class="calendar-service service-appointment status-inprogress confirmation-confirmed"
+                        >
+                            <div class="service-title">Instalación A/C</div>
+                            <div class="service-client">María Pérez</div>
+                            <div class="service-time">8:00 - 10:00 AM</div>
+                        </div>
+                    </div>
+                    <div class="calendar-service-cell"></div>
+                </div>
+
+                <!-- Fila para las 9:00 AM -->
+                <div class="calendar-row">
+                    <div class="calendar-hour-cell">9:00 AM</div>
+                    <div class="calendar-service-cell"></div>
+                    <div class="calendar-service-cell">
+                        <!-- Un servicio programado -->
+                        <div
+                            class="calendar-service service-meeting status-pending"
+                        >
+                            <div class="service-title">Reunión Interna</div>
+                            <div class="service-client">Equipo Técnico</div>
+                            <div class="service-time">9:00 - 10:00 AM</div>
+                        </div>
+                    </div>
+                    <div class="calendar-service-cell">
+                        <!-- El servicio de instalación A/C continúa -->
+                    </div>
+                    <div class="calendar-service-cell">
+                        <!-- Otro servicio programado -->
+                        <div
+                            class="calendar-service service-appointment status-completed confirmation-confirmed"
+                        >
+                            <div class="service-title">Reparación Mueble</div>
+                            <div class="service-client">Carlos López</div>
+                            <div class="service-time">9:00 - 11:00 AM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fila para las 10:00 AM -->
+                <div class="calendar-row">
+                    <div class="calendar-hour-cell">10:00 AM</div>
+                    <div class="calendar-service-cell">
+                        <!-- Un servicio programado -->
+                        <div
+                            class="calendar-service service-conference status-pending confirmation-pending"
+                        >
+                            <div class="service-title">Llamada Cliente</div>
+                            <div class="service-client">Empresa ABC</div>
+                            <div class="service-time">10:00 - 10:30 AM</div>
+                        </div>
+                    </div>
+                    <div class="calendar-service-cell"></div>
+                    <div class="calendar-service-cell">
+                        <!-- Un servicio programado -->
+                        <div class="calendar-service service-break">
+                            <div class="service-title">Descanso</div>
+                            <div class="service-time">10:00 - 10:30 AM</div>
+                        </div>
+                    </div>
+                    <div class="calendar-service-cell">
+                        <!-- El servicio de reparación de mueble continúa -->
+                    </div>
+                </div>
+
+                <!-- Fila para las 11:00 AM -->
+                <div class="calendar-row">
+                    <div class="calendar-hour-cell">11:00 AM</div>
+                    <div class="calendar-service-cell">
+                        <!-- Un servicio programado -->
+                        <div
+                            class="calendar-service service-appointment status-inprogress confirmation-confirmed"
+                        >
+                            <div class="service-title">Mantenimiento</div>
+                            <div class="service-client">Laura Sánchez</div>
+                            <div class="service-time">11:00 - 12:30 PM</div>
+                        </div>
+                    </div>
+                    <div class="calendar-service-cell">
+                        <!-- Un servicio programado -->
+                        <div
+                            class="calendar-service service-appointment status-pending confirmation-pending"
+                        >
+                            <div class="service-title">Presupuesto</div>
+                            <div class="service-client">Pedro Ramírez</div>
+                            <div class="service-time">11:00 - 12:00 PM</div>
+                        </div>
+                    </div>
+                    <div class="calendar-service-cell"></div>
+                    <div class="calendar-service-cell"></div>
+                </div>
+
+                <!-- Fila para las 12:00 PM -->
+                <div class="calendar-row">
+                    <div class="calendar-hour-cell">12:00 PM</div>
+                    <div class="calendar-service-cell">
+                        <!-- El servicio de mantenimiento continúa -->
+                    </div>
+                    <div class="calendar-service-cell"></div>
+                    <div class="calendar-service-cell">
+                        <!-- Un servicio programado -->
+                        <div class="calendar-service service-break">
+                            <div class="service-title">Almuerzo</div>
+                            <div class="service-time">12:00 - 1:00 PM</div>
+                        </div>
+                    </div>
+                    <div class="calendar-service-cell">
+                        <!-- Un servicio programado -->
+                        <div class="calendar-service service-break">
+                            <div class="service-title">Almuerzo</div>
+                            <div class="service-time">12:00 - 1:00 PM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Indicador de hora actual (se posicionará con JavaScript) -->
+                <div class="current-time-indicator" style="top: 150px"></div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Ejemplo de código JavaScript para actualizar la posición del indicador de hora actual
+            function updateCurrentTimeIndicator() {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const startHour = 8; // Hora de inicio del calendario (8 AM)
+                const hourHeight = 60; // Altura en píxeles de cada hora en el calendario
+
+                const minutesSinceStart = (hours - startHour) * 60 + minutes;
+                const topPosition = (minutesSinceStart / 60) * hourHeight;
+
+                const indicator = document.querySelector(
+                    ".current-time-indicator"
+                );
+                indicator.style.top = `${topPosition}px`;
+            }
+
+            // Actualizar al cargar la página y luego cada minuto
+            updateCurrentTimeIndicator();
+            setInterval(updateCurrentTimeIndicator, 60000);
+        </script>
+    </body>
+</html>

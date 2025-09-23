@@ -1,6 +1,124 @@
 /* Mejoras visuales para el calendario de agendamiento */
 
-/* Estilos para eventos en el calendario */
+/* Estructura principal del calendario de técnicos */
+.technician-calendar-container {
+    display: grid;
+    grid-template-columns: 80px repeat(auto-fill, minmax(200px, 1fr));
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+/* Cabecera con horas y técnicos */
+.calendar-header {
+    display: contents;
+}
+
+/* Celda de hora en la cabecera */
+.calendar-header-hour {
+    grid-column: 1;
+    background-color: var(--ensek-green-dark);
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    text-align: center;
+    border-bottom: 2px solid var(--ensek-green-light);
+}
+
+/* Celdas de técnicos en la cabecera */
+.calendar-header-tech {
+    background-color: var(--ensek-green-dark);
+    color: white;
+    font-weight: bold;
+    padding: 12px 5px;
+    text-align: center;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 2px solid var(--ensek-green-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.calendar-header-tech-name {
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+.calendar-header-tech-specialty {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* Filas de horas */
+.calendar-row {
+    display: contents;
+}
+
+/* Celda de hora en el cuerpo */
+.calendar-hour-cell {
+    grid-column: 1;
+    background-color: #f5f5f5;
+    font-weight: bold;
+    text-align: center;
+    padding: 5px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #444;
+    height: 40px; /* Altura reducida para caber 24 horas */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Celda para servicio */
+.calendar-service-cell {
+    border-left: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    min-height: 40px; /* Altura reducida para caber 24 horas */
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+/* Efecto hover en celdas de servicio */
+.calendar-service-cell:hover {
+    background-color: #f9f9f9;
+}
+
+/* Filas alternantes para mejorar la legibilidad */
+.calendar-row:nth-child(odd) .calendar-hour-cell {
+    background-color: rgba(135, 201, 71, 0.1);
+}
+
+.calendar-row:nth-child(odd) .calendar-service-cell {
+    background-color: rgba(135, 201, 71, 0.03);
+}
+
+/* Estilos para horas laborales y no laborales */
+.calendar-row[data-work-hours="true"] .calendar-hour-cell,
+.calendar-row[data-work-hours="true"] .calendar-service-cell {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.calendar-row[data-work-hours="false"] .calendar-hour-cell,
+.calendar-row[data-work-hours="false"] .calendar-service-cell {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Resaltar la hora actual */
+.calendar-row[data-current-hour="true"] .calendar-hour-cell {
+    background-color: rgba(255, 107, 107, 0.2);
+    font-weight: bold;
+    color: #e74c3c;
+    border-left: 3px solid #e74c3c;
+}
+
+.calendar-row[data-current-hour="true"] .calendar-service-cell {
+    background-color: rgba(255, 107, 107, 0.05);
+}
+
+/* Estilo para eventos en el calendario */
 .fc-event {
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -49,6 +167,134 @@
 .fc-timeline-now-indicator-arrow {
     border-color: #ff6b6b;
     border-width: 5px;
+}
+
+/* Estilos para servicios en la nueva estructura del calendario */
+.calendar-service {
+    background-color: #7caad4;
+    color: white;
+    border-radius: 4px;
+    padding: 5px;
+    margin: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.calendar-service:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Diferentes tipos de servicios */
+.calendar-service.service-appointment {
+    background-color: #7caad4;
+}
+
+.calendar-service.service-meeting {
+    background-color: #a8d7a8;
+    color: #333;
+}
+
+.calendar-service.service-break {
+    background-color: #f9d971;
+    color: #333;
+}
+
+.calendar-service.service-conference {
+    background-color: #a2c4e5;
+}
+
+/* Estilos para estados de servicios */
+.calendar-service.status-pending {
+    border-left: 4px solid #ffc107;
+}
+
+.calendar-service.status-inprogress {
+    border-left: 4px solid #17a2b8;
+}
+
+.calendar-service.status-completed {
+    border-left: 4px solid #28a745;
+}
+
+.calendar-service.status-cancelled {
+    border-left: 4px solid #dc3545;
+    opacity: 0.7;
+}
+
+/* Estructura interna de un servicio */
+.service-title {
+    font-weight: bold;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 1px;
+}
+
+.service-client {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.service-time {
+    font-size: 9px;
+    opacity: 0.9;
+    margin-top: 1px;
+    letter-spacing: -0.3px;
+}
+
+/* Indicadores de confirmación */
+.calendar-service.confirmation-confirmed::after {
+    content: "✓";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #28a745;
+    color: white;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 10px;
+}
+
+.calendar-service.confirmation-rejected::after {
+    content: "✕";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #dc3545;
+    color: white;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 10px;
+}
+
+.calendar-service.confirmation-pending::after {
+    content: "?";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #ffc107;
+    color: white;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 10px;
 }
 
 /* Estilo para los tooltips personalizados */
@@ -149,8 +395,176 @@
     animation: highlight 2s ease-in-out;
 }
 
+/* Visualización de la hora actual */
+.current-time-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #ff6b6b;
+    z-index: 100;
+    pointer-events: none;
+    box-shadow: 0 0 5px rgba(255, 107, 107, 0.7);
+    animation: pulseLine 2s infinite;
+}
+
+@keyframes pulseLine {
+    0% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.7;
+    }
+}
+
+.current-time-indicator::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    background-color: #ff6b6b;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 5px rgba(255, 107, 107, 0.7);
+    animation: pulseCircle 2s infinite;
+}
+
+@keyframes pulseCircle {
+    0% {
+        transform: translateY(-50%) scale(1);
+    }
+    50% {
+        transform: translateY(-50%) scale(1.2);
+    }
+    100% {
+        transform: translateY(-50%) scale(1);
+    }
+}
+
+.current-time-indicator::after {
+    content: attr(data-time);
+    position: absolute;
+    left: 15px;
+    top: -10px;
+    background-color: #ff6b6b;
+    color: white;
+    font-size: 11px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-weight: bold;
+    display: block; /* Asegurar que se muestre */
+    white-space: nowrap; /* Evitar saltos de línea */
+    z-index: 101; /* Mayor z-index para asegurar visibilidad */
+}
+
+/* Leyenda del calendario */
+.calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    margin-bottom: 5px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+
+.legend-label {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Controles del calendario */
+.calendar-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.date-nav {
+    display: flex;
+    align-items: center;
+}
+
+.date-nav button {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.date-nav button:hover {
+    background-color: #efefef;
+}
+
+.current-date {
+    font-weight: bold;
+    margin: 0 10px;
+}
+
+.view-options {
+    display: flex;
+    align-items: center;
+}
+
 /* Mejoras para dispositivos móviles y tabletas */
+@media (max-width: 1024px) {
+    .technician-calendar-container {
+        grid-template-columns: 60px repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .calendar-header-tech-name {
+        font-size: 13px;
+    }
+
+    .calendar-header-tech-specialty {
+        font-size: 10px;
+    }
+
+    .calendar-hour-cell {
+        padding: 8px 3px;
+        font-size: 12px;
+    }
+
+    .service-title {
+        font-size: 11px;
+    }
+
+    .service-client {
+        font-size: 10px;
+    }
+}
+
 @media (max-width: 768px) {
+    .technician-calendar-container {
+        grid-template-columns: 50px repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .calendar-header-tech {
+        padding: 8px 3px;
+    }
+
     .fc-timeline-header .fc-resource-cell {
         font-size: 12px;
         padding: 5px 2px;
@@ -159,5 +573,48 @@
     .fc-timeline-event .fc-event-main {
         padding: 1px 2px;
         font-size: 11px;
+    }
+
+    .calendar-service {
+        padding: 3px;
+        margin: 3px;
+    }
+}
+
+@media (max-width: 576px) {
+    .technician-calendar-container {
+        grid-template-columns: 40px repeat(auto-fill, minmax(100px, 1fr));
+        font-size: 11px;
+    }
+
+    .calendar-header-tech-name {
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+
+    .calendar-header-tech-specialty {
+        font-size: 9px;
+    }
+
+    .calendar-hour-cell {
+        padding: 5px 2px;
+        font-size: 11px;
+    }
+
+    .service-title {
+        font-size: 10px;
+    }
+
+    .service-client,
+    .service-time {
+        font-size: 9px;
+    }
+
+    .legend-item {
+        margin-right: 8px;
+    }
+
+    .legend-label {
+        font-size: 10px;
     }
 }

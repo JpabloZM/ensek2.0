@@ -88,6 +88,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::resource('schedules', ScheduleController::class)->names('admin.schedules');
         Route::patch('/schedules/{schedule}/update-duration', [ScheduleController::class, 'updateDuration'])->name('admin.schedules.updateDuration');
         Route::get('/api/schedules', [ScheduleController::class, 'getCalendarData'])->name('api.schedules');
+        Route::get('/schedules/{schedule}/json', [ScheduleController::class, 'getJson'])->name('admin.schedules.json');
         
         // Rutas de citas y calendario
         Route::prefix('appointments')->name('appointments.')->middleware(['auth'])->group(function () {

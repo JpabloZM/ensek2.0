@@ -433,4 +433,43 @@ class ScheduleController extends Controller
         
         return response()->json($events);
     }
+    
+    /**
+     * Obtener datos de un agendamiento en formato JSON
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getJson($id)
+    {
+        $schedule = Schedule::with(['serviceRequest.service', 'technician.user'])
+            ->findOrFail($id);
+        
+        return response()->json([
+            'id' => $schedule->id,
+            'technician' => [
+                'id' => $schedule->technician_id,
+                'name' => $schedule->technician->user->name,
+                'specialty' => $schedule->technician->specialty ?? 'Técnico'
+            ],
+            'service' => [
+                'id' => $schedule->serviceRequest->service_id,
+                'name' => $schedule->serviceRequest->service->name,
+            ],
+            'client' => [
+                'name' => $schedule->serviceRequest->client_name,
+                'phone' => $schedule->serviceRequest->client_phone,
+                'email' => $schedule->serviceRequest->client_email,
+            ],
+            'scheduled_date' => $schedule->scheduled_date->format('Y-m-d H:i:s'),
+            'duration' => $schedule->duration,
+            'estimated_end_time' => $schedule->estimated_end_time ? $schedule->estimated_end_time->format('Y-m-d H:i:s') : null,
+            'status' => $schedule->status,
+            'confirmation_status' => $schedule->confirmation_status ?? 'pending',
+            'notes' => $schedule->notes,
+            'address' => $schedule->serviceRequest->address,
+            'description' => $schedule->serviceRequest->description,
+            'completed_at' => $schedule->completed_at ? $schedule->completed_at->format('Y-m-d H:i:s') : null
+        ]);
+    }
 }

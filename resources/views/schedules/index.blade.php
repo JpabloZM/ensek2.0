@@ -229,7 +229,65 @@
                             </div>
                         </div>
                     </div>
-                    <div class="calendar-container overflow-hidden">
+                    <!-- Controles del calendario -->
+                    <div class="calendar-controls mb-3">
+                        <div class="date-nav">
+                            <button id="prev-day" class="btn btn-sm btn-outline-secondary"><i class="fas fa-chevron-left"></i></button>
+                            <span class="current-date" id="current-date">{{ now()->format('d') }} de {{ now()->locale('es')->format('F') }}, {{ now()->format('Y') }}</span>
+                            <button id="next-day" class="btn btn-sm btn-outline-secondary"><i class="fas fa-chevron-right"></i></button>
+                            <button class="btn btn-sm btn-outline-primary ms-2" id="today">Hoy</button>
+                            <button class="btn btn-sm btn-outline-danger ms-2" id="currentHour">
+                                <i class="far fa-clock me-1"></i>Hora Actual
+                            </button>
+                        </div>
+                        
+                        <div class="view-options">
+                            <button class="btn btn-sm btn-outline-primary me-2" id="dayViewBtn">Día</button>
+                            <button class="btn btn-sm btn-outline-secondary" id="weekViewBtn">Semana</button>
+                        </div>
+                    </div>
+
+                    <!-- Nuevo contenedor del calendario estructurado -->
+                    <div class="technician-calendar-container">
+                        <!-- Cabecera del calendario -->
+                        <div class="calendar-header">
+                            <!-- Celda de hora en la cabecera -->
+                            <div class="calendar-header-hour">Hora</div>
+                            
+                            <!-- Celdas de técnicos en la cabecera -->
+                            @foreach($technicians as $technician)
+                            <div class="calendar-header-tech">
+                                <div class="calendar-header-tech-name">{{ $technician->user->name }}</div>
+                                <div class="calendar-header-tech-specialty">{{ $technician->specialty ?? 'Técnico' }}</div>
+                            </div>
+                            @endforeach
+                        </div>
+                        
+                        <!-- Filas de horas (las 24 horas del día) -->
+                        @php
+                            $startHour = 0;
+                            $endHour = 23;
+                        @endphp
+                        
+                        @for($hour = $startHour; $hour <= $endHour; $hour++)
+                        <div class="calendar-row" data-hour="{{ $hour }}">
+                            <div class="calendar-hour-cell" data-hour="{{ $hour }}">
+                                {{ str_pad($hour, 2, '0', STR_PAD_LEFT) }}:00
+                            </div>
+                            @foreach($technicians as $technician)
+                            <div class="calendar-service-cell" data-hour="{{ $hour }}" data-technician-id="{{ $technician->id }}">
+                                <!-- Aquí se cargarán los servicios dinámicamente -->
+                            </div>
+                            @endforeach
+                        </div>
+                        @endfor
+                        
+                        <!-- Indicador de hora actual -->
+                        <div class="current-time-indicator"></div>
+                    </div>
+                    
+                    <!-- Contenedor original del calendario (oculto inicialmente) -->
+                    <div class="calendar-container overflow-hidden d-none">
                         <div id="technician-calendar" class="technician-calendar"></div>
                     </div>
                 </div>
@@ -2625,6 +2683,417 @@
             });
         });
     });
+</script>
+
+<!-- Script para el nuevo calendario de técnicos -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar el calendario nuevo
+        initTechnicianCalendar();
+        
+        // Botones de navegación
+        document.getElementById('prev-day').addEventListener('click', function() {
+            navigateCalendar(-1);
+        });
+        
+        document.getElementById('next-day').addEventListener('click', function() {
+            navigateCalendar(1);
+        });
+        
+        document.getElementById('today').addEventListener('click', function() {
+            const today = new Date();
+            updateCalendarDate(today);
+            loadServices(formatDate(today));
+        });
+        
+        // Botón para ir a la hora actual
+        document.getElementById('currentHour').addEventListener('click', function() {
+            scrollToCurrentHour();
+        });
+        
+        // Botones de vista
+        document.getElementById('dayViewBtn').addEventListener('click', function() {
+            document.querySelector('.technician-calendar-container').classList.remove('d-none');
+            document.querySelector('.calendar-container').classList.add('d-none');
+            this.classList.add('btn-outline-primary');
+            this.classList.remove('btn-outline-secondary');
+            document.getElementById('weekViewBtn').classList.add('btn-outline-secondary');
+            document.getElementById('weekViewBtn').classList.remove('btn-outline-primary');
+        });
+        
+        document.getElementById('weekViewBtn').addEventListener('click', function() {
+            document.querySelector('.technician-calendar-container').classList.add('d-none');
+            document.querySelector('.calendar-container').classList.remove('d-none');
+            this.classList.add('btn-outline-primary');
+            this.classList.remove('btn-outline-secondary');
+            document.getElementById('dayViewBtn').classList.add('btn-outline-secondary');
+            document.getElementById('dayViewBtn').classList.remove('btn-outline-primary');
+            
+            // Actualizar el calendario original
+            if (window.calendar) {
+                window.calendar.render();
+            }
+        });
+        
+        // Eventos para celdas de servicio (crear nuevos servicios con doble click)
+        document.querySelectorAll('.calendar-service-cell').forEach(cell => {
+            cell.addEventListener('dblclick', function(event) {
+                if (!event.target.closest('.calendar-service')) {
+                    const hour = this.getAttribute('data-hour');
+                    const technicianId = this.getAttribute('data-technician-id');
+                    openNewServiceModal(hour, technicianId);
+                }
+            });
+        });
+        
+        // Actualizar indicador de hora actual
+        updateCurrentTimeIndicator();
+        
+        // Calcular el tiempo restante hasta el próximo minuto exacto para sincronizar actualizaciones
+        const nowTime = new Date();
+        const timeToNextMinute = (60 - nowTime.getSeconds()) * 1000;
+        
+        // Primera actualización sincronizada al minuto exacto
+        setTimeout(() => {
+            updateCurrentTimeIndicator();
+            // Luego, actualizar regularmente cada minuto
+            setInterval(updateCurrentTimeIndicator, 60000);
+        }, timeToNextMinute);
+    });
+    
+    /**
+     * Inicializa el calendario con la fecha actual
+     */
+    function initTechnicianCalendar() {
+        // Configurar la fecha actual
+        const today = new Date();
+        updateCalendarDate(today);
+        
+        // Cargar datos de servicios para la fecha actual
+        loadServices(formatDate(today));
+    }
+    
+    /**
+     * Navega el calendario un día hacia adelante o hacia atrás
+     * @param {number} direction - Dirección de navegación (-1 para atrás, 1 para adelante)
+     */
+    function navigateCalendar(direction) {
+        const currentDateEl = document.getElementById('current-date');
+        const currentDateAttr = currentDateEl.getAttribute('data-date');
+        let currentDate;
+        
+        if (currentDateAttr) {
+            currentDate = new Date(currentDateAttr);
+        } else {
+            currentDate = new Date();
+            currentDateEl.setAttribute('data-date', formatDate(currentDate));
+        }
+        
+        // Avanzar o retroceder un día
+        currentDate.setDate(currentDate.getDate() + direction);
+        
+        // Actualizar fecha y cargar servicios
+        updateCalendarDate(currentDate);
+        loadServices(formatDate(currentDate));
+    }
+    
+    /**
+     * Actualiza la visualización de la fecha del calendario
+     * @param {Date} date - La fecha a mostrar
+     */
+    function updateCalendarDate(date) {
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        const formattedDate = date.toLocaleDateString('es-ES', options);
+        
+        document.getElementById('current-date').textContent = formattedDate;
+        document.getElementById('current-date').setAttribute('data-date', formatDate(date));
+    }
+    
+    /**
+     * Formatea una fecha como YYYY-MM-DD
+     * @param {Date} date - Objeto fecha
+     * @returns {string} - Fecha formateada
+     */
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        
+        return `${year}-${month}-${day}`;
+    }
+    
+    /**
+     * Carga los servicios para la fecha especificada
+     * @param {string} date - Fecha en formato YYYY-MM-DD
+     */
+    function loadServices(date) {
+        // Mostrar indicador de carga
+        showLoadingIndicator(true);
+        
+        // Limpiar servicios existentes
+        clearServices();
+        
+        // Obtener valores de los filtros
+        const technicianId = document.getElementById('technicianFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const confirmation = document.getElementById('confirmationFilter').value;
+        
+        // Construir URL con parámetros de filtrado
+        let url = `/admin/api/schedules?start=${date}T00:00:00&end=${date}T23:59:59`;
+        if (technicianId) url += `&technician_id=${technicianId}`;
+        if (status) url += `&status=${status}`;
+        if (confirmation) url += `&confirmation=${confirmation}`;
+        
+        // Realizar petición AJAX para obtener los servicios
+        fetch(url)
+            .then(response => response.json())
+            .then(events => {
+                // Renderizar los servicios
+                renderServices(events);
+                
+                // Ocultar indicador de carga
+                showLoadingIndicator(false);
+            })
+            .catch(error => {
+                console.error('Error al cargar los servicios:', error);
+                showLoadingIndicator(false);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudieron cargar los servicios. Por favor, intente nuevamente.'
+                });
+            });
+    }
+    
+    /**
+     * Muestra u oculta el indicador de carga
+     * @param {boolean} show - Indica si se debe mostrar u ocultar
+     */
+    function showLoadingIndicator(show) {
+        // Por implementar un indicador visual
+        document.body.style.cursor = show ? 'wait' : 'default';
+    }
+    
+    /**
+     * Elimina todos los servicios del calendario
+     */
+    function clearServices() {
+        document.querySelectorAll('.calendar-service').forEach(service => {
+            service.remove();
+        });
+    }
+    
+    /**
+     * Renderiza los servicios en el calendario
+     * @param {Array} events - Array de objetos de evento
+     */
+    function renderServices(events) {
+        events.forEach(event => {
+            const startTime = new Date(event.start);
+            const hour = startTime.getHours();
+            const technicianId = event.resourceId;
+            
+            // Encontrar la celda correspondiente
+            const cell = document.querySelector(`.calendar-service-cell[data-hour="${hour}"][data-technician-id="${technicianId}"]`);
+            
+            if (cell) {
+                // Determinar tipo de servicio
+                let serviceType = 'appointment';
+                const eventTitle = event.title.toLowerCase();
+                if (eventTitle.includes('reunión') || eventTitle.includes('meeting')) {
+                    serviceType = 'meeting';
+                } else if (eventTitle.includes('descanso') || eventTitle.includes('almuerzo') || eventTitle.includes('break') || eventTitle.includes('lunch')) {
+                    serviceType = 'break';
+                } else if (eventTitle.includes('llamada') || eventTitle.includes('conferencia') || eventTitle.includes('call') || eventTitle.includes('conference')) {
+                    serviceType = 'conference';
+                }
+                
+                // Crear el elemento para el servicio
+                const serviceElement = document.createElement('div');
+                serviceElement.className = `calendar-service service-${serviceType}`;
+                serviceElement.setAttribute('data-service-id', event.id);
+                
+                // Agregar clases según estado y confirmación
+                if (event.extendedProps && event.extendedProps.status) {
+                    serviceElement.classList.add(`status-${event.extendedProps.status.replace(' ', '')}`);
+                }
+                
+                if (event.extendedProps && event.extendedProps.confirmation_status) {
+                    serviceElement.classList.add(`confirmation-${event.extendedProps.confirmation_status}`);
+                }
+                
+                // Extraer información del título
+                let displayTitle = event.title;
+                let clientName = '';
+                if (event.extendedProps) {
+                    displayTitle = event.extendedProps.serviceName || displayTitle.split(' - ')[0];
+                    clientName = event.extendedProps.clientName || (displayTitle.includes(' - ') ? displayTitle.split(' - ')[1] : '');
+                }
+                
+                // Calcular hora de inicio y fin en formato 24 horas
+                const startTimeStr = startTime.getHours().toString().padStart(2, '0') + ':' + 
+                                     startTime.getMinutes().toString().padStart(2, '0');
+                
+                const endTime = new Date(event.end);
+                const endTimeStr = endTime.getHours().toString().padStart(2, '0') + ':' + 
+                                   endTime.getMinutes().toString().padStart(2, '0');
+                
+                // Contenido HTML del servicio
+                serviceElement.innerHTML = `
+                    <div class="service-title">${displayTitle}</div>
+                    ${clientName ? `<div class="service-client">${clientName}</div>` : ''}
+                    <div class="service-time">${startTimeStr} - ${endTimeStr}</div>
+                `;
+                
+                // Añadir evento clic
+                serviceElement.addEventListener('click', function() {
+                    showServiceDetails(event.id);
+                });
+                
+                // Añadir al calendario
+                cell.appendChild(serviceElement);
+            }
+        });
+    }
+    
+    /**
+     * Abre el modal para crear un nuevo servicio
+     * @param {string} hour - Hora seleccionada
+     * @param {string|number} technicianId - ID del técnico seleccionado
+     */
+    function openNewServiceModal(hour, technicianId) {
+        // Configurar fecha y hora en el modal
+        const currentDate = document.getElementById('current-date').getAttribute('data-date');
+        if (!currentDate) return;
+        
+        // Obtener el modal y configurar la fecha/hora
+        const modal = document.getElementById('newScheduleModal');
+        if (modal) {
+            // Seleccionar el técnico en el modal
+            const techSelect = document.getElementById('technician_id');
+            if (techSelect) techSelect.value = technicianId;
+            
+            // Configurar fecha y hora
+            const dateInput = document.getElementById('scheduled_date');
+            if (dateInput) {
+                const hourInt = parseInt(hour);
+                const timeStr = hourInt < 10 ? `0${hourInt}:00` : `${hourInt}:00`;
+                dateInput.value = `${currentDate}T${timeStr}`;
+            }
+            
+            // Actualizar título del modal
+            document.getElementById('newScheduleModalLabel').textContent = 
+                `Nuevo Agendamiento - ${hour}:00 hrs`;
+            
+            // Abrir el modal
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+    }
+    
+    /**
+     * Muestra los detalles de un servicio
+     * @param {string|number} serviceId - ID del servicio
+     */
+    function showServiceDetails(serviceId) {
+        // Usar la función existente para mostrar detalles
+        if (typeof showScheduleDetails === 'function') {
+            showScheduleDetails(serviceId);
+        } else {
+            // Abrir el modal de detalles
+            fetch(`/admin/schedules/${serviceId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Aquí iría el código para mostrar los detalles en un modal
+                    console.log('Detalles del servicio:', data);
+                })
+                .catch(error => {
+                    console.error('Error al obtener detalles del servicio:', error);
+                });
+        }
+    }
+    
+    /**
+     * Actualiza la posición del indicador de hora actual
+     */
+    /**
+     * Función para hacer scroll a la hora actual en el calendario
+     */
+    function scrollToCurrentHour() {
+        const now = new Date();
+        const hours = now.getHours();
+        
+        // Buscar la fila de la hora actual
+        const hourCell = document.querySelector(`.calendar-hour-cell[data-hour="${hours}"]`);
+        
+        if (hourCell) {
+            // Calcular la posición para el scroll
+            const hourRow = hourCell.closest('.calendar-row');
+            const container = document.querySelector('.card-body');
+            const offset = hourRow.offsetTop - container.offsetTop;
+            
+            // Scroll con animación suave
+            container.scrollTo({
+                top: offset - 100, // 100px arriba para dar contexto
+                behavior: 'smooth'
+            });
+            
+            // Efecto de resaltado temporal
+            hourRow.classList.add('highlight-row');
+            setTimeout(() => {
+                hourRow.classList.remove('highlight-row');
+            }, 2000);
+        }
+    }
+
+    function updateCurrentTimeIndicator() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const startHour = 0; // Hora de inicio del calendario (00:00)
+        const endHour = 23; // Hora de fin del calendario (23:00)
+        const hourHeight = 40; // Altura en píxeles de cada fila de hora
+        
+        // Marcar la hora actual en el calendario
+        document.querySelectorAll('.calendar-row').forEach(row => {
+            const hourCell = row.querySelector('.calendar-hour-cell');
+            const rowHour = parseInt(hourCell.getAttribute('data-hour'));
+            
+            // Marcar horas laborales/no laborales
+            const isWorkHour = rowHour >= 8 && rowHour < 18;
+            row.setAttribute('data-work-hours', isWorkHour.toString());
+            
+            // Marcar hora actual
+            row.setAttribute('data-current-hour', (rowHour === hours).toString());
+        });
+        
+        // Mostrar y posicionar el indicador
+        const indicator = document.querySelector('.current-time-indicator');
+        if (indicator) {
+            indicator.classList.remove('d-none');
+            
+            // Formatear la hora actual para mostrarla en el indicador
+            const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            indicator.setAttribute('data-time', formattedTime);
+            
+            // Obtener la celda de la hora actual
+            const hourCell = document.querySelector(`.calendar-hour-cell[data-hour="${hours}"]`);
+            
+            if (hourCell) {
+                // Posicionar relativo a la celda de la hora
+                const hourRow = hourCell.closest('.calendar-row');
+                const hourRowTop = hourRow.offsetTop;
+                const minutePosition = (minutes / 60) * hourHeight;
+                
+                indicator.style.top = `${hourRowTop + minutePosition}px`;
+            } else {
+                // Calcular posición basada en horas desde el inicio
+                const position = hours * hourHeight + (minutes / 60) * hourHeight;
+                indicator.style.top = `${position}px`;
+            }
+        }
+    }
+});
 </script>
 
 <!-- Script de corrección URGENTE para asegurar que las líneas horizontales abarcan todo el calendario -->
