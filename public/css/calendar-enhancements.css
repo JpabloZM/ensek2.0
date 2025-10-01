@@ -3,14 +3,17 @@
 /* Estructura principal del calendario de técnicos */
 .technician-calendar-container {
     display: grid;
-    grid-template-columns: 80px repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: 80px repeat(auto-fit, minmax(120px, 1fr));
     border: 1px solid #ddd;
     border-radius: 8px;
-    overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     background-color: #fff;
     position: relative; /* Importante: punto de referencia para el posicionamiento absoluto */
     width: 100%;
+    max-height: 500px; /* Altura máxima fija */
+    overflow-y: auto; /* Scroll vertical interno */
+    overflow-x: hidden; /* Evitar scroll horizontal */
+    column-gap: 0; /* Evitar espacios entre columnas */
 }
 
 /* Cabecera con horas y técnicos */
@@ -18,6 +21,12 @@
     display: contents;
     position: relative;
     z-index: 15; /* Mayor que las celdas de hora para que quede por encima */
+}
+
+/* Contenedor para mantener los encabezados fijos */
+.calendar-header-row {
+    display: contents;
+    height: auto;
 }
 
 /* Celda de hora en la cabecera */
@@ -29,10 +38,15 @@
     padding: 8px 4px;
     text-align: center;
     border-bottom: 2px solid var(--ensek-green-light);
-    position: sticky; /* Mantener visible al desplazarse horizontalmente */
+    position: sticky; /* Mantener visible al desplazarse */
     left: 0;
-    z-index: 20; /* Mayor que las celdas normales de hora */
+    top: 0; /* Fijado en la parte superior */
+    z-index: 25; /* Mayor que las celdas normales de hora */
     font-size: 12px;
+    height: 50px; /* Altura fija para alinear con los encabezados de técnicos */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Celdas de técnicos en la cabecera */
@@ -40,7 +54,7 @@
     background-color: var(--ensek-green-dark);
     color: white;
     font-weight: bold;
-    padding: 8px 4px;
+    padding: 6px 2px;
     text-align: center;
     border-left: 1px solid rgba(255, 255, 255, 0.2);
     border-bottom: 2px solid var(--ensek-green-light);
@@ -49,28 +63,45 @@
     justify-content: center;
     flex-direction: column;
     min-width: 0; /* Permite que el contenido se ajuste */
-    flex: 1;
-    overflow: hidden; /* Evita desbordamiento */
+    overflow: hidden; /* Evitar desbordamiento */
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: 50px; /* Altura fija para consistencia */
+    max-width: 100%;
 }
 
 .calendar-header-tech-name {
-    font-size: 14px;
-    margin-bottom: 3px;
+    font-size: 12px;
+    margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
     text-align: center;
+    padding: 0 4px;
+    max-height: 2.4em;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-weight: bold;
 }
 
 .calendar-header-tech-specialty {
-    font-size: 11px;
+    font-size: 10px;
     opacity: 0.8;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
+    padding: 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
     text-align: center;
+    padding: 0 4px;
 }
 
 /* Filas de horas */
@@ -92,10 +123,10 @@
     align-items: center;
     justify-content: center;
     font-size: 10px; /* Texto más pequeño */
-    position: sticky; /* Mantener visible al desplazarse horizontalmente */
+    position: sticky; /* Mantener visible al desplazarse */
     left: 0;
     z-index: 10; /* Encima de las celdas de servicio */
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* Sombra para destacar la columna de horas */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Sombra para destacar la columna de horas */
 }
 
 /* Celda para servicio */
@@ -106,36 +137,43 @@
     transition: background-color 0.2s;
     position: relative;
     padding: 1px;
+    box-sizing: border-box;
 }
 
 /* Efecto hover en celdas de servicio */
 .calendar-service-cell:hover {
-    background-color: #f9f9f9;
+    background-color: #f0f0f0;
 }
 
-/* Filas alternantes para mejorar la legibilidad */
-.calendar-row:nth-child(odd) .calendar-hour-cell {
-    background-color: rgba(135, 201, 71, 0.1);
+/* Fondo uniforme para todas las celdas */
+.calendar-row .calendar-hour-cell {
+    background-color: #f8f9fa;
 }
 
-.calendar-row:nth-child(odd) .calendar-service-cell {
-    background-color: rgba(135, 201, 71, 0.03);
+.calendar-row .calendar-service-cell {
+    background-color: #ffffff;
 }
 
-/* Estilos para horas laborales y no laborales */
-.calendar-row[data-work-hours="true"] .calendar-hour-cell,
+/* Estilos para horas laborales y no laborales - fondo uniforme */
+.calendar-row[data-work-hours="true"] .calendar-hour-cell {
+    background-color: #f8f9fa;
+}
+
 .calendar-row[data-work-hours="true"] .calendar-service-cell {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: #ffffff;
 }
 
-.calendar-row[data-work-hours="false"] .calendar-hour-cell,
+.calendar-row[data-work-hours="false"] .calendar-hour-cell {
+    background-color: #f8f9fa;
+}
+
 .calendar-row[data-work-hours="false"] .calendar-service-cell {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: #ffffff;
 }
 
 /* Estilos para celdas de media hora */
 .calendar-half-hour-cell {
-    background-color: #f9f9f9;
+    background-color: #f8f9fa;
     font-size: 9px;
     color: #666;
     border-bottom-style: dashed;
@@ -144,33 +182,39 @@
 }
 
 .calendar-half-hour-row .calendar-service-cell {
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     min-height: 22px !important;
     border-bottom-style: dashed;
 }
 
 /* Resaltar la hora actual */
 .calendar-row[data-current-hour="true"] .calendar-hour-cell {
-    background-color: rgba(255, 107, 107, 0.15);
+    background-color: #f8f9fa;
     font-weight: bold;
     color: #333;
     border-right: 2px solid #ff3b3b;
+    border-left: 2px solid #ff3b3b;
 }
 
 .calendar-row[data-current-hour="true"] .calendar-service-cell {
-    background-color: rgba(255, 107, 107, 0.05);
+    background-color: #ffffff;
+    border-top: 1px solid #ffdbdb;
+    border-bottom: 1px solid #ffdbdb;
 }
 
 /* Resaltar la media hora actual */
 .calendar-row[data-current-half-hour="true"] .calendar-hour-cell {
-    background-color: rgba(255, 107, 107, 0.15);
+    background-color: #f8f9fa;
     font-weight: bold;
     color: #e74c3c;
     border-left: 2px solid #e74c3c;
+    border-right: 2px solid #e74c3c;
 }
 
 .calendar-row[data-current-half-hour="true"] .calendar-service-cell {
-    background-color: rgba(255, 107, 107, 0.03);
+    background-color: #ffffff;
+    border-top: 1px solid #ffdbdb;
+    border-bottom: 1px solid #ffdbdb;
 }
 
 /* Efecto de resaltado temporal al hacer scroll */
@@ -214,19 +258,19 @@
 }
 
 @keyframes highlight-indicator {
-    0% { 
-        height: 3px; 
+    0% {
+        height: 3px;
         box-shadow: 0 0 8px rgba(255, 59, 59, 0.9);
     }
-    15% { 
-        height: 5px; 
-        box-shadow: 0 0 15px rgba(255, 59, 59, 1);
-    }
-    70% { 
+    15% {
         height: 5px;
         box-shadow: 0 0 15px rgba(255, 59, 59, 1);
     }
-    100% { 
+    70% {
+        height: 5px;
+        box-shadow: 0 0 15px rgba(255, 59, 59, 1);
+    }
+    100% {
         height: 3px;
         box-shadow: 0 0 8px rgba(255, 59, 59, 0.9);
     }
@@ -237,21 +281,25 @@
 }
 
 @keyframes highlight-indicator-dot {
-    0% { 
+    0% {
         transform: translateY(-50%) scale(1);
-        box-shadow: 0 0 8px rgba(255, 59, 59, 0.9), 0 0 0 2px rgba(255, 59, 59, 0.3);
+        box-shadow: 0 0 8px rgba(255, 59, 59, 0.9),
+            0 0 0 2px rgba(255, 59, 59, 0.3);
     }
-    15% { 
+    15% {
         transform: translateY(-50%) scale(1.5);
-        box-shadow: 0 0 15px rgba(255, 59, 59, 1), 0 0 0 3px rgba(255, 59, 59, 0.5);
+        box-shadow: 0 0 15px rgba(255, 59, 59, 1),
+            0 0 0 3px rgba(255, 59, 59, 0.5);
     }
-    70% { 
+    70% {
         transform: translateY(-50%) scale(1.5);
-        box-shadow: 0 0 15px rgba(255, 59, 59, 1), 0 0 0 3px rgba(255, 59, 59, 0.5);
+        box-shadow: 0 0 15px rgba(255, 59, 59, 1),
+            0 0 0 3px rgba(255, 59, 59, 0.5);
     }
-    100% { 
+    100% {
         transform: translateY(-50%) scale(1);
-        box-shadow: 0 0 8px rgba(255, 59, 59, 0.9), 0 0 0 2px rgba(255, 59, 59, 0.3);
+        box-shadow: 0 0 8px rgba(255, 59, 59, 0.9),
+            0 0 0 2px rgba(255, 59, 59, 0.3);
     }
 }
 
@@ -308,12 +356,9 @@
 }
 
 /* Efecto alternante para las horas */
-.fc-timeline-slot.fc-timeline-slot-hour:nth-child(odd) {
-    background-color: rgba(135, 201, 71, 0.05);
-}
-
+.fc-timeline-slot.fc-timeline-slot-hour:nth-child(odd),
 .fc-timeline-slot.fc-timeline-slot-hour:nth-child(even) {
-    background-color: rgba(0, 65, 34, 0.03);
+    background-color: #ffffff;
 }
 
 /* Estilo para hora actual */
@@ -571,6 +616,7 @@
     pointer-events: none;
     box-shadow: 0 0 8px rgba(255, 59, 59, 0.9); /* Sombra intensa */
     animation: pulseLine 2s infinite;
+    transform: translateY(0); /* No transformar, ya posicionado exactamente */
 }
 
 @keyframes pulseLine {
@@ -702,15 +748,16 @@
 /* Mejoras para dispositivos móviles y tabletas */
 @media (max-width: 1024px) {
     .technician-calendar-container {
-        grid-template-columns: 60px repeat(auto-fit, minmax(130px, 1fr));
+        grid-template-columns: 60px repeat(auto-fit, minmax(100px, 1fr));
+        max-height: 450px; /* Altura máxima ajustada para tablets */
     }
 
     .calendar-header-tech-name {
-        font-size: 13px;
+        font-size: 11px;
     }
 
     .calendar-header-tech-specialty {
-        font-size: 10px;
+        font-size: 9px;
     }
 
     .calendar-hour-cell {
@@ -730,6 +777,7 @@
 @media (max-width: 768px) {
     .technician-calendar-container {
         grid-template-columns: 50px repeat(auto-fit, minmax(100px, 1fr));
+        max-height: 420px; /* Altura ajustada para tablets más pequeñas */
     }
 
     .calendar-header-tech {
@@ -752,10 +800,36 @@
     }
 }
 
+/* Estilos personalizados para el scrollbar del calendario */
+.technician-calendar-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.technician-calendar-container::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.technician-calendar-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 65, 34, 0.3);
+    border-radius: 4px;
+}
+
+.technician-calendar-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 65, 34, 0.5);
+}
+
+/* Estilos para scrollbar en Firefox */
+.technician-calendar-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 65, 34, 0.3) #f5f5f5;
+}
+
 @media (max-width: 576px) {
     .technician-calendar-container {
         grid-template-columns: 40px repeat(auto-fit, minmax(85px, 1fr));
         font-size: 11px;
+        max-height: 400px; /* Altura reducida en móviles */
     }
 
     .calendar-header-tech-name {

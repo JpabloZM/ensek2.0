@@ -257,8 +257,8 @@
                             <!-- Celdas de técnicos en la cabecera -->
                             @foreach($technicians as $technician)
                             <div class="calendar-header-tech">
-                                <div class="calendar-header-tech-name">{{ $technician->user->name }}</div>
-                                <div class="calendar-header-tech-specialty">{{ $technician->specialty ?? 'Técnico' }}</div>
+                                <div class="calendar-header-tech-name" title="{{ $technician->user->name }}">{{ Str::limit($technician->user->name, 15) }}</div>
+                                <div class="calendar-header-tech-specialty" title="{{ $technician->specialty ?? 'Técnico' }}">{{ $technician->specialty ?? 'Técnico' }}</div>
                             </div>
                             @endforeach
                         </div>
@@ -3047,57 +3047,69 @@
         const hourCell = document.querySelector(`.calendar-hour-cell[data-hour="${hours}"][data-minute="${minuteBlock}"]`);
         
         if (hourCell) {
+            // Obtener el contenedor del calendario con scroll
+            const calendarContainer = document.querySelector('.technician-calendar-container');
+            
             // Calcular la posición para el scroll
             const hourCellRect = hourCell.getBoundingClientRect();
-            const cardBody = document.querySelector('.card-body');
+            const calendarContainerRect = calendarContainer.getBoundingClientRect();
             
-            // Calcular posición y aplicar scroll
-            const scrollPosition = hourCellRect.top + cardBody.scrollTop - cardBody.getBoundingClientRect().top - 100;
+            // Calcular posición y aplicar scroll dentro del contenedor del calendario
+            const scrollPosition = hourCellRect.top + calendarContainer.scrollTop - calendarContainerRect.top - 100;
             
-            // Scroll con animación suave
-            cardBody.scrollTo({
+            // Scroll con animación suave en el contenedor del calendario
+            calendarContainer.scrollTo({
                 top: scrollPosition, // 100px arriba para dar contexto
                 behavior: 'smooth'
             });
             
             // Crear un resaltado temporal para el indicador
             const indicator = document.querySelector('.current-time-indicator');
-            if (indicator) {
-                indicator.classList.add('highlight-indicator');
-                setTimeout(() => {
-                    indicator.classList.remove('highlight-indicator');
-                }, 2500);
-            }
-            
-            // Efecto de resaltado temporal para la hora/media hora
-            const allCells = document.querySelectorAll(`.calendar-service-cell[data-hour="${hours}"][data-minute="${minuteBlock}"]`);
-            allCells.forEach(cell => {
-                cell.classList.add('highlight-cell');
-                setTimeout(() => {
-                    cell.classList.remove('highlight-cell');
-                }, 2500);
-            });
-            
-            // Agregar mensaje de notificación
-            const timeLabel = document.createElement('div');
-            timeLabel.className = 'time-jump-notification';
-            timeLabel.textContent = `Hora actual: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-            document.body.appendChild(timeLabel);
-            
-            setTimeout(() => {
-                timeLabel.classList.add('show');
+                if (indicator) {
+                    indicator.classList.add('highlight-indicator');
+                    // Asegurar que el indicador es visible dentro del contenedor con scroll
+                    const indicatorTop = parseInt(indicator.style.top, 10);
+                    const containerHeight = calendarContainer.clientHeight;
+                    const containerScrollTop = calendarContainer.scrollTop;
+                    const containerScrollBottom = containerScrollTop + containerHeight;
+                    
+                    // Si el indicador no está visible en la ventana actual, ajustar el scroll
+                    if (indicatorTop < containerScrollTop || indicatorTop > containerScrollBottom) {
+                        calendarContainer.scrollTop = indicatorTop - (containerHeight / 2); // Centrar el indicador
+                    }
+                    
+                    setTimeout(() => {
+                        indicator.classList.remove('highlight-indicator');
+                    }, 2500);
+                }
+                
+                // Efecto de resaltado temporal para la hora/media hora
+                const allCells = document.querySelectorAll(`.calendar-service-cell[data-hour="${hours}"][data-minute="${minuteBlock}"]`);
+                allCells.forEach(cell => {
+                    cell.classList.add('highlight-cell');
+                    setTimeout(() => {
+                        cell.classList.remove('highlight-cell');
+                    }, 2500);
+                });
+                
+                // Agregar mensaje de notificación
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-jump-notification';
+                timeLabel.textContent = `Hora actual: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                document.body.appendChild(timeLabel);
                 
                 setTimeout(() => {
-                    timeLabel.classList.remove('show');
+                    timeLabel.classList.add('show');
+                    
                     setTimeout(() => {
-                        timeLabel.remove();
-                    }, 500);
-                }, 2000);
-            }, 100);
-        }
-    }
-
-    function updateCurrentTimeIndicator() {
+                        timeLabel.classList.remove('show');
+                        setTimeout(() => {
+                            timeLabel.remove();
+                        }, 500);
+                    }, 2000);
+                }, 100);
+            }
+        }    function updateCurrentTimeIndicator() {
         const now = new Date();
         const hours = now.getHours();
         const minutes = now.getMinutes();
@@ -3105,8 +3117,9 @@
         const endHour = 23; // Hora de fin del calendario (23:00)
         const hourHeight = 28; // Altura en píxeles de cada fila de hora completa (actualizada)
         const halfHourHeight = 22; // Altura en píxeles de media hora (actualizada)
-        const calendarHeaderHeight = document.querySelector('.calendar-header') ? 
-            document.querySelector('.calendar-header').offsetHeight : 0;
+        const calendarContainer = document.querySelector('.technician-calendar-container');
+        const calendarHeaderHeight = document.querySelector('.calendar-header-hour') ? 
+            document.querySelector('.calendar-header-hour').offsetHeight : 0;
         
         // Determinar si estamos en la primera o segunda mitad de la hora
         const isFirstHalf = minutes < 30;
@@ -3152,18 +3165,19 @@
                 // Posicionar relativo a la celda de la hora o media hora
                 const hourTop = hourCell.getBoundingClientRect().top;
                 const calendarContainerTop = document.querySelector('.technician-calendar-container').getBoundingClientRect().top;
-                const relativeTop = hourTop - calendarContainerTop;
+                const relativeTop = hourTop - calendarContainerTop + calendarContainer.scrollTop;
                 
                 // Calcular la posición de los minutos dentro del bloque actual (0-30 o 30-60)
                 const blockMinutes = isFirstHalf ? minutes : minutes - 30;
                 const cellHeight = isFirstHalf ? hourHeight : halfHourHeight;
                 const minutePosition = (blockMinutes / 30) * cellHeight;
                 
-                // Reposicionar el indicador (agregar 1px para evitar solapamiento con bordes)
-                indicator.style.top = `${Math.round(relativeTop + minutePosition) + 1}px`;
+                // Reposicionar el indicador exactamente en la hora actual
+                indicator.style.top = `${Math.round(relativeTop + minutePosition)}px`;
             } else {
                 // Cálculo fallback si no se encuentra la celda
-                const headerHeight = document.querySelector('.calendar-header').offsetHeight;
+                const headerHeight = document.querySelector('.calendar-header-row') ? 
+                    document.querySelector('.calendar-header-row').offsetHeight : 0;
                 let position = headerHeight;
                 
                 // Sumar la altura de todas las horas anteriores
@@ -3179,6 +3193,22 @@
                 }
                 
                 indicator.style.top = `${Math.round(position)}px`;
+            }
+            
+            // Función para comprobar si una posición del tiempo está visible dentro del contenedor
+            function isTimePositionVisible(position, container) {
+                const containerTop = container.scrollTop;
+                const containerBottom = containerTop + container.clientHeight;
+                return position >= containerTop && position <= containerBottom;
+            }
+            
+            // Si el indicador de hora actual no está en el área visible, ajustar el scroll
+            // pero solo si no estamos respondiendo a un clic explícito en el botón "Hora Actual"
+            if (calendarContainer && !document.activeElement?.id === 'currentHour') {
+                const indicatorTop = parseInt(indicator.style.top, 10);
+                if (!isTimePositionVisible(indicatorTop, calendarContainer)) {
+                    calendarContainer.scrollTop = indicatorTop - (calendarContainer.clientHeight / 2);
+                }
             }
         }
     }
