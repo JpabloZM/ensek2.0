@@ -263,19 +263,32 @@
                             @endforeach
                         </div>
                         
-                        <!-- Filas de horas (las 24 horas del día) -->
+                        <!-- Filas de horas (las 24 horas del día con media hora) -->
                         @php
                             $startHour = 0;
                             $endHour = 23;
                         @endphp
                         
                         @for($hour = $startHour; $hour <= $endHour; $hour++)
-                        <div class="calendar-row" data-hour="{{ $hour }}">
-                            <div class="calendar-hour-cell" data-hour="{{ $hour }}">
+                        <!-- Hora exacta -->
+                        <div class="calendar-row" data-hour="{{ $hour }}" data-minute="0">
+                            <div class="calendar-hour-cell" data-hour="{{ $hour }}" data-minute="0">
                                 {{ str_pad($hour, 2, '0', STR_PAD_LEFT) }}:00
                             </div>
                             @foreach($technicians as $technician)
-                            <div class="calendar-service-cell" data-hour="{{ $hour }}" data-technician-id="{{ $technician->id }}">
+                            <div class="calendar-service-cell" data-hour="{{ $hour }}" data-minute="0" data-technician-id="{{ $technician->id }}">
+                                <!-- Aquí se cargarán los servicios dinámicamente -->
+                            </div>
+                            @endforeach
+                        </div>
+                        
+                        <!-- Media hora -->
+                        <div class="calendar-row calendar-half-hour-row" data-hour="{{ $hour }}" data-minute="30">
+                            <div class="calendar-hour-cell calendar-half-hour-cell" data-hour="{{ $hour }}" data-minute="30">
+                                {{ str_pad($hour, 2, '0', STR_PAD_LEFT) }}:30
+                            </div>
+                            @foreach($technicians as $technician)
+                            <div class="calendar-service-cell calendar-half-hour-cell" data-hour="{{ $hour }}" data-minute="30" data-technician-id="{{ $technician->id }}">
                                 <!-- Aquí se cargarán los servicios dinámicamente -->
                             </div>
                             @endforeach
@@ -2891,15 +2904,20 @@
         events.forEach(event => {
             const startTime = new Date(event.start);
             const hour = startTime.getHours();
+            const minute = startTime.getMinutes();
             const technicianId = event.resourceId;
             
+            // Determinar si es hora exacta o media hora (redondeamos al bloque más cercano)
+            const minuteBlock = minute < 15 ? 0 : minute < 45 ? 30 : 0;
+            const hourAdjusted = minuteBlock === 0 && minute >= 45 ? (hour + 1) % 24 : hour;
+            
             // Encontrar la celda correspondiente
-            const cell = document.querySelector(`.calendar-service-cell[data-hour="${hour}"][data-technician-id="${technicianId}"]`);
+            const cell = document.querySelector(`.calendar-service-cell[data-hour="${hourAdjusted}"][data-minute="${minuteBlock}"][data-technician-id="${technicianId}"]`);
             
             if (cell) {
                 // Determinar tipo de servicio
                 let serviceType = 'appointment';
-                const eventTitle = event.title.toLowerCase();
+                const eventTitle = (event.title || '').toLowerCase();
                 if (eventTitle.includes('reunión') || eventTitle.includes('meeting')) {
                     serviceType = 'meeting';
                 } else if (eventTitle.includes('descanso') || eventTitle.includes('almuerzo') || eventTitle.includes('break') || eventTitle.includes('lunch')) {
@@ -3014,35 +3032,68 @@
     }
     
     /**
-     * Actualiza la posición del indicador de hora actual
-     */
-    /**
-     * Función para hacer scroll a la hora actual en el calendario
+     * Actualiza la posición del indicador de hora actual y hace scroll a la hora actual en el calendario
      */
     function scrollToCurrentHour() {
         const now = new Date();
         const hours = now.getHours();
+        const minutes = now.getMinutes();
         
-        // Buscar la fila de la hora actual
-        const hourCell = document.querySelector(`.calendar-hour-cell[data-hour="${hours}"]`);
+        // Determinar si estamos en la primera o segunda mitad de la hora
+        const isFirstHalf = minutes < 30;
+        const minuteBlock = isFirstHalf ? '0' : '30';
+        
+        // Buscar la celda de la hora/media hora actual
+        const hourCell = document.querySelector(`.calendar-hour-cell[data-hour="${hours}"][data-minute="${minuteBlock}"]`);
         
         if (hourCell) {
             // Calcular la posición para el scroll
-            const hourRow = hourCell.closest('.calendar-row');
-            const container = document.querySelector('.card-body');
-            const offset = hourRow.offsetTop - container.offsetTop;
+            const hourCellRect = hourCell.getBoundingClientRect();
+            const cardBody = document.querySelector('.card-body');
+            
+            // Calcular posición y aplicar scroll
+            const scrollPosition = hourCellRect.top + cardBody.scrollTop - cardBody.getBoundingClientRect().top - 100;
             
             // Scroll con animación suave
-            container.scrollTo({
-                top: offset - 100, // 100px arriba para dar contexto
+            cardBody.scrollTo({
+                top: scrollPosition, // 100px arriba para dar contexto
                 behavior: 'smooth'
             });
             
-            // Efecto de resaltado temporal
-            hourRow.classList.add('highlight-row');
+            // Crear un resaltado temporal para el indicador
+            const indicator = document.querySelector('.current-time-indicator');
+            if (indicator) {
+                indicator.classList.add('highlight-indicator');
+                setTimeout(() => {
+                    indicator.classList.remove('highlight-indicator');
+                }, 2500);
+            }
+            
+            // Efecto de resaltado temporal para la hora/media hora
+            const allCells = document.querySelectorAll(`.calendar-service-cell[data-hour="${hours}"][data-minute="${minuteBlock}"]`);
+            allCells.forEach(cell => {
+                cell.classList.add('highlight-cell');
+                setTimeout(() => {
+                    cell.classList.remove('highlight-cell');
+                }, 2500);
+            });
+            
+            // Agregar mensaje de notificación
+            const timeLabel = document.createElement('div');
+            timeLabel.className = 'time-jump-notification';
+            timeLabel.textContent = `Hora actual: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            document.body.appendChild(timeLabel);
+            
             setTimeout(() => {
-                hourRow.classList.remove('highlight-row');
-            }, 2000);
+                timeLabel.classList.add('show');
+                
+                setTimeout(() => {
+                    timeLabel.classList.remove('show');
+                    setTimeout(() => {
+                        timeLabel.remove();
+                    }, 500);
+                }, 2000);
+            }, 100);
         }
     }
 
@@ -3052,19 +3103,36 @@
         const minutes = now.getMinutes();
         const startHour = 0; // Hora de inicio del calendario (00:00)
         const endHour = 23; // Hora de fin del calendario (23:00)
-        const hourHeight = 40; // Altura en píxeles de cada fila de hora
+        const hourHeight = 28; // Altura en píxeles de cada fila de hora completa (actualizada)
+        const halfHourHeight = 22; // Altura en píxeles de media hora (actualizada)
+        const calendarHeaderHeight = document.querySelector('.calendar-header') ? 
+            document.querySelector('.calendar-header').offsetHeight : 0;
         
-        // Marcar la hora actual en el calendario
+        // Determinar si estamos en la primera o segunda mitad de la hora
+        const isFirstHalf = minutes < 30;
+        const currentMinuteBlock = isFirstHalf ? 0 : 30;
+        
+        // Marcar la hora actual y media hora en el calendario
         document.querySelectorAll('.calendar-row').forEach(row => {
             const hourCell = row.querySelector('.calendar-hour-cell');
             const rowHour = parseInt(hourCell.getAttribute('data-hour'));
+            const rowMinute = parseInt(hourCell.getAttribute('data-minute') || '0');
             
-            // Marcar horas laborales/no laborales
-            const isWorkHour = rowHour >= 8 && rowHour < 18;
+            // Marcar horas laborales/no laborales (8:00 - 18:00)
+            const isWorkHour = (rowHour >= 8 && rowHour < 18) || 
+                              (rowHour === 18 && rowMinute === 0);
             row.setAttribute('data-work-hours', isWorkHour.toString());
             
-            // Marcar hora actual
-            row.setAttribute('data-current-hour', (rowHour === hours).toString());
+            // Marcar hora actual (hora exacta o media hora)
+            const isCurrentHour = (rowHour === hours && rowMinute === 0);
+            const isCurrentHalfHour = (rowHour === hours && rowMinute === 30);
+            
+            row.setAttribute('data-current-hour', isCurrentHour.toString());
+            row.setAttribute('data-current-half-hour', isCurrentHalfHour.toString());
+            
+            // Marcar la media hora activa (donde estamos actualmente)
+            const isActiveTimeBlock = (rowHour === hours && rowMinute === currentMinuteBlock);
+            row.setAttribute('data-active-time-block', isActiveTimeBlock.toString());
         });
         
         // Mostrar y posicionar el indicador
@@ -3076,24 +3144,44 @@
             const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
             indicator.setAttribute('data-time', formattedTime);
             
-            // Obtener la celda de la hora actual
-            const hourCell = document.querySelector(`.calendar-hour-cell[data-hour="${hours}"]`);
+            // Determinar la celda de la hora/media hora actual
+            const minuteSelector = isFirstHalf ? '0' : '30';
+            const hourCell = document.querySelector(`.calendar-hour-cell[data-hour="${hours}"][data-minute="${minuteSelector}"]`);
             
             if (hourCell) {
-                // Posicionar relativo a la celda de la hora
-                const hourRow = hourCell.closest('.calendar-row');
-                const hourRowTop = hourRow.offsetTop;
-                const minutePosition = (minutes / 60) * hourHeight;
+                // Posicionar relativo a la celda de la hora o media hora
+                const hourTop = hourCell.getBoundingClientRect().top;
+                const calendarContainerTop = document.querySelector('.technician-calendar-container').getBoundingClientRect().top;
+                const relativeTop = hourTop - calendarContainerTop;
                 
-                indicator.style.top = `${hourRowTop + minutePosition}px`;
+                // Calcular la posición de los minutos dentro del bloque actual (0-30 o 30-60)
+                const blockMinutes = isFirstHalf ? minutes : minutes - 30;
+                const cellHeight = isFirstHalf ? hourHeight : halfHourHeight;
+                const minutePosition = (blockMinutes / 30) * cellHeight;
+                
+                // Reposicionar el indicador (agregar 1px para evitar solapamiento con bordes)
+                indicator.style.top = `${Math.round(relativeTop + minutePosition) + 1}px`;
             } else {
-                // Calcular posición basada en horas desde el inicio
-                const position = hours * hourHeight + (minutes / 60) * hourHeight;
-                indicator.style.top = `${position}px`;
+                // Cálculo fallback si no se encuentra la celda
+                const headerHeight = document.querySelector('.calendar-header').offsetHeight;
+                let position = headerHeight;
+                
+                // Sumar la altura de todas las horas anteriores
+                for (let h = 0; h < hours; h++) {
+                    position += hourHeight + halfHourHeight; // Sumar hora completa y media hora
+                }
+                
+                // Agregar la posición dentro de la hora actual
+                if (isFirstHalf) {
+                    position += (minutes / 30) * hourHeight;
+                } else {
+                    position += hourHeight + (minutes - 30) / 30 * halfHourHeight;
+                }
+                
+                indicator.style.top = `${Math.round(position)}px`;
             }
         }
     }
-});
 </script>
 
 <!-- Script de corrección URGENTE para asegurar que las líneas horizontales abarcan todo el calendario -->
