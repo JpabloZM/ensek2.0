@@ -1,0 +1,48 @@
+/* Estilos reforzados para indicar visualmente el área seleccionada */
+
+/* Estilo simple con solo un borde verde para el área seleccionada */
+.calendar-selection-overlay {
+    background-color: transparent !important;
+    border: 2px solid #87c947 !important;
+    box-shadow: none !important;
+}
+
+/* Eliminar el patrón de rayas */
+.calendar-selection-overlay::after {
+    display: none;
+}
+
+/* Estilo simple para las celdas seleccionadas */
+.calendar-cell-selected {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Indicador de tiempo simple */
+.selection-time {
+    background-color: #87c947;
+    color: #004122;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 2px;
+}
+
+/* Cambiar el cursor para indicar claramente que está seleccionando */
+body.calendar-dragging .technician-calendar-container {
+    cursor: grabbing !important;
+}
+
+/* Marcar todo el calendario cuando hay una selección activa */
+body.active-selection .technician-calendar-container {
+    background-color: rgba(240, 240, 240, 0.5);
+}
+
+/* Borde más visible para la selección */
+.calendar-selection-overlay {
+    border-width: 3px !important;
+    border-color: #004122 !important;
+    border-style: solid !important;
+    box-shadow: 0 0 0 1px white, 0 0 3px rgba(0,0,0,0.3) !important;
+}

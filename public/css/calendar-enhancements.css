@@ -14,6 +14,11 @@
     overflow-y: auto; /* Scroll vertical interno */
     overflow-x: hidden; /* Evitar scroll horizontal */
     column-gap: 0; /* Evitar espacios entre columnas */
+    /* Prevenir ajustes durante interacción */
+    box-sizing: border-box;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none; /* Estándar */
 }
 
 /* Cabecera con horas y técnicos */
@@ -140,9 +145,11 @@
     box-sizing: border-box;
 }
 
-/* Efecto hover en celdas de servicio */
+/* Efecto hover en celdas de servicio (sutil para evitar cambios de layout) */
 .calendar-service-cell:hover {
     background-color: #f0f0f0;
+    box-shadow: inset 0 0 0 1px var(--ensek-green-dark);
+    /* No usar transform para evitar cambios de layout */
 }
 
 /* Fondo uniforme para todas las celdas */
@@ -389,8 +396,8 @@
 }
 
 .calendar-service:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    /* Eliminar transform para evitar cambios de layout */
+    box-shadow: 0 0 0 2px var(--ensek-green-dark);
     z-index: 10; /* Asegura que el servicio con hover aparezca sobre otros elementos */
 }
 

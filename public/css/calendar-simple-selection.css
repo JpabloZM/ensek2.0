@@ -1,0 +1,29 @@
+.technician-calendar-container {
+    /* Asegurar ancho completo y evitar cambios de layout */
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+/* Indicador de tiempo simple y discreto */
+.selection-time {
+    background-color: #87c947;
+    color: #004122;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 2px;
+    z-index: 100;
+    position: relative;
+    box-shadow: none;
+    margin-top: 0;
+}
+
+/* Estilo mejorado para la selección con borde más visible */
+.calendar-selection-overlay {
+    background-color: rgba(135, 201, 71, 0.1);
+    border: 3px solid #004122;
+    z-index: 50;
+    transition: none;
+    box-shadow: 0 0 0 1px white, 0 0 5px rgba(0,0,0,0.3);
+}

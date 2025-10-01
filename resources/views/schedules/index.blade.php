@@ -2,6 +2,16 @@
 
 @section('page-title', 'Calendario de Agendamientos')
 
+@section('styles')
+<!-- Estilos para la selección por arrastre en el calendario -->
+<link rel="stylesheet" href="{{ asset('css/calendar-drag-selection.css') }}">
+<link rel="stylesheet" href="{{ asset('css/calendar-drag-fixes.css') }}">
+<link rel="stylesheet" href="{{ asset('css/calendar-simple-selection.css') }}">
+<link rel="stylesheet" href="{{ asset('css/calendar-highlight-selection.css') }}">
+<link rel="stylesheet" href="{{ asset('css/calendar-visible-selection.css') }}">
+<link rel="stylesheet" href="{{ asset('css/calendar-visible-border.css') }}">
+@endsection
+
 @section('content')
 <div class="container-fluid px-0 px-sm-3 overflow-hidden">
     <!-- Encabezado con controles del calendario -->
@@ -3272,4 +3282,10 @@
         }, 2000); // Retrasar para asegurar que FullCalendar ha terminado de renderizar
     });
 </script>
+
+<!-- Script estabilizador del calendario (debe ir antes de otros scripts) -->
+<script src="{{ asset('js/calendar-stabilizer.js') }}"></script>
+
+<!-- Script para selección por arrastre en el calendario -->
+<script src="{{ asset('js/calendar-drag-selection.js') }}"></script>
 @endpush

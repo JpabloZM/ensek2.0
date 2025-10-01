@@ -1,0 +1,84 @@
+/* Estilos para corregir el calendario durante la selección por arrastre */
+
+/* Prevenir completamente que el contenedor del calendario cambie de tamaño */
+.technician-calendar-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    table-layout: fixed !important;
+    position: relative !important;
+}
+
+/* Estilo específico para mantener estabilidad durante el arrastre activo */
+.technician-calendar-container.dragging-active {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+/* Fijar las dimensiones de la tabla del calendario */
+table.technician-calendar-container,
+.technician-calendar-container table {
+    table-layout: fixed !important;
+    width: 100% !important;
+}
+
+/* Evitar cualquier cambio en el layout durante la interacción */
+.technician-calendar-container * {
+    box-sizing: border-box !important;
+}
+
+/* Prevenir efectos de selección de texto no deseados */
+.calendar-selectable,
+.technician-calendar-container,
+.calendar-service-cell,
+.calendar-header-tech,
+.calendar-hour-cell {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
+/* Mejorar la visualización del overlay */
+.calendar-selection-overlay {
+    pointer-events: none !important;
+    z-index: 100 !important;
+}
+
+/* Asegurar que las celdas mantengan sus dimensiones durante el arrastre */
+.calendar-service-cell {
+    box-sizing: border-box !important;
+    position: relative !important;
+    transition: none !important;  /* Desactivar transiciones durante el arrastre */
+}
+
+/* Prevenir que los eventos de clic afecten el layout */
+.technician-calendar-container,
+.calendar-header,
+.calendar-row,
+.calendar-service-cell,
+.calendar-hour-cell {
+    transition: none !important; /* Desactivar todas las transiciones */
+}
+
+/* Evitar que las barras de desplazamiento aparezcan temporalmente durante el arrastre */
+body.calendar-dragging {
+    overflow: hidden !important;
+}
+
+/* Fijar ancho de columnas */
+.calendar-header-hour,
+.calendar-hour-cell {
+    width: 80px !important;
+}
+
+/* Prevenir cualquier modificación de layout por efecto hover */
+.calendar-service-cell:hover {
+    transform: none !important;
+    outline: 1px solid var(--ensek-green-dark) !important;
+    outline-offset: -1px !important;
+    box-shadow: none !important;
+    z-index: 5 !important;
+}

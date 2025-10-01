@@ -1,0 +1,40 @@
+/* Eliminar efectos de destello */
+@keyframes noAnimation {
+    0% { }
+    100% { }
+}
+
+/* Sin animación ni fondos para el área seleccionada */
+.calendar-selection-overlay {
+    animation: none;
+    background-color: transparent !important;
+}
+
+/* Borde más notorio y visible */
+.calendar-selection-overlay {
+    border: 3px solid #004122 !important; 
+    box-shadow: 0 0 0 1px white, 0 0 5px rgba(0,0,0,0.3) !important;
+    outline: none !important;
+}
+
+/* Quitar resaltado de celdas individuales */
+.calendar-cell-selected {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Borde más destacado durante la selección activa */
+body.calendar-dragging .calendar-selection-overlay {
+    border: 4px solid #004122 !important;
+    background-color: rgba(135, 201, 71, 0.15) !important;
+}
+
+/* Quitar borde rayado */
+.calendar-selection-overlay::before {
+    display: none;
+}
+
+/* Destacar el área activa completa */
+.technician-calendar-container.dragging-active {
+    background-color: rgba(0, 65, 34, 0.02);
+}
