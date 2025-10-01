@@ -1,7 +1,9 @@
 /* Eliminar efectos de destello */
 @keyframes noAnimation {
-    0% { }
-    100% { }
+    0% {
+    }
+    100% {
+    }
 }
 
 /* Sin animación ni fondos para el área seleccionada */
@@ -12,8 +14,8 @@
 
 /* Borde más notorio y visible */
 .calendar-selection-overlay {
-    border: 3px solid #004122 !important; 
-    box-shadow: 0 0 0 1px white, 0 0 5px rgba(0,0,0,0.3) !important;
+    border: 3px solid #004122 !important;
+    box-shadow: 0 0 0 1px white, 0 0 5px rgba(0, 0, 0, 0.3) !important;
     outline: none !important;
 }
 

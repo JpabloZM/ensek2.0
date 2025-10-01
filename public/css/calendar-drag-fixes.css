@@ -51,7 +51,7 @@ table.technician-calendar-container,
 .calendar-service-cell {
     box-sizing: border-box !important;
     position: relative !important;
-    transition: none !important;  /* Desactivar transiciones durante el arrastre */
+    transition: none !important; /* Desactivar transiciones durante el arrastre */
 }
 
 /* Prevenir que los eventos de clic afecten el layout */

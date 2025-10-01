@@ -44,5 +44,5 @@ body.active-selection .technician-calendar-container {
     border-width: 3px !important;
     border-color: #004122 !important;
     border-style: solid !important;
-    box-shadow: 0 0 0 1px white, 0 0 3px rgba(0,0,0,0.3) !important;
+    box-shadow: 0 0 0 1px white, 0 0 3px rgba(0, 0, 0, 0.3) !important;
 }
