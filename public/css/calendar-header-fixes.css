@@ -19,7 +19,7 @@
     position: relative !important;
     z-index: 2001 !important;
     background-color: #f0f8ff !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
     border: 1px solid #ddd !important;
 }
 
@@ -28,7 +28,7 @@
     position: sticky !important;
     top: 0 !important;
     z-index: 2000 !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Ajustar el z-index del indicador de hora actual */
