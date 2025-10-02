@@ -3,25 +3,28 @@
  * Este script asegura que siempre haya un borde verde visible alrededor de la selección
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
     // Esperar a que todo el DOM esté cargado para inicializar
-    setTimeout(function() {
+    setTimeout(function () {
         console.log("Inicializando marcador de selección definitivo");
-        
+
         // Elementos clave
-        const calendarContainer = document.querySelector('.technician-calendar-container');
+        const calendarContainer = document.querySelector(
+            ".technician-calendar-container"
+        );
         if (!calendarContainer) return;
-        
+
         // Crear un nuevo elemento para mostrar la selección con alta visibilidad
-        const definitiveBorder = document.createElement('div');
-        definitiveBorder.id = 'definitive-selection-border';
-        definitiveBorder.style.position = 'absolute';
-        definitiveBorder.style.display = 'none';
-        definitiveBorder.style.pointerEvents = 'none';
-        definitiveBorder.style.zIndex = '10000';
-        definitiveBorder.style.border = '3px solid #00a651';
-        definitiveBorder.style.boxShadow = '0 0 0 1px white, 0 0 8px rgba(0,0,0,0.5)';
-        definitiveBorder.style.backgroundColor = 'rgba(135, 201, 71, 0.15)';
+        const definitiveBorder = document.createElement("div");
+        definitiveBorder.id = "definitive-selection-border";
+        definitiveBorder.style.position = "absolute";
+        definitiveBorder.style.display = "none";
+        definitiveBorder.style.pointerEvents = "none";
+        definitiveBorder.style.zIndex = "10000";
+        definitiveBorder.style.border = "3px solid #00a651";
+        definitiveBorder.style.boxShadow =
+            "0 0 0 1px white, 0 0 8px rgba(0,0,0,0.5)";
+        definitiveBorder.style.backgroundColor = "rgba(135, 201, 71, 0.15)";
         definitiveBorder.innerHTML = `
             <div class="border-time-indicator"></div>
             <div class="border-corner top-left"></div>
@@ -30,9 +33,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="border-corner bottom-right"></div>
         `;
         document.body.appendChild(definitiveBorder);
-        
+
         // Estilos para el borde y sus elementos
-        const borderStyles = document.createElement('style');
+        const borderStyles = document.createElement("style");
         borderStyles.textContent = `
             #definitive-selection-border {
                 transition: all 0.05s ease-out;
@@ -104,38 +107,43 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         `;
         document.head.appendChild(borderStyles);
-        
+
         // Observar cambios en el overlay original
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'attributes' && 
-                    mutation.attributeName === 'style' && 
-                    mutation.target.classList.contains('calendar-selection-overlay')) {
-                    
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (
+                    mutation.type === "attributes" &&
+                    mutation.attributeName === "style" &&
+                    mutation.target.classList.contains(
+                        "calendar-selection-overlay"
+                    )
+                ) {
                     const overlay = mutation.target;
-                    
-                    if (overlay.style.display !== 'none') {
+
+                    if (overlay.style.display !== "none") {
                         // La selección está visible, actualizar nuestro borde definitivo
                         const rect = overlay.getBoundingClientRect();
                         updateDefinitiveBorder(rect, overlay);
                     } else {
                         // La selección está oculta, ocultar nuestro borde
-                        definitiveBorder.classList.remove('visible');
-                        definitiveBorder.style.display = 'none';
+                        definitiveBorder.classList.remove("visible");
+                        definitiveBorder.style.display = "none";
                     }
                 }
             });
         });
-        
+
         // Conectar el observador al overlay original
-        const originalOverlay = document.querySelector('.calendar-selection-overlay');
+        const originalOverlay = document.querySelector(
+            ".calendar-selection-overlay"
+        );
         if (originalOverlay) {
-            observer.observe(originalOverlay, { 
+            observer.observe(originalOverlay, {
                 attributes: true,
-                attributeFilter: ['style', 'class']
+                attributeFilter: ["style", "class"],
             });
         }
-        
+
         // Función para actualizar el borde definitivo
         function updateDefinitiveBorder(rect, originalOverlay) {
             // Posicionar el borde exactamente sobre la selección
@@ -143,48 +151,52 @@ document.addEventListener('DOMContentLoaded', function() {
             definitiveBorder.style.left = `${rect.left}px`;
             definitiveBorder.style.width = `${rect.width}px`;
             definitiveBorder.style.height = `${rect.height}px`;
-            
+
             // Actualizar el indicador de tiempo
-            const timeElement = originalOverlay.querySelector('.selection-time');
+            const timeElement =
+                originalOverlay.querySelector(".selection-time");
             if (timeElement) {
                 const timeText = timeElement.textContent.trim();
-                definitiveBorder.querySelector('.border-time-indicator').textContent = timeText;
+                definitiveBorder.querySelector(
+                    ".border-time-indicator"
+                ).textContent = timeText;
             }
-            
+
             // Hacer visible el borde
-            definitiveBorder.style.display = 'block';
-            definitiveBorder.classList.add('visible');
+            definitiveBorder.style.display = "block";
+            definitiveBorder.classList.add("visible");
         }
-        
+
         // También conectar con eventos del mouse para mayor confiabilidad
-        document.addEventListener('mousedown', function(e) {
-            const cell = e.target.closest('.calendar-service-cell');
-            if (cell && !cell.querySelector('.calendar-service')) {
+        document.addEventListener("mousedown", function (e) {
+            const cell = e.target.closest(".calendar-service-cell");
+            if (cell && !cell.querySelector(".calendar-service")) {
                 // Estamos iniciando una selección, prepararnos
-                document.body.classList.add('calendar-selection-active');
+                document.body.classList.add("calendar-selection-active");
             }
         });
-        
-        document.addEventListener('mouseup', function() {
+
+        document.addEventListener("mouseup", function () {
             // La selección ha terminado
-            document.body.classList.remove('calendar-selection-active');
-            
+            document.body.classList.remove("calendar-selection-active");
+
             // Si el overlay original está oculto, ocultar nuestro borde también
-            const originalOverlay = document.querySelector('.calendar-selection-overlay');
-            if (originalOverlay && originalOverlay.style.display === 'none') {
-                definitiveBorder.style.display = 'none';
-                definitiveBorder.classList.remove('visible');
+            const originalOverlay = document.querySelector(
+                ".calendar-selection-overlay"
+            );
+            if (originalOverlay && originalOverlay.style.display === "none") {
+                definitiveBorder.style.display = "none";
+                definitiveBorder.classList.remove("visible");
             }
         });
-        
+
         // También monitorear el final de la creación del servicio
-        document.addEventListener('hidden.bs.modal', function(e) {
-            if (e.target.id === 'newScheduleModal') {
+        document.addEventListener("hidden.bs.modal", function (e) {
+            if (e.target.id === "newScheduleModal") {
                 // Se cerró el modal de servicio, ocultar cualquier selección
-                definitiveBorder.style.display = 'none';
-                definitiveBorder.classList.remove('visible');
+                definitiveBorder.style.display = "none";
+                definitiveBorder.classList.remove("visible");
             }
         });
-        
     }, 500); // Dar tiempo para que otros scripts se carguen primero
 });

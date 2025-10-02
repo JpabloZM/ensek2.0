@@ -1,0 +1,52 @@
+/* 
+ * Ajustes adicionales para mejorar la fluidez de movimiento en el calendario
+ */
+
+/* Estilos para hacer más fluido el movimiento */
+#simple-selection-marker {
+    /* Transiciones refinadas para movimiento más suave */
+    transition: top 90ms cubic-bezier(0.1, 0.7, 0.1, 1),
+        left 90ms cubic-bezier(0.1, 0.7, 0.1, 1), width 150ms ease-out,
+        height 150ms ease-out !important;
+    transform: translate3d(0, 0, 0) !important;
+    will-change: top, left, width, height !important;
+
+    /* Borde más nítido y refinado */
+    border: 2px solid rgba(0, 166, 81, 0.9) !important;
+    box-shadow: 0 0 0 1px white, 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Mejorar la posición del indicador de tiempo */
+#simple-selection-marker .time-display {
+    top: -28px !important;
+    transform: translateX(-50%) !important;
+    transition: transform 100ms ease-out !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+    font-weight: bold !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Efectos visuales durante el arrastre */
+body.is-selecting #simple-selection-marker {
+    box-shadow: 0 0 0 1px white, 0 3px 12px rgba(0, 65, 34, 0.3) !important;
+}
+
+/* Reducir trabajo de pintura durante arrastres */
+body.dragging-active * {
+    animation-duration: 0s !important;
+}
+
+/* Estilo específico para alto rendimiento */
+@media screen and (min-width: 768px) {
+    #simple-selection-marker {
+        /* Optimizado para equipos de mayor rendimiento */
+        transition: top 60ms cubic-bezier(0.1, 0.9, 0.2, 1),
+            left 60ms cubic-bezier(0.1, 0.9, 0.2, 1), width 120ms ease-out,
+            height 120ms ease-out !important;
+    }
+}
+
+/* Estilos para modo de bajo rendimiento */
+body.low-performance-mode #simple-selection-marker {
+    transition: none !important;
+}

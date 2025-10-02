@@ -7,6 +7,7 @@
 <!-- Estilos unificados para el calendario -->
 <link rel="stylesheet" href="{{ asset('css/calendar-drag-selection.css') }}">
 <link rel="stylesheet" href="{{ asset('css/calendar-unified-selection.css') }}">
+<link rel="stylesheet" href="{{ asset('css/calendar-smooth-motion.css') }}">
 @endsection
 
 @section('content')
@@ -593,6 +594,9 @@
 <link href="{{ asset('css/calendar-resource-view.css') }}" rel="stylesheet">
 <!-- Mejoras en la leyenda del calendario -->
 <link href="{{ asset('css/calendar-legend-enhanced.css') }}" rel="stylesheet">
+<link href="{{ asset('css/calendar-header-fixes.css') }}" rel="stylesheet">
+<!-- Corrección urgente para el indicador de hora -->
+<link href="{{ asset('css/calendar-critical-indicator-fix.css') }}" rel="stylesheet">
 <style>
     .calendar-container {
         width: 100%;
@@ -3291,4 +3295,13 @@
 
 <!-- Corrección final de posicionamiento -->
 <script src="{{ asset('js/calendar-position-fix.js') }}"></script>
+
+<!-- Optimizaciones para movimiento fluido -->
+<script src="{{ asset('js/calendar-smooth-movement.js') }}"></script>
+
+<!-- Corrección para el indicador de hora -->
+<script src="{{ asset('js/calendar-indicator-fix.js') }}"></script>
+
+<!-- Corrección crítica para el indicador de hora (definitiva) -->
+<script src="{{ asset('js/calendar-critical-indicator-fix.js') }}"></script>
 @endpush

@@ -5,7 +5,7 @@
     border: 3px solid #004122 !important;
     background-color: rgba(135, 201, 71, 0.25) !important;
     z-index: 9999 !important;
-    box-shadow: 0 0 0 1px white, 0 0 10px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 0 0 1px white, 0 0 10px rgba(0, 0, 0, 0.5) !important;
     visibility: visible !important;
     display: flex !important;
     opacity: 1 !important;
@@ -33,25 +33,25 @@
     font-weight: bold !important;
     border-radius: 2px !important;
     margin-top: 0 !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
     z-index: 10000 !important;
 }
 
 /* Añadir un borde punteado dentro para mayor visibilidad */
 .calendar-selection-overlay::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 4px;
     left: 4px;
     right: 4px;
     bottom: 4px;
-    border: 1px dashed rgba(255,255,255,0.7);
+    border: 1px dashed rgba(255, 255, 255, 0.7);
     pointer-events: none;
 }
 
 /* Añadir indicadores visuales adicionales en las esquinas */
 .calendar-selection-overlay::after {
-    content: '';
+    content: "";
     position: absolute;
     width: 10px;
     height: 10px;

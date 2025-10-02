@@ -6,7 +6,7 @@
 /* El elemento principal que muestra el borde definitivo */
 #definitive-selection-border {
     border: 3px solid #00a651 !important;
-    box-shadow: 0 0 0 1px white, 0 0 10px rgba(0,0,0,0.6) !important;
+    box-shadow: 0 0 0 1px white, 0 0 10px rgba(0, 0, 0, 0.6) !important;
     background-color: rgba(135, 201, 71, 0.15) !important;
     display: block !important;
     z-index: 10000 !important;
@@ -22,7 +22,7 @@
     background-color: #004122 !important;
     color: white !important;
     font-weight: bold !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
     z-index: 10001 !important;
 }
 
@@ -30,7 +30,7 @@
 .border-corner {
     background-color: #00a651 !important;
     border: 2px solid white !important;
-    box-shadow: 0 0 5px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
     z-index: 10002 !important;
     width: 10px !important;
     height: 10px !important;
@@ -56,7 +56,7 @@ body.calendar-selection-active .calendar-service-cell {
 
 /* Estilo para el borde punteado interior */
 #definitive-selection-border:after {
-    content: '';
+    content: "";
     position: absolute;
     top: 4px;
     left: 4px;

@@ -1,0 +1,73 @@
+/* 
+ * Correcciones para el indicador de hora en el calendario
+ * Soluciona el problema de superposición con los nombres de técnicos durante el scroll
+ */
+
+/* Asegurar que el encabezado con los nombres de los técnicos siempre esté por encima del indicador de hora */
+.fc .fc-timeline-header,
+.fc .fc-datagrid-header,
+.fc .fc-datagrid-header .fc-datagrid-cell,
+.fc-resource-timeline .fc-datagrid-cell,
+.fc-timeline-lane {
+    position: relative !important;
+    z-index: 2000 !important; /* Mayor que el del indicador de hora */
+    background-color: #fff !important; /* Asegurar que sea opaco */
+}
+
+/* Mejorar visibilidad del fondo de los nombres de técnicos */
+.fc-datagrid-header .fc-datagrid-cell-cushion {
+    position: relative !important;
+    z-index: 2001 !important;
+    background-color: #f0f8ff !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    border: 1px solid #ddd !important;
+}
+
+/* Hacer que los encabezados estén fijos durante el desplazamiento */
+.fc-datagrid-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 2000 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+/* Ajustar el z-index del indicador de hora actual */
+.fc .fc-timeline-now-indicator-line,
+.fc .fc-timeline-now-indicator-arrow,
+.fc .fc-timegrid-now-indicator-line,
+.fc .fc-timegrid-now-indicator-arrow {
+    z-index: 999 !important; /* Mucho menor que el de los encabezados */
+    position: absolute !important;
+}
+
+/* Aplicar estilo más visible para la hora actual */
+.fc .fc-timeline-now-indicator-line {
+    border-color: #f44336 !important;
+    border-width: 2px !important;
+    opacity: 0.8 !important;
+}
+
+/* Estilos específicos para la etiqueta de hora actual */
+.fc .fc-timeline-now-indicator-arrow {
+    border-color: #f44336 !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    background-color: #f44336 !important;
+    padding: 1px 3px !important;
+    border-radius: 2px !important;
+    opacity: 0.9 !important;
+}
+
+/* Estilo para el tiempo mostrado */
+.fc-timeline-now-indicator-arrow::before {
+    content: attr(data-time);
+    position: absolute;
+    top: -20px;
+    right: -30px;
+    background-color: #004122;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 11px;
+    white-space: nowrap;
+}

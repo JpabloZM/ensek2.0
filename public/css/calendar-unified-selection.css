@@ -17,13 +17,16 @@
     position: relative !important;
 }
 
-/* Estilos para el nuevo marcador simplificado */
+/* Estilos para el nuevo marcador simplificado con movimiento fluido */
 #simple-selection-marker {
     border: 2px solid #00a651 !important;
     background-color: rgba(135, 201, 71, 0.15) !important;
     box-shadow: 0 0 0 1px white !important;
     z-index: 10000 !important;
     position: absolute !important;
+    transition: top 0.1s ease-out, left 0.1s ease-out, width 0.1s ease-out,
+        height 0.1s ease-out !important;
+    will-change: top, left, width, height !important;
 }
 
 #simple-selection-marker .time-display {
@@ -33,7 +36,7 @@
     font-size: 12px !important;
     font-weight: bold !important;
     border-radius: 3px !important;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Evitar que las celdas seleccionadas tengan estilos que interfieran */
