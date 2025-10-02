@@ -4,12 +4,9 @@
 
 @section('styles')
 <!-- Estilos para la selección por arrastre en el calendario -->
+<!-- Estilos unificados para el calendario -->
 <link rel="stylesheet" href="{{ asset('css/calendar-drag-selection.css') }}">
-<link rel="stylesheet" href="{{ asset('css/calendar-drag-fixes.css') }}">
-<link rel="stylesheet" href="{{ asset('css/calendar-simple-selection.css') }}">
-<link rel="stylesheet" href="{{ asset('css/calendar-highlight-selection.css') }}">
-<link rel="stylesheet" href="{{ asset('css/calendar-visible-selection.css') }}">
-<link rel="stylesheet" href="{{ asset('css/calendar-visible-border.css') }}">
+<link rel="stylesheet" href="{{ asset('css/calendar-unified-selection.css') }}">
 @endsection
 
 @section('content')
@@ -3286,6 +3283,12 @@
 <!-- Script estabilizador del calendario (debe ir antes de otros scripts) -->
 <script src="{{ asset('js/calendar-stabilizer.js') }}"></script>
 
-<!-- Script para selección por arrastre en el calendario -->
+<!-- Script para selección por arrastre en el calendario (base) -->
 <script src="{{ asset('js/calendar-drag-selection.js') }}"></script>
+
+<!-- Solución unificada y simplificada para la selección -->
+<script src="{{ asset('js/calendar-simple-selection.js') }}"></script>
+
+<!-- Corrección final de posicionamiento -->
+<script src="{{ asset('js/calendar-position-fix.js') }}"></script>
 @endpush

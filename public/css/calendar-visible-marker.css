@@ -1,0 +1,67 @@
+/* 
+ * Estilos finales para garantizar la visibilidad de la selección del calendario
+ * Estos estilos complementan el JS para crear un borde siempre visible
+ */
+
+/* El elemento principal que muestra el borde definitivo */
+#definitive-selection-border {
+    border: 3px solid #00a651 !important;
+    box-shadow: 0 0 0 1px white, 0 0 10px rgba(0,0,0,0.6) !important;
+    background-color: rgba(135, 201, 71, 0.15) !important;
+    display: block !important;
+    z-index: 10000 !important;
+}
+
+#definitive-selection-border.visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Asegurar que el texto de tiempo siempre sea visible */
+.border-time-indicator {
+    background-color: #004122 !important;
+    color: white !important;
+    font-weight: bold !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
+    z-index: 10001 !important;
+}
+
+/* Reforzar estilos para los indicadores de esquina */
+.border-corner {
+    background-color: #00a651 !important;
+    border: 2px solid white !important;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5) !important;
+    z-index: 10002 !important;
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+}
+
+/* Asegurar que el overlay original no interfiera */
+.calendar-selection-overlay {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Hacer el seleccionador más visible en hover */
+.calendar-service-cell:hover {
+    background-color: rgba(135, 201, 71, 0.15) !important;
+    cursor: pointer !important;
+}
+
+/* Cuando se está arrastrando, mostrar un cursor de agarre */
+body.calendar-selection-active .calendar-service-cell {
+    cursor: grabbing !important;
+}
+
+/* Estilo para el borde punteado interior */
+#definitive-selection-border:after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    border: 1px dashed rgba(255, 255, 255, 0.7) !important;
+    pointer-events: none;
+}

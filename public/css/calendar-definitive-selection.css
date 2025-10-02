@@ -1,0 +1,63 @@
+/* Estilos definitivos y específicos para el marcador de selección */
+
+/* El overlay de selección siempre debe ser visible con un borde claro */
+.calendar-selection-overlay {
+    border: 3px solid #004122 !important;
+    background-color: rgba(135, 201, 71, 0.25) !important;
+    z-index: 9999 !important;
+    box-shadow: 0 0 0 1px white, 0 0 10px rgba(0,0,0,0.5) !important;
+    visibility: visible !important;
+    display: flex !important;
+    opacity: 1 !important;
+    pointer-events: none;
+}
+
+/* Evitar que se oculte si está visible */
+.calendar-selection-overlay:not([style*="display: none"]) {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Cuando la selección está oculta, ocultarla realmente */
+.calendar-selection-overlay[style*="display: none"] {
+    display: none !important;
+}
+
+/* Estilos para el indicador de tiempo */
+.selection-time {
+    background-color: #004122 !important;
+    color: white !important;
+    padding: 4px 8px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    border-radius: 2px !important;
+    margin-top: 0 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+    z-index: 10000 !important;
+}
+
+/* Añadir un borde punteado dentro para mayor visibilidad */
+.calendar-selection-overlay::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    border: 1px dashed rgba(255,255,255,0.7);
+    pointer-events: none;
+}
+
+/* Añadir indicadores visuales adicionales en las esquinas */
+.calendar-selection-overlay::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #004122;
+    bottom: -5px;
+    right: -5px;
+    box-shadow: 0 0 0 2px white;
+}

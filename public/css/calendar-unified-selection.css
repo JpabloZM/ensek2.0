@@ -1,0 +1,59 @@
+/* 
+ * Estilos corregidos para la selección del calendario
+ * Soluciona problemas de posicionamiento del marcador de selección
+ */
+
+/* Ocultar todos los marcadores anteriores */
+.calendar-selection-overlay,
+#advanced-selection-marker,
+#definitive-selection-border {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Asegurar que el contenedor del calendario tenga posición relativa para el posicionamiento correcto */
+.technician-calendar-container {
+    position: relative !important;
+}
+
+/* Estilos para el nuevo marcador simplificado */
+#simple-selection-marker {
+    border: 2px solid #00a651 !important;
+    background-color: rgba(135, 201, 71, 0.15) !important;
+    box-shadow: 0 0 0 1px white !important;
+    z-index: 10000 !important;
+    position: absolute !important;
+}
+
+#simple-selection-marker .time-display {
+    background-color: #004122 !important;
+    color: white !important;
+    padding: 3px 8px !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    border-radius: 3px !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3) !important;
+}
+
+/* Evitar que las celdas seleccionadas tengan estilos que interfieran */
+.calendar-cell-selected {
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Estilo para el cursor durante la selección */
+.calendar-selectable {
+    cursor: pointer !important;
+}
+
+.calendar-selectable.dragging-active {
+    cursor: grabbing !important;
+}
+
+/* Asegurar que el contenedor no cambie durante la selección */
+.technician-calendar-container.dragging-active {
+    max-width: 100% !important;
+    width: 100% !important;
+}
