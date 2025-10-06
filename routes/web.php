@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DirectScheduleController;
 use App\Http\Controllers\InventoryCategoryController;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryMovementController;
@@ -89,6 +90,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::patch('/schedules/{schedule}/update-duration', [ScheduleController::class, 'updateDuration'])->name('admin.schedules.updateDuration');
         Route::get('/api/schedules', [ScheduleController::class, 'getCalendarData'])->name('api.schedules');
         Route::get('/schedules/{schedule}/json', [ScheduleController::class, 'getJson'])->name('admin.schedules.json');
+        
+        // Agendamiento directo (sin solicitud previa)
+        Route::post('/schedules/direct', [DirectScheduleController::class, 'store'])->name('admin.schedules.store-direct');
         
         // Rutas de citas y calendario
         Route::prefix('appointments')->name('appointments.')->middleware(['auth'])->group(function () {
