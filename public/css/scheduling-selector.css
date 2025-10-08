@@ -29,13 +29,13 @@
 .scheduling-type-selection .btn-outline-primary:hover {
     background-color: #e6f7ff;
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .scheduling-type-selection .btn-outline-success:hover {
     background-color: #e7f5e8;
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .scheduling-type-selection .btn:hover i {
@@ -144,7 +144,7 @@
     .scheduling-type-selection .btn-group {
         flex-direction: column;
     }
-    
+
     .scheduling-type-selection .btn {
         width: 100%;
     }

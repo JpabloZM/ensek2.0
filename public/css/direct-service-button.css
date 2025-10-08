@@ -1,0 +1,115 @@
+/* Estilos para la selección de tipo de agendamiento */
+.scheduling-type-selection {
+    margin: 10px 0;
+}
+
+.scheduling-type-selection .btn-group {
+    width: 100%;
+    gap: 10px;
+    display: flex;
+}
+
+.scheduling-type-selection .btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+/* Botón para solicitud existente */
+.scheduling-type-selection #btnExistingRequest {
+    border-color: #004122;
+    color: #004122;
+}
+
+.scheduling-type-selection #btnExistingRequest:hover {
+    background-color: rgba(0, 65, 34, 0.1);
+}
+
+/* Botón para servicio nuevo - destacado */
+.scheduling-type-selection #btnNewDirect {
+    border-color: #87c947;
+    color: #004122;
+}
+
+.scheduling-type-selection #btnNewDirect:hover {
+    background-color: rgba(135, 201, 71, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(135, 201, 71, 0.3);
+}
+
+/* Efecto de selección */
+.scheduling-type-selection .btn:active {
+    transform: scale(0.95);
+}
+
+/* Iconos en los botones */
+.scheduling-type-selection .btn i {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+/* Textos en los botones */
+.scheduling-type-selection .btn span {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Texto descriptivo */
+.scheduling-type-selection .btn small {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+/* Para móviles, cambiar a disposición vertical */
+@media (max-width: 576px) {
+    .scheduling-type-selection .btn-group {
+        flex-direction: column;
+    }
+    
+    .scheduling-type-selection .btn {
+        margin-bottom: 10px;
+    }
+}
+
+/* Mejoras visuales para SweetAlert */
+.swal2-popup {
+    border-radius: 15px !important;
+}
+
+.swal2-title {
+    color: #004122 !important;
+}
+
+/* Resaltado para el botón de crear servicio nuevo */
+#btnNewDirect {
+    position: relative;
+    overflow: hidden;
+}
+
+#btnNewDirect::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(135, 201, 71, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+    opacity: 0;
+    transition: opacity 1s;
+    pointer-events: none;
+}
+
+#btnNewDirect:hover::after {
+    opacity: 1;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    50% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(0.95); opacity: 0.7; }
+}
