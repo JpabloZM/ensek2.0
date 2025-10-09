@@ -9,19 +9,6 @@
             <form id="directScheduleForm" action="{{ route('admin.schedules.store-direct') }}" method="POST">
                 @csrf
                 <div class="modal-body">
-                    <!-- Alerta para horario seleccionado -->
-                    <div class="alert alert-info rounded-4 border-0 shadow-sm mb-4 d-none" id="direct-selected-time-info" style="background-color: #e5f6fd;">
-                        <div class="d-flex align-items-center">
-                            <div class="me-3 text-info" style="font-size: 1.5rem;">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Horario seleccionado</h6>
-                                <span class="selected-time-text text-dark">No se ha seleccionado un horario</span>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <div class="row">
                         <!-- Columna izquierda: Información del servicio -->
                         <div class="col-md-6">
@@ -164,8 +151,6 @@
                     const endTimeInput = document.getElementById('direct_end_time');
                     const durationInput = document.getElementById('direct_duration');
                     const costInput = document.getElementById('direct_estimated_cost');
-                    const infoBox = document.getElementById('direct-selected-time-info');
-                    const infoText = infoBox.querySelector(".selected-time-text");
                     const form = document.getElementById('directScheduleForm');
                     const modalTitle = document.getElementById('newDirectScheduleModalLabel');
                     
@@ -204,8 +189,7 @@
                         // Calcular duración basada en los horarios
                         calculateDurationFromTimes(timeInfo.start, timeInfo.end);
                         
-                        // Actualizar InfoBox
-                        updateInfoBoxFromTimes(timeInfo.start, timeInfo.end);
+                        // No es necesario actualizar infoBox (eliminado)
                     }
                     
                     // Calcular duración basada en horarios de inicio y fin
@@ -238,14 +222,7 @@
                         }
                     }
                     
-                    // Actualizar infoBox con horarios formateados
-                    function updateInfoBoxFromTimes(start, end) {
-                        if (!infoText || !infoBox) return;
-                        
-                        const duration = durationInput ? durationInput.value : "?";
-                        infoText.textContent = `${start} - ${end} (${duration} minutos)`;
-                        infoBox.classList.remove('d-none');
-                    }
+                    // Función de infoBox eliminada completamente ya que no es necesaria
                     
                     // 1. CAMBIO DE SERVICIO
                     // Cuando cambia el servicio seleccionado, actualizar duración y precio
@@ -321,8 +298,7 @@
                             endTimeInput.classList.add("field-highlight");
                             setTimeout(() => endTimeInput.classList.remove("field-highlight"), 1000);
                             
-                            // Actualizar infoBox
-                            updateInfoBox(startDateTime, endDateTime, durationMins);
+                            // No es necesario actualizar infoBox (eliminado)
                             
                         } catch (error) {
                             console.error("Error calculando hora fin:", error);
@@ -363,35 +339,14 @@
                             durationInput.classList.add("field-highlight");
                             setTimeout(() => durationInput.classList.remove("field-highlight"), 1000);
                             
-                            // Actualizar infoBox
-                            updateInfoBox(startDateTime, endDateTime, durationMins);
+                            // No es necesario actualizar infoBox (eliminado)
                             
                         } catch (error) {
                             console.error("Error calculando duración:", error);
                         }
                     }
                     
-                    // Actualizar infoBox con información de horario
-                    function updateInfoBox(startDateTime, endDateTime, duration) {
-                        if (!infoText) return;
-                        
-                        // Formatear horas
-                        const formattedStart = startDateTime.toLocaleTimeString("es-ES", {
-                            hour: "2-digit", 
-                            minute: "2-digit"
-                        });
-                        
-                        const formattedEnd = endDateTime.toLocaleTimeString("es-ES", {
-                            hour: "2-digit", 
-                            minute: "2-digit"
-                        });
-                        
-                        // Actualizar texto
-                        infoText.textContent = `${formattedStart} - ${formattedEnd} (${duration} minutos)`;
-                        
-                        // Mostrar infoBox
-                        infoBox.classList.remove("d-none");
-                    }
+                    // Función de infoBox eliminada completamente ya que no es necesaria
                     
                     // Inicializar cálculos al abrir el modal
                     document.querySelector('#newDirectScheduleModal').addEventListener('shown.bs.modal', function() {

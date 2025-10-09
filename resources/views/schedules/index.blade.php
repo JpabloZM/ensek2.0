@@ -391,19 +391,6 @@
                 @csrf
                 <input type="hidden" name="direct_scheduling" value="1">
                 <div class="modal-body px-3 py-4" style="max-height: 70vh; overflow-y: auto;">
-                    <!-- Alerta para horario seleccionado -->
-                    <div class="alert alert-info rounded-4 border-0 shadow-sm mb-4 d-none" id="selected-time-info" style="background-color: #e5f6fd;">
-                        <div class="d-flex align-items-center">
-                            <div class="me-3 text-info" style="font-size: 1.5rem;">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Horario seleccionado</h6>
-                                <span class="selected-time-text text-dark">No se ha seleccionado un horario</span>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="card border-0 shadow-sm rounded-4 mb-4">
@@ -569,27 +556,10 @@
                         }
                     }
                     
-                    // Actualizar infoBox
+                    // Función de infoBox eliminada, ya no necesitamos mostrar la alerta
                     function updateInfoBox(start, end, duration) {
-                        if (!infoBox || !infoText) return;
-                        
-                        try {
-                            const formattedStart = start.toLocaleTimeString('es-ES', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            });
-                            
-                            const formattedEnd = end.toLocaleTimeString('es-ES', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            });
-                            
-                            infoText.textContent = `${formattedStart} - ${formattedEnd} (${duration} minutos)`;
-                            infoBox.classList.remove('d-none');
-                            
-                        } catch (error) {
-                            console.error('Error actualizando infoBox:', error);
-                        }
+                        // La función se mantiene vacía pero existente para compatibilidad con el código existente
+                        return; // No hace nada, ya que se eliminó la alerta
                     }
                     
                     // Inicializar cálculos cuando se abre el modal
