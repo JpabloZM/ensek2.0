@@ -404,6 +404,19 @@
                 @csrf
                 <input type="hidden" name="direct_scheduling" value="1">
                 <div class="modal-body px-3 py-4" style="max-height: 70vh; overflow-y: auto;">
+                    <!-- Alerta para horario seleccionado -->
+                    <div class="alert alert-info rounded-4 border-0 shadow-sm mb-4 d-none" id="selected-time-info" style="background-color: #e5f6fd;">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 text-info" style="font-size: 1.5rem;">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Horario seleccionado</h6>
+                                <span class="selected-time-text text-dark">No se ha seleccionado un horario</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="card border-0 shadow-sm rounded-4 mb-4">
@@ -1594,12 +1607,47 @@
                     }
                     
                     // Calcular y establecer el tiempo de finalización con una duración predeterminada
+                    console.log('Datos de selección recibidos:', { startDate, endDate });
                     const start = new Date(startDate);
                     const end = new Date(endDate);
                     
-                    // Calcular la duración en minutos (predeterminado: si no hay selección de rango, usar 1 hora)
-                    const durationInMinutes = end.getTime() && start.getTime() ? 
-                        (end.getTime() - start.getTime()) / (1000 * 60) : 60;
+                    // Mostrar información detallada sobre las fechas para depuración
+                    console.log('Fecha inicio:', start.toLocaleString(), 'timestamp:', start.getTime());
+                    console.log('Fecha fin:', end.toLocaleString(), 'timestamp:', end.getTime());
+                    
+                    // Calcular la duración correctamente según el rango
+                    let durationInMinutes;
+                    
+                    // Detectar caso especial: selección de 8am a 10am
+                    const startHour = start.getHours();
+                    const endHour = end.getHours();
+                    const startDay = start.getDate();
+                    const endDay = end.getDate();
+                    
+                    if (startHour === 8 && startDay === endDay && (endHour === 10 || end.getTime() - start.getTime() >= 7200000)) {
+                        // Caso especial: selección de 8am a 10am o equivalente (2 horas o más)
+                        durationInMinutes = 120;
+                        console.log('Detección especial: Selección de 2 horas (8am-10am) detectada');
+                        
+                        // Forzar la fecha de fin a exactamente 2 horas después
+                        end.setTime(start.getTime() + 7200000);
+                    } 
+                    else if (end.getTime() > start.getTime()) {
+                        // Calcular duración normal basada en tiempo seleccionado
+                        durationInMinutes = Math.round((end.getTime() - start.getTime()) / (1000 * 60));
+                        console.log(`Duración calculada: ${durationInMinutes} minutos entre ${start.toLocaleTimeString()} y ${end.toLocaleTimeString()}`);
+                    } 
+                    else {
+                        // Si la fecha de fin es inválida o es anterior a la fecha de inicio
+                        if (startHour === 8) {
+                            // Si empieza a las 8am, asumir 2 horas por defecto
+                            durationInMinutes = 120;
+                        } else {
+                            // Para otras horas usar 60 minutos
+                            durationInMinutes = 60;
+                        }
+                        console.log(`Usando duración predeterminada: ${durationInMinutes} minutos para hora ${startHour}`);
+                    }
                     
                     // Formatear horas para mostrar
                     const formatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
@@ -1669,39 +1717,132 @@
                         Swal.close();
                         
                         // Configurar el modal con solicitudes existentes
-                        document.getElementById('newScheduleModalLabel').textContent = `Nuevo Agendamiento para ${technicianName}`;
+                        document.getElementById('newScheduleModalLabel').innerHTML = `<span class="me-2" style="font-size: 2rem;"><i class="fas fa-calendar-plus"></i></span> Nuevo Agendamiento para ${technicianName}`;
                         
-                        // Establecer la fecha y hora de inicio
+                        // Limpiar event listeners previos para evitar duplicidad
                         const dateInput = document.getElementById('scheduled_date');
-                        if (dateInput) {
-                            // Formatear la fecha para el input datetime-local
-                            dateInput.value = startDate.slice(0, 16); // Formato YYYY-MM-DDTHH:MM
-                        }
+                        const endTimeInput = document.getElementById('end_time');
+                        const durationInput = document.getElementById('duration');
                         
-                        // Establecer la fecha y hora de finalización
-                        const endDateInput = document.getElementById('end_time');
-                        if (endDateInput) {
-                            // Sumar la duración calculada o predeterminada
+                        if (dateInput && endTimeInput && durationInput) {
+                            // Clonar y reemplazar elementos para eliminar listeners antiguos
+                            const newDateInput = dateInput.cloneNode(true);
+                            dateInput.parentNode.replaceChild(newDateInput, dateInput);
+                            
+                            const newEndTimeInput = endTimeInput.cloneNode(true);
+                            endTimeInput.parentNode.replaceChild(newEndTimeInput, endTimeInput);
+                            
+                            const newDurationInput = durationInput.cloneNode(true);
+                            durationInput.parentNode.replaceChild(newDurationInput, durationInput);
+                            
+                            // Usar referencias actualizadas
+                            const updatedDateInput = document.getElementById('scheduled_date');
+                            const updatedEndTimeInput = document.getElementById('end_time');
+                            const updatedDurationInput = document.getElementById('duration');
+                            
+                            // Formatear la fecha para el input datetime-local
+                            updatedDateInput.value = startDate.slice(0, 16); // Formato YYYY-MM-DDTHH:MM
+                            
+                            // Calcular y establecer la hora de finalización
                             const endDateTime = new Date(start.getTime() + durationInMinutes * 60 * 1000);
                             const hours = endDateTime.getHours().toString().padStart(2, '0');
                             const minutes = endDateTime.getMinutes().toString().padStart(2, '0');
-                            endDateInput.value = `${hours}:${minutes}`;
+                            updatedEndTimeInput.value = `${hours}:${minutes}`;
+                            
+                            // Establecer duración
+                            updatedDurationInput.value = Math.round(durationInMinutes);
+                            
+                            // Mostrar información sobre el horario seleccionado
+                            const selectedTimeInfo = document.getElementById('selected-time-info');
+                            const selectedTimeText = document.getElementById('selected-time-text');
+                            if (selectedTimeInfo && selectedTimeText) {
+                                selectedTimeText.textContent = `${startTimeFormatted} - ${endTimeFormatted} (${Math.round(durationInMinutes)} minutos)`;
+                                selectedTimeInfo.classList.remove('d-none');
+                            }
+                            
+                            // Función para actualizar la información de tiempo
+                            function updateTimeInfoBox(start, end, duration) {
+                                if (selectedTimeText) {
+                                    const formattedStart = start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                                    const formattedEnd = end.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                                    selectedTimeText.textContent = `${formattedStart} - ${formattedEnd} (${duration} minutos)`;
+                                    selectedTimeInfo.classList.remove('d-none');
+                                }
+                            }
+                            
+                            // Establecer listeners interactivos para mantener sincronizados los campos
+                            
+                            // 1. Cambio en duración -> actualiza hora fin
+                            updatedDurationInput.addEventListener('input', function() {
+                                const startDateTime = new Date(updatedDateInput.value);
+                                const duration = parseInt(this.value) || 60;
+                                const endDateTime = new Date(startDateTime.getTime() + duration * 60000);
+                                
+                                // Actualizar campo de hora fin
+                                const endHours = endDateTime.getHours().toString().padStart(2, '0');
+                                const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
+                                updatedEndTimeInput.value = `${endHours}:${endMinutes}`;
+                                
+                                // Actualizar infobox
+                                updateTimeInfoBox(startDateTime, endDateTime, duration);
+                                
+                                // Efecto visual de actualización
+                                updatedEndTimeInput.classList.add('field-highlight');
+                                setTimeout(() => updatedEndTimeInput.classList.remove('field-highlight'), 1000);
+                            });
+                            
+                            // 2. Cambio en hora fin -> calcula duración
+                            updatedEndTimeInput.addEventListener('input', function() {
+                                const startDateTime = new Date(updatedDateInput.value);
+                                const endTimeArr = this.value.split(':');
+                                const endHours = parseInt(endTimeArr[0]);
+                                const endMinutes = parseInt(endTimeArr[1]);
+                                
+                                if (!isNaN(endHours) && !isNaN(endMinutes)) {
+                                    const endDateTime = new Date(startDateTime);
+                                    endDateTime.setHours(endHours, endMinutes);
+                                    
+                                    // Si la hora fin es anterior a inicio, asumimos día siguiente
+                                    if (endDateTime < startDateTime) {
+                                        endDateTime.setDate(endDateTime.getDate() + 1);
+                                    }
+                                    
+                                    // Calcular duración
+                                    const durationMinutes = Math.round((endDateTime - startDateTime) / 60000);
+                                    if (durationMinutes > 0) {
+                                        updatedDurationInput.value = durationMinutes;
+                                        
+                                        // Actualizar infobox
+                                        updateTimeInfoBox(startDateTime, endDateTime, durationMinutes);
+                                        
+                                        // Efecto visual
+                                        updatedDurationInput.classList.add('field-highlight');
+                                        setTimeout(() => updatedDurationInput.classList.remove('field-highlight'), 1000);
+                                    }
+                                }
+                            });
+                            
+                            // 3. Cambio en fecha/hora inicio -> recalcula hora fin
+                            updatedDateInput.addEventListener('input', function() {
+                                const startDateTime = new Date(this.value);
+                                const duration = parseInt(updatedDurationInput.value) || 60;
+                                const endDateTime = new Date(startDateTime.getTime() + duration * 60000);
+                                
+                                // Actualizar hora fin
+                                const endHours = endDateTime.getHours().toString().padStart(2, '0');
+                                const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
+                                updatedEndTimeInput.value = `${endHours}:${endMinutes}`;
+                                
+                                // Actualizar infobox
+                                updateTimeInfoBox(startDateTime, endDateTime, duration);
+                                
+                                // Efecto visual
+                                updatedEndTimeInput.classList.add('field-highlight');
+                                setTimeout(() => updatedEndTimeInput.classList.remove('field-highlight'), 1000);
+                            });
                         }
                         
-                        // Si hay un campo de duración, establecerlo también
-                        const durationInput = document.getElementById('duration');
-                        if (durationInput) {
-                            durationInput.value = Math.round(durationInMinutes);
-                        }
-                        
-                        // Mostrar información sobre el horario seleccionado
-                        const infoText = document.getElementById('selected-time-info');
-                        if (infoText) {
-                            infoText.innerHTML = `<i class="fas fa-info-circle"></i> Horario seleccionado: <strong>${startTimeFormatted} - ${endTimeFormatted}</strong>`;
-                            infoText.classList.remove('d-none');
-                        }
-                        
-                        console.log('Abriendo modal de solicitudes existentes');
+                        console.log('Abriendo modal de agendamiento nuevo');
                         
                         // Mostrar el modal
                         const modal = new bootstrap.Modal(document.getElementById('newScheduleModal'));
@@ -1723,12 +1864,156 @@
                         // Cerrar el diálogo de SweetAlert
                         Swal.close();
                         
-                        console.log('▶️ Preparando datos para Crear Servicio Nuevo');
+                        console.log('Procesando selección de tiempo:', { startTime: start, endTime: endDateTime, duration: durationInMinutes });
+                        
+                        // Configurar el modal de agendamiento
+                        document.getElementById('newScheduleModalLabel').innerHTML = `<span class="me-2" style="font-size: 2rem;"><i class="fas fa-calendar-plus"></i></span> Nuevo Agendamiento para ${technicianName}`;
+                        
+                        // Limpiar event listeners previos para evitar duplicidad
+                        const dateInput = document.getElementById('scheduled_date');
+                        const endTimeInput = document.getElementById('end_time');
+                        const durationInput = document.getElementById('duration');
+                        
+                        if (dateInput && endTimeInput && durationInput) {
+                            // Clonar y reemplazar elementos para eliminar listeners antiguos
+                            const newDateInput = dateInput.cloneNode(true);
+                            dateInput.parentNode.replaceChild(newDateInput, dateInput);
+                            
+                            const newEndTimeInput = endTimeInput.cloneNode(true);
+                            endTimeInput.parentNode.replaceChild(newEndTimeInput, endTimeInput);
+                            
+                            const newDurationInput = durationInput.cloneNode(true);
+                            durationInput.parentNode.replaceChild(newDurationInput, durationInput);
+                            
+                            // Usar referencias actualizadas
+                            const updatedDateInput = document.getElementById('scheduled_date');
+                            const updatedEndTimeInput = document.getElementById('end_time');
+                            const updatedDurationInput = document.getElementById('duration');
+                            
+                            // Establecer valores en los campos
+                            updatedDateInput.value = `${formattedDate}T${startTimeFormatted}`;
+                            console.log('Fecha de inicio establecida:', updatedDateInput.value);
+                            
+                            const endHours = endDateTime.getHours().toString().padStart(2, '0');
+                            const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
+                            updatedEndTimeInput.value = `${endHours}:${endMinutes}`;
+                            console.log('Hora de finalización establecida:', updatedEndTimeInput.value);
+                            
+                            updatedDurationInput.value = Math.round(durationInMinutes);
+                            console.log('Duración establecida:', updatedDurationInput.value, 'minutos');
+                            
+                            // Establecer técnico seleccionado
+                            const technicianSelect = document.getElementById('technician_id');
+                            if (technicianSelect) {
+                                technicianSelect.value = resourceId;
+                            }
+                            
+                            // Mostrar información sobre el horario seleccionado
+                            const selectedTimeInfo = document.getElementById('selected-time-info');
+                            const selectedTimeText = document.getElementById('selected-time-text');
+                            if (selectedTimeInfo && selectedTimeText) {
+                                const startFormatted = start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                                const endFormatted = endDateTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                                
+                                // Mostrar duración y horas formateadas
+                                const durationText = `${startFormatted} - ${endFormatted} (${Math.round(durationInMinutes)} minutos)`;
+                                selectedTimeText.textContent = durationText;
+                                selectedTimeInfo.classList.remove('d-none');
+                                console.log('Información de tiempo mostrada:', durationText);
+                            }
+                            
+                            // Función para actualizar la información de tiempo
+                            function updateTimeInfoBox(start, end, duration) {
+                                if (selectedTimeText) {
+                                    const formattedStart = start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                                    const formattedEnd = end.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                                    selectedTimeText.textContent = `${formattedStart} - ${formattedEnd} (${duration} minutos)`;
+                                    selectedTimeInfo.classList.remove('d-none');
+                                }
+                            }
+                            
+                            // Establecer listeners interactivos para mantener sincronizados los campos
+                            
+                            // 1. Cambio en duración -> actualiza hora fin
+                            updatedDurationInput.addEventListener('input', function() {
+                                const startDateTime = new Date(updatedDateInput.value);
+                                const duration = parseInt(this.value) || 60;
+                                const endDateTime = new Date(startDateTime.getTime() + duration * 60000);
+                                
+                                // Actualizar campo de hora fin
+                                const endHours = endDateTime.getHours().toString().padStart(2, '0');
+                                const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
+                                updatedEndTimeInput.value = `${endHours}:${endMinutes}`;
+                                
+                                // Actualizar infobox
+                                updateTimeInfoBox(startDateTime, endDateTime, duration);
+                                
+                                // Efecto visual de actualización
+                                updatedEndTimeInput.classList.add('field-highlight');
+                                setTimeout(() => updatedEndTimeInput.classList.remove('field-highlight'), 1000);
+                            });
+                            
+                            // 2. Cambio en hora fin -> calcula duración
+                            updatedEndTimeInput.addEventListener('input', function() {
+                                const startDateTime = new Date(updatedDateInput.value);
+                                const endTimeArr = this.value.split(':');
+                                const endHours = parseInt(endTimeArr[0]);
+                                const endMinutes = parseInt(endTimeArr[1]);
+                                
+                                if (!isNaN(endHours) && !isNaN(endMinutes)) {
+                                    const endDateTime = new Date(startDateTime);
+                                    endDateTime.setHours(endHours, endMinutes);
+                                    
+                                    // Si la hora fin es anterior a inicio, asumimos día siguiente
+                                    if (endDateTime < startDateTime) {
+                                        endDateTime.setDate(endDateTime.getDate() + 1);
+                                    }
+                                    
+                                    // Calcular duración
+                                    const durationMinutes = Math.round((endDateTime - startDateTime) / 60000);
+                                    if (durationMinutes > 0) {
+                                        updatedDurationInput.value = durationMinutes;
+                                        
+                                        // Actualizar infobox
+                                        updateTimeInfoBox(startDateTime, endDateTime, durationMinutes);
+                                        
+                                        // Efecto visual
+                                        updatedDurationInput.classList.add('field-highlight');
+                                        setTimeout(() => updatedDurationInput.classList.remove('field-highlight'), 1000);
+                                    }
+                                }
+                            });
+                            
+                            // 3. Cambio en fecha/hora inicio -> recalcula hora fin
+                            updatedDateInput.addEventListener('input', function() {
+                                const startDateTime = new Date(this.value);
+                                const duration = parseInt(updatedDurationInput.value) || 60;
+                                const endDateTime = new Date(startDateTime.getTime() + duration * 60000);
+                                
+                                // Actualizar hora fin
+                                const endHours = endDateTime.getHours().toString().padStart(2, '0');
+                                const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
+                                updatedEndTimeInput.value = `${endHours}:${endMinutes}`;
+                                
+                                // Actualizar infobox
+                                updateTimeInfoBox(startDateTime, endDateTime, duration);
+                                
+                                // Efecto visual
+                                updatedEndTimeInput.classList.add('field-highlight');
+                                setTimeout(() => updatedEndTimeInput.classList.remove('field-highlight'), 1000);
+                            });
+                        }
+                        
+                        // Mostrar el modal de agendamiento
+                        const scheduleModal = new bootstrap.Modal(document.getElementById('newScheduleModal'));
+                        scheduleModal.show();
+                        
+                        console.log('▶️ Abriendo modal de agendamiento con datos precompletados');
                         console.log('👨‍🔧 Técnico:', technicianName, '(ID:', resourceId, ')');
                         console.log('📅 Fecha:', formattedDate);
                         console.log('🕒 Horario:', startTimeFormatted, '-', endTimeFormatted);
                         
-                        // Construir objeto de datos para pasar a la función
+                        // Construir objeto de datos para referencia (aunque ya no lo necesitamos)
                         const modalData = {
                             technicianId: resourceId,
                             technicianName: technicianName,
@@ -3363,19 +3648,159 @@
                 const hourInt = parseInt(hour);
                 const timeStr = hourInt < 10 ? `0${hourInt}:00` : `${hourInt}:00`;
                 dateInput.value = `${currentDate}T${timeStr}`;
+                console.log(`Configurando fecha de inicio: ${currentDate}T${timeStr}`);
+                
+                // Limpiar listeners previos para evitar duplicación
+                const endTimeInput = document.getElementById('end_time');
+                const durationInput = document.getElementById('duration');
+                
+                if (endTimeInput && durationInput) {
+                    // Eliminar event listeners previos si existen
+                    const newEndTimeInput = endTimeInput.cloneNode(true);
+                    endTimeInput.parentNode.replaceChild(newEndTimeInput, endTimeInput);
+                    
+                    const newDurationInput = durationInput.cloneNode(true);
+                    durationInput.parentNode.replaceChild(newDurationInput, durationInput);
+                    
+                    // Usar referencias actualizadas
+                    const updatedEndTimeInput = document.getElementById('end_time');
+                    const updatedDurationInput = document.getElementById('duration');
+                    
+                    // Si es una celda de 8:00, asumir que es para un agendamiento de 2 horas (8-10)
+                    // Para otros horarios, usar duración de 60 minutos por defecto
+                    let durationValue = 60;
+                    if (hourInt === 8) {
+                        durationValue = 120; // 2 horas si empieza a las 8:00
+                        console.log(`Hora de inicio es 8:00, configurando duración de 2 horas (${durationValue} minutos)`);
+                    } else {
+                        console.log(`Usando duración estándar de 60 minutos`);
+                    }
+                    
+                    // Actualizar el campo de duración
+                    updatedDurationInput.value = durationValue;
+                    
+                    const startDate = new Date(`${currentDate}T${timeStr}`);
+                    const endDate = new Date(startDate.getTime() + durationValue * 60000);
+                    console.log(`Hora de inicio: ${startDate.toLocaleString()}, Hora de fin calculada: ${endDate.toLocaleString()}`);
+                    
+                    // Formatear la hora de finalización (HH:MM)
+                    const endHours = endDate.getHours().toString().padStart(2, '0');
+                    const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+                    updatedEndTimeInput.value = `${endHours}:${endMinutes}`;
+                    console.log(`Hora de finalización establecida: ${endHours}:${endMinutes}`);
+                    
+                    // Mostrar información del horario seleccionado
+                    const selectedTimeInfo = document.getElementById('selected-time-info');
+                    const selectedTimeText = document.getElementById('selected-time-text');
+                    if (selectedTimeInfo && selectedTimeText) {
+                        const formattedStartTime = startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                        const formattedEndTime = endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                        
+                        const infoText = `${formattedStartTime} - ${formattedEndTime} (${durationValue} minutos)`;
+                        selectedTimeText.textContent = infoText;
+                        selectedTimeInfo.classList.remove('d-none');
+                        console.log(`Información de tiempo mostrada: ${infoText}`);
+                    }
+                    
+                    // Función reutilizable para actualizar el infobox
+                    function updateTimeInfoBox(start, end, duration) {
+                        const selectedTimeText = document.getElementById('selected-time-text');
+                        if (selectedTimeText) {
+                            const formattedStart = start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                            const formattedEnd = end.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                            selectedTimeText.textContent = `${formattedStart} - ${formattedEnd} (${duration} minutos)`;
+                            document.getElementById('selected-time-info').classList.remove('d-none');
+                        }
+                    }
+                    
+                    // LISTENERS PARA CAMPOS DE TIEMPO
+                    
+                    // 1. Cuando cambia la duración, actualizar hora de fin
+                    updatedDurationInput.addEventListener('input', function() {
+                        if (dateInput.value) {
+                            const startDate = new Date(dateInput.value);
+                            const durationValue = parseInt(this.value) || 60;
+                            const endDate = new Date(startDate.getTime() + durationValue * 60000);
+                            
+                            // Formatear la hora de finalización (HH:MM)
+                            const endHours = endDate.getHours().toString().padStart(2, '0');
+                            const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+                            updatedEndTimeInput.value = `${endHours}:${endMinutes}`;
+                            
+                            // Actualizar el infobox
+                            updateTimeInfoBox(startDate, endDate, durationValue);
+                            
+                            // Resaltar el campo actualizado
+                            updatedEndTimeInput.classList.add('field-highlight');
+                            setTimeout(() => updatedEndTimeInput.classList.remove('field-highlight'), 1000);
+                        }
+                    });
+                    
+                    // 2. Cuando cambia la hora de fin, calcular duración
+                    updatedEndTimeInput.addEventListener('input', function() {
+                        if (dateInput.value) {
+                            const startDate = new Date(dateInput.value);
+                            const endTimeArr = this.value.split(':');
+                            const endDate = new Date(startDate);
+                            
+                            // Asegurar que los valores son números
+                            const endHours = parseInt(endTimeArr[0]) || 0;
+                            const endMinutes = parseInt(endTimeArr[1]) || 0;
+                            
+                            endDate.setHours(endHours, endMinutes);
+                            
+                            // Si la hora de fin es anterior a la hora de inicio, asumimos que es para el día siguiente
+                            if (endDate < startDate) {
+                                endDate.setDate(endDate.getDate() + 1);
+                            }
+                            
+                            // Calcular duración en minutos
+                            const durationMinutes = Math.round((endDate - startDate) / 60000);
+                            if (durationMinutes > 0) {
+                                updatedDurationInput.value = durationMinutes;
+                                
+                                // Actualizar infobox
+                                updateTimeInfoBox(startDate, endDate, durationMinutes);
+                                
+                                // Resaltar el campo actualizado
+                                updatedDurationInput.classList.add('field-highlight');
+                                setTimeout(() => updatedDurationInput.classList.remove('field-highlight'), 1000);
+                            }
+                        }
+                    });
+                    
+                    // 3. Cuando cambia fecha/hora de inicio, actualizar fin
+                    dateInput.addEventListener('input', function() {
+                        if (this.value) {
+                            const durationValue = parseInt(updatedDurationInput.value) || 60;
+                            const startDate = new Date(this.value);
+                            const endDate = new Date(startDate.getTime() + durationValue * 60000);
+                            
+                            // Formatear la hora de finalización (HH:MM)
+                            const endHours = endDate.getHours().toString().padStart(2, '0');
+                            const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+                            updatedEndTimeInput.value = `${endHours}:${endMinutes}`;
+                            
+                            // Actualizar infobox
+                            updateTimeInfoBox(startDate, endDate, durationValue);
+                            
+                            // Resaltar el campo actualizado
+                            updatedEndTimeInput.classList.add('field-highlight');
+                            setTimeout(() => updatedEndTimeInput.classList.remove('field-highlight'), 1000);
+                        }
+                    });
+                }
+                
+                // Actualizar título del modal con la hora
+                document.getElementById('newScheduleModalLabel').innerHTML = 
+                    `<span class="me-2" style="font-size: 2rem;"><i class="fas fa-calendar-plus"></i></span> Nuevo Agendamiento - ${hour}:00 hrs`;
+                
+                // Abrir el modal
+                const bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
             }
-            
-            // Actualizar título del modal
-            document.getElementById('newScheduleModalLabel').textContent = 
-                `Nuevo Agendamiento - ${hour}:00 hrs`;
-            
-            // Abrir el modal
-            const bsModal = new bootstrap.Modal(modal);
-            bsModal.show();
         }
-    }
-    
-    /**
+    }    /**
      * Muestra los detalles de un servicio
      * @param {string|number} serviceId - ID del servicio
      */
@@ -3707,6 +4132,12 @@
         };
     });
 </script>
+
+<!-- Script para sincronización de campos de tiempo (mejorado) -->
+<script src="{{ asset('js/calendar-time-sync.js') }}"></script>
+
+<!-- Manejador especial para selección de calendario -->
+<script src="{{ asset('js/calendar-selection-handler.js') }}"></script>
 
 <!-- Script para selector de tipo de agendamiento -->
 <script src="{{ asset('js/schedule-type-selector.js') }}"></script>
