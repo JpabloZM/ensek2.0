@@ -24,11 +24,14 @@ document.addEventListener("DOMContentLoaded", function () {
             element.classList.remove("field-highlight");
         }, 1500);
     }
-    
+
     // Escuchar evento personalizado para preparar el modal
-    document.addEventListener('prepareDirectModal', function(event) {
-        console.log('📣 Evento prepareDirectModal recibido con datos:', event.detail);
-        
+    document.addEventListener("prepareDirectModal", function (event) {
+        console.log(
+            "📣 Evento prepareDirectModal recibido con datos:",
+            event.detail
+        );
+
         // Almacenar datos para uso posterior
         window.directModalData = event.detail;
     });
@@ -42,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("❌ ERROR: Modal no encontrado en la función global");
             return false;
         }
-        
+
         // Almacenar datos para uso posterior
         window.directModalData = data;
 
@@ -56,46 +59,67 @@ document.addEventListener("DOMContentLoaded", function () {
             return false;
         }
     };
-    
+
     // Elementos del formulario - Información del servicio
     const directServiceSelect = document.getElementById("direct_service_id");
-    const directDescriptionTextarea = document.getElementById("direct_description");
+    const directDescriptionTextarea =
+        document.getElementById("direct_description");
     const directAddressInput = document.getElementById("direct_address");
-    
+
     // Elementos del formulario - Información del cliente
     const directClientNameInput = document.getElementById("direct_client_name");
-    const directClientPhoneInput = document.getElementById("direct_client_phone");
-    const directClientEmailInput = document.getElementById("direct_client_email");
-    
+    const directClientPhoneInput = document.getElementById(
+        "direct_client_phone"
+    );
+    const directClientEmailInput = document.getElementById(
+        "direct_client_email"
+    );
+
     // Elementos del formulario - Programación
-    const directTechnicianSelect = document.getElementById("direct_technician_id");
-    const directScheduledDateInput = document.getElementById("direct_scheduled_date");
+    const directTechnicianSelect = document.getElementById(
+        "direct_technician_id"
+    );
+    const directScheduledDateInput = document.getElementById(
+        "direct_scheduled_date"
+    );
     const directStartTimeInput = document.getElementById("direct_start_time");
     const directEndTimeInput = document.getElementById("direct_end_time");
     const directDurationInput = document.getElementById("direct_duration");
-    const directEstimatedCostInput = document.getElementById("direct_estimated_cost");
-    
+    const directEstimatedCostInput = document.getElementById(
+        "direct_estimated_cost"
+    );
+
     // Elementos del formulario - Notas
     const directNotesTextarea = document.getElementById("direct_notes");
-    
+
     // Botón de envío
-    const submitButton = document.querySelector('#directScheduleForm button[type="submit"]');
-    
+    const submitButton = document.querySelector(
+        '#directScheduleForm button[type="submit"]'
+    );
+
     // Actualizar el título del modal con información de la cita
-    function updateModalTitle(technicianName, serviceName, date, startTime, endTime) {
-        const modalTitle = document.getElementById("newDirectScheduleModalLabel");
+    function updateModalTitle(
+        technicianName,
+        serviceName,
+        date,
+        startTime,
+        endTime
+    ) {
+        const modalTitle = document.getElementById(
+            "newDirectScheduleModalLabel"
+        );
         if (!modalTitle) return;
-        
+
         let title = "Nuevo Servicio";
-        
+
         if (technicianName) {
             title += ` - ${technicianName}`;
         }
-        
+
         if (startTime && endTime) {
             title += ` (${startTime} a ${endTime})`;
         }
-        
+
         modalTitle.innerHTML = title;
     }
 
@@ -107,12 +131,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (selectedOption && selectedOption.value) {
                 console.log("Opción seleccionada:", selectedOption.text);
-                
+
                 // Actualizar título del modal
-                const techName = directTechnicianSelect ? 
-                    directTechnicianSelect.options[directTechnicianSelect.selectedIndex]?.text : '';
+                const techName = directTechnicianSelect
+                    ? directTechnicianSelect.options[
+                          directTechnicianSelect.selectedIndex
+                      ]?.text
+                    : "";
                 updateModalTitle(techName, selectedOption.text);
-                
+
                 // Actualizar duración si está disponible
                 if (selectedOption.dataset.duration && directDurationInput) {
                     directDurationInput.value = selectedOption.dataset.duration;
@@ -122,20 +149,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Actualizar precio estimado si está disponible
                 if (selectedOption.dataset.price && directEstimatedCostInput) {
-                    directEstimatedCostInput.value = selectedOption.dataset.price;
+                    directEstimatedCostInput.value =
+                        selectedOption.dataset.price;
                     highlightField(directEstimatedCostInput);
                 }
             }
         });
     }
-    
+
     // Actualizar el título cuando cambia el técnico
     if (directTechnicianSelect) {
-        directTechnicianSelect.addEventListener("change", function() {
+        directTechnicianSelect.addEventListener("change", function () {
             const selectedTech = this.options[this.selectedIndex];
-            const selectedService = directServiceSelect ? 
-                directServiceSelect.options[directServiceSelect.selectedIndex]?.text : '';
-                
+            const selectedService = directServiceSelect
+                ? directServiceSelect.options[directServiceSelect.selectedIndex]
+                      ?.text
+                : "";
+
             if (selectedTech && selectedTech.value) {
                 updateModalTitle(selectedTech.text, selectedService);
             }
@@ -170,22 +200,40 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
 
                     // Formatear la hora para el input time
-                    const endHours = endDate.getHours().toString().padStart(2, "0");
-                    const endMinutes = endDate.getMinutes().toString().padStart(2, "0");
+                    const endHours = endDate
+                        .getHours()
+                        .toString()
+                        .padStart(2, "0");
+                    const endMinutes = endDate
+                        .getMinutes()
+                        .toString()
+                        .padStart(2, "0");
                     directEndTimeInput.value = `${endHours}:${endMinutes}`;
                     highlightField(directEndTimeInput);
-                    
+
                     // Actualizar título del modal con el rango de horas
-                    const techName = directTechnicianSelect ? 
-                        directTechnicianSelect.options[directTechnicianSelect.selectedIndex]?.text : '';
-                    const serviceName = directServiceSelect ? 
-                        directServiceSelect.options[directServiceSelect.selectedIndex]?.text : '';
-                    updateModalTitle(techName, serviceName, dateString, timeString, `${endHours}:${endMinutes}`);
+                    const techName = directTechnicianSelect
+                        ? directTechnicianSelect.options[
+                              directTechnicianSelect.selectedIndex
+                          ]?.text
+                        : "";
+                    const serviceName = directServiceSelect
+                        ? directServiceSelect.options[
+                              directServiceSelect.selectedIndex
+                          ]?.text
+                        : "";
+                    updateModalTitle(
+                        techName,
+                        serviceName,
+                        dateString,
+                        timeString,
+                        `${endHours}:${endMinutes}`
+                    );
                 }
             }
         }
     }
-    
+
     // Actualizar duración cuando cambia la hora de fin
     function updateDuration() {
         if (
@@ -202,15 +250,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Crear fechas para inicio y fin
                 const [startHours, startMinutes] = startTimeString.split(":");
                 const [endHours, endMinutes] = endTimeString.split(":");
-                
+
                 const startDate = new Date(dateString);
                 startDate.setHours(parseInt(startHours) || 0);
                 startDate.setMinutes(parseInt(startMinutes) || 0);
-                
+
                 const endDate = new Date(dateString);
                 endDate.setHours(parseInt(endHours) || 0);
                 endDate.setMinutes(parseInt(endMinutes) || 0);
-                
+
                 // Si la hora de fin es anterior a la de inicio, asumimos que es del día siguiente
                 if (endDate < startDate) {
                     endDate.setDate(endDate.getDate() + 1);
@@ -219,7 +267,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Calcular la duración en minutos
                 const durationMs = endDate.getTime() - startDate.getTime();
                 const durationMinutes = Math.round(durationMs / (60 * 1000));
-                
+
                 if (durationMinutes > 0) {
                     directDurationInput.value = durationMinutes;
                     highlightField(directDurationInput);
@@ -249,7 +297,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Inicializar formulario cuando se abre el modal
-    const directScheduleModal = document.getElementById("newDirectScheduleModal");
+    const directScheduleModal = document.getElementById(
+        "newDirectScheduleModal"
+    );
     if (directScheduleModal) {
         directScheduleModal.addEventListener("shown.bs.modal", function () {
             console.log("🎉 MODAL DIRECTO ABIERTO CORRECTAMENTE");
@@ -258,19 +308,29 @@ document.addEventListener("DOMContentLoaded", function () {
             setTimeout(() => {
                 if (directServiceSelect) {
                     directServiceSelect.focus();
-                    directServiceSelect.classList.add('border-highlight');
+                    directServiceSelect.classList.add("border-highlight");
                     setTimeout(() => {
-                        directServiceSelect.classList.remove('border-highlight');
+                        directServiceSelect.classList.remove(
+                            "border-highlight"
+                        );
                     }, 1500);
                 }
             }, 300);
 
             // Obtener datos precargados
-            let technicianId, technicianName, date, startTime, endTime, duration;
+            let technicianId,
+                technicianName,
+                date,
+                startTime,
+                endTime,
+                duration;
 
             // Intentar múltiples fuentes de datos
             if (window.directModalData) {
-                console.log("📌 Usando datos pasados globalmente:", window.directModalData);
+                console.log(
+                    "📌 Usando datos pasados globalmente:",
+                    window.directModalData
+                );
                 technicianId = window.directModalData.technicianId;
                 technicianName = window.directModalData.technicianName;
                 date = window.directModalData.date;
@@ -280,7 +340,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             // Del contenedor temporal
             else {
-                const tempDataHolder = document.getElementById("temp-modal-data");
+                const tempDataHolder =
+                    document.getElementById("temp-modal-data");
                 if (tempDataHolder) {
                     technicianId = tempDataHolder.dataset.technicianId;
                     technicianName = tempDataHolder.dataset.technicianName;
@@ -293,8 +354,15 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             // Aplicar los datos a los campos
-            console.log("Datos a aplicar:", { technicianId, technicianName, date, startTime, endTime, duration });
-            
+            console.log("Datos a aplicar:", {
+                technicianId,
+                technicianName,
+                date,
+                startTime,
+                endTime,
+                duration,
+            });
+
             // Actualizar título del modal
             updateModalTitle(technicianName, null, null, startTime, endTime);
 
@@ -324,13 +392,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 directTechnicianSelect.value = technicianId;
                 highlightField(directTechnicianSelect);
             }
-            
+
             // Establecer fecha de hoy si no hay fecha
-            if (!date && directScheduledDateInput && !directScheduledDateInput.value) {
+            if (
+                !date &&
+                directScheduledDateInput &&
+                !directScheduledDateInput.value
+            ) {
                 const today = new Date();
                 const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
+                const month = String(today.getMonth() + 1).padStart(2, "0");
+                const day = String(today.getDate()).padStart(2, "0");
                 directScheduledDateInput.value = `${year}-${month}-${day}`;
             }
         });
@@ -349,21 +421,21 @@ document.addEventListener("DOMContentLoaded", function () {
         directScheduleForm.addEventListener("submit", function (event) {
             // Campos requeridos según el controlador
             const requiredFields = [
-                directClientNameInput,        // client_name
-                directClientPhoneInput,       // client_phone
-                directServiceSelect,          // service_id
-                directDescriptionTextarea,    // description
-                directTechnicianSelect,       // technician_id
-                directScheduledDateInput,     // scheduled_date
-                directStartTimeInput,         // implícito para scheduled_date
-                directEndTimeInput            // end_time
+                directClientNameInput, // client_name
+                directClientPhoneInput, // client_phone
+                directServiceSelect, // service_id
+                directDescriptionTextarea, // description
+                directTechnicianSelect, // technician_id
+                directScheduledDateInput, // scheduled_date
+                directStartTimeInput, // implícito para scheduled_date
+                directEndTimeInput, // end_time
             ];
 
             let isValid = true;
             let firstInvalidField = null;
 
             // Validar campos requeridos
-            requiredFields.forEach(field => {
+            requiredFields.forEach((field) => {
                 if (field && !field.value) {
                     field.classList.add("is-invalid");
                     isValid = false;
@@ -375,24 +447,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!isValid) {
                 event.preventDefault();
-                
+
                 // Enfocar el primer campo inválido
                 if (firstInvalidField) {
                     firstInvalidField.focus();
                 }
-                
+
                 // Alerta de campos requeridos
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'Campos incompletos',
-                    text: 'Por favor complete todos los campos requeridos',
-                    confirmButtonColor: '#87c947'
+                    icon: "warning",
+                    title: "Campos incompletos",
+                    text: "Por favor complete todos los campos requeridos",
+                    confirmButtonColor: "#87c947",
                 });
             } else {
                 // Mostrar indicador de carga
                 if (submitButton) {
                     submitButton.disabled = true;
-                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Guardando...';
+                    submitButton.innerHTML =
+                        '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Guardando...';
                 }
             }
         });

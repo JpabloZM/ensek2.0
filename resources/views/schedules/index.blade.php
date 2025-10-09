@@ -389,198 +389,86 @@
     </div>
 </div>
 
-<!-- Modal para crear nuevo agendamiento -->
+
+<!-- Modal para crear nuevo agendamiento (Diseño alternativo) -->
 <div class="modal fade" id="newScheduleModal" tabindex="-1" aria-labelledby="newScheduleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-lg-down modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header position-sticky top-0 bg-gradient-primary text-white" style="background: linear-gradient(to right, #004122, #045a30); z-index: 1050;">
-                <h5 class="modal-title" id="newScheduleModalLabel">
-                    <i class="fas fa-calendar-plus me-2"></i>Nuevo Agendamiento
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="background: linear-gradient(120deg, #f8f9fa 60%, #e9f5ee 100%);">
+            <div class="modal-header bg-white border-0" style="border-bottom: 2px solid #87c947;">
+                <h5 class="modal-title d-flex align-items-center fw-bold text-success" id="newScheduleModalLabel">
+                    <span class="me-2" style="font-size: 2rem;"><i class="fas fa-calendar-plus"></i></span> Nuevo Agendamiento
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('admin.schedules.store-direct') }}" method="POST">
                 @csrf
                 <input type="hidden" name="direct_scheduling" value="1">
-                
-                <div class="modal-body p-3 p-md-4" style="max-height: 70vh; overflow-y: auto;">
-                    <!-- Alerta para horario seleccionado -->
-                    <div class="alert alert-info d-none mb-4" id="selected-time-info" style="border-left: 4px solid #0dcaf0;">
-                    </div>
-                    
-                    <!-- Sección de servicio y cliente -->
-                    <div class="card border-0 rounded-3 shadow-sm hover-card mb-4">
-                        <div class="card-header bg-white py-3 border-bottom">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-circle bg-primary text-white me-3">
-                                    <i class="fas fa-tools"></i>
-                                </div>
-                                <h6 class="mb-0 fw-bold text-primary">Servicio y Cliente</h6>
-                            </div>
-                        </div>
-                        <div class="card-body p-3 p-md-4">
-                            <div class="row g-3">
-                                <div class="col-lg-6 col-md-12">
-                                    <label for="service_id" class="form-label fw-semibold">
-                                        <i class="fas fa-tools me-1 text-primary"></i>
-                                        Servicio a Programar
-                                    </label>
-                                    <select class="form-select border-0 shadow-sm select-hover" id="service_id" name="service_id" required style="background-color: #f8f9fa; padding: 12px;">
+                <div class="modal-body px-3 py-4" style="max-height: 70vh; overflow-y: auto;">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-tools fa-lg me-2"></i>Servicio</h6>
+                                    <select class="form-select form-select-lg border-0 mb-2" id="service_id" name="service_id" required style="background-color: #e9f5ee;">
                                         <option value="">Seleccione un servicio...</option>
                                         @foreach($services as $service)
-                                            <option value="{{ $service->id }}">
-                                                {{ $service->name }}
-                                            </option>
+                                            <option value="{{ $service->id }}">{{ $service->name }}</option>
                                         @endforeach
                                     </select>
-                                    <small class="text-muted mt-1 d-block">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        Seleccione el servicio que desea programar
-                                    </small>
-                                </div>
-                                
-                                <div class="col-lg-6 col-md-12">
-                                    <label for="technician_id" class="form-label fw-semibold">
-                                        <i class="fas fa-user-hard-hat me-1 text-primary"></i>
-                                        Técnico Asignado
-                                    </label>
-                                    <select class="form-select border-0 shadow-sm select-hover" id="technician_id" name="technician_id" required style="background-color: #f8f9fa; padding: 12px;">
+                                    <h6 class="fw-bold text-primary mt-4 mb-3"><i class="fas fa-user-hard-hat fa-lg me-2"></i>Técnico</h6>
+                                    <select class="form-select form-select-lg border-0" id="technician_id" name="technician_id" required style="background-color: #e9f5ee;">
                                         <option value="">Seleccione un técnico...</option>
                                         @foreach($technicians as $technician)
-                                            <option value="{{ $technician->id }}">
-                                                {{ $technician->user->name }}
-                                            </option>
+                                            <option value="{{ $technician->id }}">{{ $technician->user->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                
-                                <div class="col-lg-6 col-md-12">
-                                    <label for="client_name" class="form-label fw-semibold">
-                                        <i class="fas fa-user me-1 text-primary"></i>
-                                        Nombre del Cliente
-                                    </label>
-                                    <input type="text" class="form-control border-0 shadow-sm input-hover" 
-                                        id="client_name" name="client_name" required style="background-color: #f8f9fa; padding: 12px;" 
-                                        placeholder="Ingrese el nombre del cliente">
-                                </div>
-                                
-                                <div class="col-lg-6 col-md-12">
-                                    <label for="client_phone" class="form-label fw-semibold">
-                                        <i class="fas fa-phone-alt me-1 text-primary"></i>
-                                        Teléfono de Contacto
-                                    </label>
-                                    <input type="tel" class="form-control border-0 shadow-sm input-hover" 
-                                        id="client_phone" name="client_phone" style="background-color: #f8f9fa; padding: 12px;" 
-                                        placeholder="Ingrese el teléfono de contacto">
+                            </div>
+                            <div class="card border-0 shadow-sm rounded-4">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-user fa-lg me-2"></i>Cliente</h6>
+                                    <input type="text" class="form-control form-control-lg border-0 mb-3" id="client_name" name="client_name" required style="background-color: #e9f5ee;" placeholder="Nombre del cliente">
+                                    <input type="tel" class="form-control form-control-lg border-0 mb-3" id="client_phone" name="client_phone" style="background-color: #e9f5ee;" placeholder="Teléfono de contacto">
+                                    <input type="email" class="form-control form-control-lg border-0" id="client_email" name="client_email" style="background-color: #e9f5ee;" placeholder="Correo electrónico">
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Sección de programación y costos -->
-                    <div class="card border-0 rounded-3 shadow-sm hover-card mb-4">
-                        <div class="card-header bg-white py-3 border-bottom">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-circle bg-info text-white me-3">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </div>
-                                <h6 class="mb-0 fw-bold text-info">Programación y Costos</h6>
-                            </div>
-                        </div>
-                        <div class="card-body p-3 p-md-4">
-                            <div class="row g-3">
-                                <div class="col-lg-6 col-md-12">
-                                    <label for="scheduled_date" class="form-label fw-semibold">
-                                        <i class="fas fa-calendar-day me-1 text-info"></i>
-                                        Fecha y Hora de Inicio
-                                    </label>
-                                    <input type="datetime-local" class="form-control border-0 shadow-sm input-hover" 
-                                        id="scheduled_date" name="scheduled_date" required style="background-color: #f8f9fa; padding: 12px;">
-                                </div>
-                                
-                                <div class="col-lg-6 col-md-12">
-                                    <label for="end_time" class="form-label fw-semibold">
-                                        <i class="fas fa-hourglass-end me-1 text-info"></i>
-                                        Hora de Finalización
-                                    </label>
-                                    <input type="time" class="form-control border-0 shadow-sm input-hover" 
-                                        id="end_time" name="end_time" required style="background-color: #f8f9fa; padding: 12px;">
-                                </div>
-                                
-                                <div class="col-lg-6 col-md-12">
-                                    <label for="duration" class="form-label fw-semibold">
-                                        <i class="fas fa-clock me-1 text-info"></i>
-                                        Duración (minutos)
-                                    </label>
-                                    <div class="input-group shadow-sm">
-                                        <input type="number" class="form-control border-0 input-hover" 
-                                            id="duration" name="duration" min="15" step="15" value="60" 
-                                            style="background-color: #f8f9fa; padding: 12px;">
-                                        <span class="input-group-text bg-info text-white border-0">
-                                            <i class="fas fa-stopwatch"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-lg-6 col-md-12">
-                                    <label for="estimated_cost" class="form-label fw-semibold">
-                                        <i class="fas fa-hand-holding-usd me-1 text-info"></i>
-                                        Costo Estimado ($)
-                                    </label>
-                                    <div class="input-group shadow-sm">
-                                        <span class="input-group-text bg-info text-white border-0">
-                                            <i class="fas fa-dollar-sign"></i>
-                                        </span>
-                                        <input type="number" class="form-control border-0 input-hover" 
-                                            id="estimated_cost" name="estimated_cost" step="0.01" 
-                                            style="background-color: #f8f9fa; padding: 12px;">
-                                    </div>
-                                </div>
-                                
-                                <div class="col-12 mt-3">
-                                    <div class="form-check form-switch ps-0">
-                                        <div class="d-flex align-items-center">
-                                            <input class="form-check-input me-2" type="checkbox" role="switch" 
-                                                id="send_notification" name="send_notification" checked 
-                                                style="width: 3rem; height: 1.5rem;">
-                                            <label class="form-check-label fw-semibold" for="send_notification">
-                                                <i class="fas fa-envelope-open-text me-1 text-info"></i>
-                                                Enviar notificación al cliente
-                                            </label>
-                                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-4">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-info mb-3"><i class="fas fa-calendar-alt fa-lg me-2"></i>Programación</h6>
+                                    <label for="scheduled_date" class="form-label fw-semibold">Fecha y Hora de Inicio</label>
+                                    <input type="datetime-local" class="form-control form-control-lg border-0 mb-3" id="scheduled_date" name="scheduled_date" required style="background-color: #e9f5ee;">
+                                    <label for="end_time" class="form-label fw-semibold">Hora de Finalización</label>
+                                    <input type="time" class="form-control form-control-lg border-0 mb-3" id="end_time" name="end_time" required style="background-color: #e9f5ee;">
+                                    <label for="duration" class="form-label fw-semibold">Duración (minutos)</label>
+                                    <input type="number" class="form-control form-control-lg border-0 mb-3" id="duration" name="duration" min="15" step="15" value="60" style="background-color: #e9f5ee;">
+                                    <label for="estimated_cost" class="form-label fw-semibold">Costo Estimado ($)</label>
+                                    <input type="number" class="form-control form-control-lg border-0 mb-3" id="estimated_cost" name="estimated_cost" step="0.01" style="background-color: #e9f5ee;">
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="send_notification" name="send_notification" checked>
+                                        <label class="form-check-label fw-semibold" for="send_notification">Enviar notificación al cliente</label>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Sección de notas -->
-                    <div class="card border-0 rounded-3 shadow-sm hover-card">
-                        <div class="card-header bg-white py-3 border-bottom">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-circle bg-success text-white me-3">
-                                    <i class="fas fa-sticky-note"></i>
+                        
+                        <!-- Sección de notas adicionales que ocupa todo el ancho -->
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm rounded-4">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-success mb-3"><i class="fas fa-sticky-note fa-lg me-2"></i>Notas Adicionales</h6>
+                                    <textarea class="form-control border-0" id="notes" name="notes" rows="4" placeholder="Instrucciones especiales, requerimientos o detalles adicionales del servicio..." style="background-color: #e9f5ee;"></textarea>
                                 </div>
-                                <h6 class="mb-0 fw-bold text-success">Notas Adicionales</h6>
-                            </div>
-                        </div>
-                        <div class="card-body p-3 p-md-4">
-                            <textarea class="form-control border-0 shadow-sm input-hover" id="notes" name="notes" rows="3" 
-                                placeholder="Instrucciones especiales, requerimientos o detalles adicionales del servicio..." 
-                                style="background-color: #f8f9fa; resize: none; padding: 12px;"></textarea>
-                            <div class="text-muted small mt-2">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Estas notas son visibles para el técnico asignado y ayudan a preparar mejor el servicio.
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="modal-footer position-sticky bottom-0 bg-light p-3 border-top" style="z-index: 1050;">
-                    <button type="button" class="btn btn-outline-secondary px-4 py-2" data-bs-dismiss="modal">
+                <div class="modal-footer bg-white border-0 pt-3">
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>Cancelar
                     </button>
-                    <button type="submit" class="btn btn-primary px-4 py-2" style="background-color: #004122; border: none;">
+                    <button type="submit" class="btn btn-success btn-lg px-4">
                         <i class="fas fa-calendar-check me-2"></i>Programar Servicio
                     </button>
                 </div>
@@ -590,49 +478,37 @@
 </div>
 
 <style>
-    /* Estilos para el ícono circular */
-    .icon-circle {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
+    /* Estilo alternativo para el modal de agendamiento */
+    .modal-content {
+        border-radius: 1.5rem !important;
     }
-    
-    /* Efectos de hover para tarjetas y campos */
-    .hover-card {
-        transition: all 0.3s ease;
+    .card {
+        border-radius: 1.25rem !important;
+        transition: box-shadow 0.2s;
     }
-    
-    .hover-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+    .card:hover {
+        box-shadow: 0 8px 24px rgba(87, 201, 71, 0.12) !important;
     }
-    
-    .input-hover:focus, .select-hover:focus {
-        box-shadow: 0 0 0 3px rgba(0, 65, 34, 0.1) !important;
-        border-color: #004122 !important;
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 2px #87c94733 !important;
+        border-color: #87c947 !important;
     }
-    
-    /* Estilo para área de scroll */
+    .modal-header {
+        border-radius: 1.5rem 1.5rem 0 0 !important;
+    }
+    .modal-footer {
+        border-radius: 0 0 1.5rem 1.5rem !important;
+    }
     .modal-body::-webkit-scrollbar {
         width: 8px;
     }
-    
-    .modal-body::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-    
     .modal-body::-webkit-scrollbar-thumb {
         background: #87c947;
-        border-radius: 10px;
+        border-radius: 8px;
     }
-    
-    .modal-body::-webkit-scrollbar-thumb:hover {
-        background: #004122;
+    .modal-body::-webkit-scrollbar-track {
+        background: #e9f5ee;
+        border-radius: 8px;
     }
 </style>
 
