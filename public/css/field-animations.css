@@ -1,0 +1,44 @@
+/* Animaciones y efectos para los campos del formulario */
+
+/* Resaltado cuando un campo se actualiza automáticamente */
+@keyframes highlight-field {
+    0% {
+        background-color: #ffffff;
+    }
+    50% {
+        background-color: #e5f6fd;
+    }
+    100% {
+        background-color: #ffffff;
+    }
+}
+
+.field-highlight {
+    animation: highlight-field 1s ease;
+    transition: all 0.3s ease;
+}
+
+/* Resaltado para los bordes */
+@keyframes highlight-border {
+    0% {
+        border-color: #ced4da;
+    }
+    50% {
+        border-color: #0dcaf0;
+        border-width: 2px;
+    }
+    100% {
+        border-color: #ced4da;
+    }
+}
+
+.border-highlight {
+    animation: highlight-border 1.5s ease;
+}
+
+/* Transición suave para todos los campos */
+input,
+select,
+textarea {
+    transition: all 0.2s ease-in-out;
+}

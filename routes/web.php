@@ -90,6 +90,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::patch('/schedules/{schedule}/update-duration', [ScheduleController::class, 'updateDuration'])->name('admin.schedules.updateDuration');
         Route::get('/api/schedules', [ScheduleController::class, 'getCalendarData'])->name('api.schedules');
         Route::get('/schedules/{schedule}/json', [ScheduleController::class, 'getJson'])->name('admin.schedules.json');
+        Route::post('/schedules/schedule-request', [ScheduleController::class, 'scheduleRequest'])->name('admin.schedules.schedule-request');
         
         // Agendamiento directo (sin solicitud previa)
         Route::post('/schedules/direct', [DirectScheduleController::class, 'store'])->name('admin.schedules.store-direct');

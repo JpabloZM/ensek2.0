@@ -1,9 +1,10 @@
 /**
  * Calendar Time Synchronization
  * Script para sincronizar los campos de tiempo en el formulario de agendamiento
+ * Versión 3: Mejorada para resolver problemas de sincronización
  */
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("🔄 Inicializando sincronización de campos de tiempo (v2)");
+    console.log("🔄 Inicializando sincronización de campos de tiempo (v3)");
 
     // Función para sincronizar campos de tiempo en el modal de agendamiento
     window.syncTimeFields = function (

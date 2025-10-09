@@ -82,6 +82,13 @@ class DirectScheduleController extends Controller
             $schedule->technician_id = $validated['technician_id'];
             $schedule->scheduled_date = $validated['scheduled_date'];
             $schedule->duration = $durationInMinutes;
+            
+            // Calcular hora de finalización estimada
+            $startDateTime = new \DateTime($validated['scheduled_date']);
+            $endDateTime = clone $startDateTime;
+            $endDateTime->modify("+{$durationInMinutes} minutes");
+            $schedule->estimated_end_time = $endDateTime;
+            
             $schedule->status = $validated['status'] ?? 'pendiente';
             $schedule->notes = $validated['notes'] ?? null;
             

@@ -7,6 +7,7 @@ use App\Models\ServiceRequest;
 use App\Models\Technician;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class ScheduleController extends Controller
@@ -471,5 +472,76 @@ class ScheduleController extends Controller
             'description' => $schedule->serviceRequest->description,
             'completed_at' => $schedule->completed_at ? $schedule->completed_at->format('Y-m-d H:i:s') : null
         ]);
+    }
+    
+    /**
+     * Agenda una solicitud de servicio existente.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function scheduleRequest(Request $request)
+    {
+        // Validar datos
+        $validated = $request->validate([
+            'service_request_id' => 'required|exists:service_requests,id',
+            'technician_id' => 'required|exists:technicians,id',
+            'scheduled_date' => 'required|date',
+            'duration' => 'nullable|integer|min:15',
+            'notes' => 'nullable|string|max:500'
+        ]);
+        
+        try {
+            // Usar transacción de DB
+            
+            DB::beginTransaction();
+            
+            // Verificar que la solicitud está pendiente
+            $serviceRequest = ServiceRequest::findOrFail($validated['service_request_id']);
+            if ($serviceRequest->status !== 'pendiente') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Esta solicitud ya ha sido agendada o procesada.'
+                ], 422);
+            }
+            
+            // Convertir la fecha programada a objeto DateTime
+            $scheduledDate = new \DateTime($validated['scheduled_date']);
+            
+            // Calcular hora de finalización
+            $duration = $validated['duration'] ?? 60;
+            $estimatedEndTime = (clone $scheduledDate)->modify("+{$duration} minutes");
+            
+            // Crear el agendamiento
+            $schedule = new Schedule();
+            $schedule->service_request_id = $serviceRequest->id;
+            $schedule->technician_id = $validated['technician_id'];
+            $schedule->scheduled_date = $scheduledDate;
+            $schedule->estimated_end_time = $estimatedEndTime;
+            $schedule->duration = $duration;
+            $schedule->status = 'pendiente';
+            $schedule->notes = $validated['notes'] ?? null;
+            $schedule->confirmation_status = 'pending';
+            $schedule->save();
+            
+            // Actualizar el estado de la solicitud a "agendado"
+            $serviceRequest->status = 'agendado';
+            $serviceRequest->save();
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Solicitud agendada correctamente.',
+                'schedule_id' => $schedule->id
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al agendar la solicitud: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

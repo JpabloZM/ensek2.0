@@ -13,30 +13,9 @@
 <!-- Estilos específicos para botón de servicio directo -->
 <link rel="stylesheet" href="{{ asset('css/direct-service-button.css') }}">
 
-<!-- Estilos para el resaltado de campos en el modal directo -->
-<style>
-    /* Resaltado para campos que se actualizan automáticamente */
-    .field-highlight {
-        animation: highlight-pulse 1s ease-in-out;
-    }
-    
-    /* Resaltado específico para el selector de servicios */
-    .border-highlight {
-        animation: border-pulse 1.5s ease-in-out;
-    }
-    
-    /* Animaciones de pulso */
-    @keyframes highlight-pulse {
-        0% { background-color: transparent; }
-        50% { background-color: rgba(135, 201, 71, 0.3); }
-        100% { background-color: transparent; }
-    }
-    
-    @keyframes border-pulse {
-        0% { box-shadow: 0 0 0 0 rgba(0, 65, 34, 0.7); }
-        50% { box-shadow: 0 0 0 5px rgba(0, 65, 34, 0.5); }
-        100% { box-shadow: 0 0 0 0 rgba(0, 65, 34, 0); }
-    }
+<!-- Estilos para el resaltado de campos en modales -->
+<link rel="stylesheet" href="{{ asset('css/field-animations.css') }}">
+    /* Los estilos de animación ahora están en field-animations.css */
     
     /* Estilos para los servicios en el select */
     #direct_service_id option {
@@ -230,9 +209,17 @@
                                 <p class="mb-1 fw-semibold">{{ $request->client_name }}</p>
                                 <small class="d-block mb-3 text-secondary">{{ Str::limit($request->description, 60) }}</small>
                                 <div class="btn-group btn-group-sm w-100" role="group">
-                                    <a href="{{ route('admin.schedules.create', ['service_request_id' => $request->id]) }}" class="btn btn-sm" style="background-color: #87c947; color: #004122; flex: 1; border: none;">
+                                    <button data-service-request-id="{{ $request->id }}" 
+                                           data-client-name="{{ $request->client_name }}"
+                                           data-client-phone="{{ $request->client_phone }}"
+                                           data-client-email="{{ $request->client_email ?? '' }}"
+                                           data-service-id="{{ $request->service_id }}"
+                                           data-service-name="{{ $request->service->name }}"
+                                           data-description="{{ $request->description }}"
+                                           data-address="{{ $request->address ?? '' }}"
+                                           class="btn btn-sm schedule-from-request" style="background-color: #87c947; color: #004122; flex: 1; border: none;">
                                         <i class="fas fa-calendar-plus"></i> Agendar
-                                    </a>
+                                    </button>
                                     <a href="{{ route('admin.service-requests.show', $request->id) }}" class="btn btn-sm btn-outline-secondary" style="flex: 1; border-color: #dee2e6;">
                                         <i class="fas fa-eye"></i> Ver
                                     </a>
@@ -486,6 +473,204 @@
                     </button>
                 </div>
             </form>
+            
+            <script>
+                // Script directo para el cálculo de hora y duración en el modal principal
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Elementos principales
+                    const dateTimeInput = document.getElementById('scheduled_date');
+                    const endTimeInput = document.getElementById('end_time');
+                    const durationInput = document.getElementById('duration');
+                    const infoBox = document.getElementById('selected-time-info');
+                    const infoText = infoBox ? infoBox.querySelector(".selected-time-text") : null;
+                    
+                    // 1. CAMBIO EN FECHA/HORA DE INICIO
+                    if (dateTimeInput) {
+                        dateTimeInput.addEventListener('input', function() {
+                            console.log("📅 Cambio en fecha/hora inicio");
+                            calculateEndTime();
+                        });
+                    }
+                    
+                    // 2. CAMBIO EN DURACIÓN
+                    if (durationInput) {
+                        durationInput.addEventListener('input', function() {
+                            console.log("⏱️ Cambio en duración");
+                            calculateEndTime();
+                        });
+                    }
+                    
+                    // 3. CAMBIO EN HORA FIN
+                    if (endTimeInput) {
+                        endTimeInput.addEventListener('input', function() {
+                            console.log("🕒 Cambio en hora fin");
+                            calculateDuration();
+                        });
+                    }
+                    
+                    // Calcular hora de fin basado en inicio y duración
+                    function calculateEndTime() {
+                        if (!dateTimeInput || !dateTimeInput.value || !durationInput || !endTimeInput) return;
+                        
+                        try {
+                            const startDateTime = new Date(dateTimeInput.value);
+                            const durationMins = parseInt(durationInput.value) || 60;
+                            
+                            const endDateTime = new Date(startDateTime.getTime() + durationMins * 60000);
+                            const hours = endDateTime.getHours().toString().padStart(2, '0');
+                            const minutes = endDateTime.getMinutes().toString().padStart(2, '0');
+                            
+                            endTimeInput.value = `${hours}:${minutes}`;
+                            
+                            // Aplicar efecto visual
+                            endTimeInput.classList.add('field-highlight');
+                            setTimeout(() => endTimeInput.classList.remove('field-highlight'), 1000);
+                            
+                            // Actualizar infoBox
+                            updateInfoBox(startDateTime, endDateTime, durationMins);
+                            
+                        } catch (error) {
+                            console.error('Error calculando hora fin:', error);
+                        }
+                    }
+                    
+                    // Calcular duración basado en inicio y fin
+                    function calculateDuration() {
+                        if (!dateTimeInput || !dateTimeInput.value || !endTimeInput || !endTimeInput.value || !durationInput) return;
+                        
+                        try {
+                            const startDateTime = new Date(dateTimeInput.value);
+                            
+                            // Parsear hora fin
+                            const [hours, minutes] = endTimeInput.value.split(':').map(Number);
+                            const endDateTime = new Date(startDateTime);
+                            endDateTime.setHours(hours, minutes);
+                            
+                            // Si fin es antes que inicio, asumir día siguiente
+                            if (endDateTime < startDateTime) {
+                                endDateTime.setDate(endDateTime.getDate() + 1);
+                            }
+                            
+                            // Calcular diferencia en minutos
+                            const diffMins = Math.round((endDateTime - startDateTime) / 60000);
+                            
+                            // Actualizar campo duración
+                            durationInput.value = diffMins > 0 ? diffMins : 60;
+                            
+                            // Aplicar efecto visual
+                            durationInput.classList.add('field-highlight');
+                            setTimeout(() => durationInput.classList.remove('field-highlight'), 1000);
+                            
+                            // Actualizar infoBox
+                            updateInfoBox(startDateTime, endDateTime, diffMins);
+                            
+                        } catch (error) {
+                            console.error('Error calculando duración:', error);
+                        }
+                    }
+                    
+                    // Actualizar infoBox
+                    function updateInfoBox(start, end, duration) {
+                        if (!infoBox || !infoText) return;
+                        
+                        try {
+                            const formattedStart = start.toLocaleTimeString('es-ES', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            
+                            const formattedEnd = end.toLocaleTimeString('es-ES', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            
+                            infoText.textContent = `${formattedStart} - ${formattedEnd} (${duration} minutos)`;
+                            infoBox.classList.remove('d-none');
+                            
+                        } catch (error) {
+                            console.error('Error actualizando infoBox:', error);
+                        }
+                    }
+                    
+                    // Inicializar cálculos cuando se abre el modal
+                    document.querySelector('#newScheduleModal').addEventListener('shown.bs.modal', function() {
+                        console.log("🔄 Modal de agendamiento abierto - inicializando cálculos");
+                        
+                        // Primero, verificar si hay información de horario en el título del modal
+                        const modalTitle = document.querySelector('#newScheduleModalLabel');
+                        if (modalTitle) {
+                            const titleText = modalTitle.textContent || '';
+                            const timeMatch = titleText.match(/(\d{1,2}:\d{2}) a (\d{1,2}:\d{2})/);
+                            
+                            if (timeMatch && timeMatch.length === 3) {
+                                console.log("⚠️ Detectado título con horario:", timeMatch[1], "a", timeMatch[2]);
+                                
+                                // Si el modal tiene inicio/fin en el título, sincronizamos todo
+                                const startTime = timeMatch[1];
+                                const endTime = timeMatch[2];
+                                
+                                // Si tenemos fecha y hora, pero el final no coincide con el título
+                                if (dateTimeInput && dateTimeInput.value) {
+                                    // Extraer solo la hora del dateTimeInput
+                                    const currentTime = dateTimeInput.value.split('T')[1];
+                                    
+                                    // Si la hora ya está correcta, no hacemos nada
+                                    if (currentTime === startTime) {
+                                        console.log("✅ Hora de inicio ya coincide con el título");
+                                    } else {
+                                        // Si no coincide, actualizamos la fecha+hora
+                                        const currentDate = dateTimeInput.value.split('T')[0];
+                                        dateTimeInput.value = `${currentDate}T${startTime}`;
+                                        console.log("🔄 Hora de inicio actualizada según título:", startTime);
+                                    }
+                                    
+                                    // Actualizar hora de fin
+                                    endTimeInput.value = endTime;
+                                    console.log("🔄 Hora de fin actualizada según título:", endTime);
+                                    
+                                    // Calcular duración
+                                    try {
+                                        const startDateTime = new Date(dateTimeInput.value);
+                                        const [endHours, endMinutes] = endTime.split(':').map(Number);
+                                        const endDateTime = new Date(startDateTime);
+                                        endDateTime.setHours(endHours, endMinutes);
+                                        
+                                        // Si fin es antes que inicio, asumir día siguiente
+                                        if (endDateTime < startDateTime) {
+                                            endDateTime.setDate(endDateTime.getDate() + 1);
+                                        }
+                                        
+                                        const diffMins = Math.round((endDateTime - startDateTime) / 60000);
+                                        
+                                        if (diffMins > 0) {
+                                            durationInput.value = diffMins;
+                                            console.log("⏱️ Duración calculada:", diffMins, "minutos");
+                                        }
+                                        
+                                        // Actualizar infoBox
+                                        const infoBox = document.getElementById('selected-time-info');
+                                        if (infoBox) {
+                                            const infoText = infoBox.querySelector(".selected-time-text");
+                                            if (infoText) {
+                                                infoText.textContent = `${startTime} - ${endTime} (${diffMins} minutos)`;
+                                                infoBox.classList.remove('d-none');
+                                            }
+                                        }
+                                    } catch (error) {
+                                        console.error("Error calculando duración:", error);
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Si no se detectó información en el título o falló la sincronización,
+                        // intentar calcular con los valores actuales
+                        if (dateTimeInput && dateTimeInput.value && durationInput && durationInput.value) {
+                            calculateEndTime();
+                        }
+                    });
+                });
+            </script>
         </div>
     </div>
 </div>
@@ -1160,6 +1345,18 @@
 <!-- FullCalendar Scheduler (para vistas de recursos) -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@5.11.3/main.min.js"></script>
 
+<!-- Sweet Alert para diálogos interactivos -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Scripts personalizados -->
+<script src="{{ asset('js/service-request-scheduler.js') }}"></script>
+<script src="{{ asset('js/calendar-auto-refresh.js') }}"></script>
+
+<!-- Contenedor de datos para JavaScript -->
+<script type="application/json" id="technicians-data">
+    @json($technicians)
+</script>
+
 <!-- Tooltips y Popovers de Bootstrap -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1194,9 +1391,9 @@
             });
         }
         
-        // Inicializar el calendario con más funcionalidades
+        // Inicializar el calendario con más funcionalidades y guardarlo como variable global
         const calendarEl = document.getElementById('technician-calendar');
-        const calendar = new FullCalendar.Calendar(calendarEl, {
+        window.calendar = new FullCalendar.Calendar(calendarEl, {
             // Vista adaptable - Técnicos en columnas, horas en filas para una vista diaria
             initialView: isMobile ? 'timeGridDay' : 'resourceTimeGridDay',
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
@@ -4138,6 +4335,12 @@
 
 <!-- Manejador especial para selección de calendario -->
 <script src="{{ asset('js/calendar-selection-handler.js') }}"></script>
+
+<!-- Script para sincronización de duración basado en el servicio -->
+<script src="{{ asset('js/service-duration-sync.js') }}"></script>
+
+<!-- Script para arreglar problemas de cálculo de tiempo -->
+<script src="{{ asset('js/direct-time-fixer.js') }}"></script>
 
 <!-- Script para selector de tipo de agendamiento -->
 <script src="{{ asset('js/schedule-type-selector.js') }}"></script>
